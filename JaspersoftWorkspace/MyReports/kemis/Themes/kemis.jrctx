@@ -1,0 +1,89 @@
+<!-- Created with Jaspersoft Studio -->
+<chart-theme>
+  <chart-settings background-image-alignment="Align.TOP_RIGHT" background-image-alpha="1.0" border-visible="true" anti-alias="true" text-anti-alias="true">
+    <font/>
+    <padding top="1.1" left="2.2" bottom="3.3" right="4.4"/>
+    <background-paint type="color" color="#FFFFFF"/>
+    <border-paint type="color" color="#000000"/>
+    <stroke width="0.2"/>
+  </chart-settings>
+  <title-settings position="Top" show-title="true" horizontal-alignment="HorizontalAlignment.CENTER" vertical-alignment="VerticalAlignment.TOP">
+    <font font-name="Open Sans Semibold" font-size="12.0" bold="true"/>
+    <padding top="1.1" left="2.2" bottom="3.3" right="4.4"/>
+    <foreground-paint type="color" color="#000000"/>
+    <background-paint type="color" color="#FFFFFF"/>
+  </title-settings>
+  <subtitle-settings position="Top" show-title="true" horizontal-alignment="HorizontalAlignment.CENTER" vertical-alignment="VerticalAlignment.TOP">
+    <font font-name="Open Sans Semibold" font-size="8.0" bold="true"/>
+    <padding top="1.1" left="2.2" bottom="3.3" right="4.4"/>
+    <foreground-paint type="color" color="#000000"/>
+    <background-paint type="color" color="#FFFFFF"/>
+  </subtitle-settings>
+  <legend-settings position="Bottom" show-legend="true" horizontal-alignment="HorizontalAlignment.CENTER" vertical-alignment="VerticalAlignment.BOTTOM">
+    <font font-name="Open Sans" font-size="8.0" bold="false"/>
+    <frame type="block-border">
+      <insets top="0.0" left="0.0" bottom="0.0" right="0.0"/>
+      <paint type="color" color="#FFFFFF"/>
+    </frame>
+    <padding top="1.1" left="2.2" bottom="3.3" right="4.4"/>
+    <foreground-paint type="color" color="#000000"/>
+    <background-paint type="color" color="#FFFFFF"/>
+  </legend-settings>
+  <plot-settings orientation="PlotOrientation.VERTICAL" background-image-alpha="0.5" background-image-alignment="Align.TOP_LEFT" label-rotation="0.0" outline-visible="false" domain-gridline-visible="true" range-gridline-visible="true">
+    <padding top="1.1" left="2.2" bottom="3.3" right="4.4"/>
+    <background-paint type="color" color="#FFFFFF"/>
+    <background-alpha>0.0</background-alpha>
+    <outline-paint type="color" color="#000000"/>
+    <stroke width="1.0"/>
+    <series-color-sequence type="color" color="#263764"/>
+    <series-color-sequence type="color" color="#84457E"/>
+    <series-color-sequence type="color" color="#D95E7E"/>
+    <series-color-sequence type="color" color="#FF945F"/>
+    <series-color-sequence type="color" color="#F7D530"/>
+    <series-outline-paint-sequence type="color" color="#1B2F64"/>
+    <series-outline-paint-sequence type="color" color="#843A7D"/>
+    <series-outline-paint-sequence type="color" color="#D9496E"/>
+    <series-outline-paint-sequence type="color" color="#FF8243"/>
+    <series-outline-paint-sequence type="color" color="#F7D00D"/>
+    <series-stroke-sequence width="2.0"/>
+    <series-stroke-sequence width="2.0"/>
+    <series-stroke-sequence width="2.0"/>
+    <series-stroke-sequence width="2.0"/>
+    <series-stroke-sequence width="2.0"/>
+    <series-outline-stroke-sequence width="3.0"/>
+    <series-outline-stroke-sequence width="3.0"/>
+    <series-outline-stroke-sequence width="3.0"/>
+    <series-outline-stroke-sequence width="3.0"/>
+    <series-outline-stroke-sequence width="3.0"/>
+    <domain-gridline-paint type="color" color="#000000"/>
+    <domain-gridline-stroke width="0.2"/>
+    <range-gridline-paint type="color" color="#000000"/>
+    <range-gridline-stroke width="0.2"/>
+    <tick-label-font font-name="Open Sans" font-size="6.0" bold="true"/>
+    <display-font font-name="Open Sans" font-size="6.0" bold="true"/>
+  </plot-settings>
+  <domain-axis-settings visible="true" location="AxisLocation.BOTTOM_OR_RIGHT" line-visible="true" label-angle="0.0" label-visible="true" tick-labels-visible="true" tick-marks-inside-length="0.1" tick-marks-outside-length="0.2" tick-marks-visible="true" tick-count="5">
+    <line-paint type="color" color="#FFFFFF"/>
+    <line-stroke width="1.0"/>
+    <label-paint type="color" color="#000000"/>
+    <label-font font-name="Open Sans" font-size="8.0" bold="true" italic="false"/>
+    <label-insets top="0.5" left="0.5" bottom="1.0" right="1.0"/>
+    <tick-label-paint type="color" color="#00FFFF"/>
+    <tick-label-font font-name="Open Sans" font-size="8.0" bold="true" italic="true"/>
+    <tick-label-insets top="0.5" left="0.5" bottom="0.5" right="0.5"/>
+    <tick-marks-paint type="color" color="#000000"/>
+    <tick-marks-stroke width="1.0"/>
+  </domain-axis-settings>
+  <range-axis-settings visible="true" location="AxisLocation.TOP_OR_RIGHT" line-visible="true" label-angle="1.5707963267948966" label-visible="true" tick-labels-visible="true" tick-marks-inside-length="0.2" tick-marks-outside-length="0.1" tick-marks-visible="true" tick-count="6">
+    <line-paint type="color" color="#FFFFFF"/>
+    <line-stroke width="1.0"/>
+    <label-paint type="color" color="#000000"/>
+    <label-font font-name="Open Sans" font-size="8.0" bold="true" italic="false"/>
+    <label-insets top="0.5" left="0.5" bottom="1.0" right="1.0"/>
+    <tick-label-paint type="color" color="#FFAFAF"/>
+    <tick-label-font font-name="Open Sans" font-size="8.0" bold="false" italic="true"/>
+    <tick-label-insets top="0.5" left="0.5" bottom="0.5" right="0.5"/>
+    <tick-marks-paint type="color" color="#000000"/>
+    <tick-marks-stroke width="1.0"/>
+  </range-axis-settings>
+</chart-theme>
