@@ -1,0 +1,652 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.2.final using JasperReports Library version 6.21.2-8434a0bd7c3bbc37cbf916f2968d35e4b165821a  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="School Exams Results by Exams and Candidates" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="df013db5-f76e-44d3-b0df-bcbc46d93160">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MIEMIS-TEST"/>
+	<property name="ireport.jasperserver.url" value="http://miemis.pss.edu.mh:8080/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/miemis/Exams/Exams_Teacher_Results_by_Nation"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/miemis/Exams/Exams_Teacher_Results_by_Nation_files/main_jrxml"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<template><![CDATA["repo:/Templates/MIEMIS_Style.jrtx"]]></template>
+	<style name="Row" mode="Transparent">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
+			<style backcolor="#ECECEC"/>
+		</conditionalStyle>
+	</style>
+	<style name="AchievementLevels" mode="Transparent" forecolor="#FFFFFF" backcolor="#FFFFFF">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{FinalLevel} == 1]]></conditionExpression>
+			<style mode="Opaque" forecolor="#C00000" backcolor="#C00000" fontName="Open Sans Semibold" fontSize="9">
+				<pen lineWidth="0.0"/>
+			</style>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{FinalLevel} == 2]]></conditionExpression>
+			<style mode="Opaque" forecolor="#FED966" backcolor="#FED966" fontName="Open Sans Semibold" fontSize="9">
+				<pen lineWidth="0.0"/>
+			</style>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{FinalLevel} == 3]]></conditionExpression>
+			<style mode="Opaque" forecolor="#92D14F" backcolor="#92D14F" fontName="Open Sans Semibold" fontSize="9">
+				<pen lineWidth="0.0"/>
+			</style>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{FinalLevel} == 4]]></conditionExpression>
+			<style mode="Opaque" forecolor="#00AF50" backcolor="#00AF50" fontName="Open Sans Semibold" fontSize="9">
+				<pen lineWidth="0.0"/>
+			</style>
+		</conditionalStyle>
+	</style>
+	<parameter name="Year" class="java.lang.Integer">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA[2021]]></defaultValueExpression>
+	</parameter>
+	<queryString language="SQL">
+		<![CDATA[SELECT [examCode]
+	  ,[examName]
+	  ,CONCAT([examCode],': ',[examName]) AS Exam
+      ,[examYear]
+	  ,[tID]
+	  ,[teacher]
+	  ,[examID]
+	  --,isnull(cast([Gender] as nvarchar(5)),'N/A') as [Gender]
+	  ,SUM([Candidates]) AS [Candidates]
+	  ,SUM(ISNULL([2], 0)) AS [Tot2]
+	  ,SUM(ISNULL([1], 0)) AS [Tot1]
+	  ,SUM(ISNULL([3], 0)) AS [Tot3]
+	  ,SUM(ISNULL([4], 0)) AS [Tot4]
+	  ,ROUND(ISNULL(convert(float, SUM([1])) / SUM(Candidates), 0), 2) * -1 as [1]
+      ,ROUND(ISNULL(convert(float, SUM([2])) / SUM(Candidates), 0), 2) * -1 as [2]
+	  ,ROUND(ISNULL(convert(float, SUM([3])) / SUM(Candidates), 0), 2) as [3]
+	  ,ROUND(ISNULL(convert(float, SUM([4])) / SUM(Candidates), 0), 2) as [4]
+	  ,[TeacherGroup]
+  FROM 
+  (
+  SELECT [examCode]
+	  ,[examName]
+      ,[examYear]
+	  ,[tID]
+	  ,[teacher]
+	  ,[examID]
+	  --,isnull(cast([Gender] as nvarchar(5)),'N/A') as [Gender]
+	  ,[Candidates]
+	  ,[2]
+	  ,[1]
+	  ,[3]
+	  ,[4]
+	  ,CASE 
+		WHEN ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) > 0 AND ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) <= 15 THEN 'Teacher Group 1-15'
+		WHEN ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) > 15 AND ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) <= 30 THEN 'Teacher Group 16-30'
+		WHEN ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) > 30 AND ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) <= 45 THEN 'Teacher Group 31-45'
+		WHEN ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) > 45 AND ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) <= 60 THEN 'Teacher Group 46-60'
+		WHEN ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) > 60 AND ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) <= 75 THEN 'Teacher Group 61-75'
+		WHEN ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) > 75 AND ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) <= 90 THEN 'Teacher Group 76-90'
+		WHEN ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) > 90 AND ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) <= 105 THEN 'Teacher Group 91-105'
+		WHEN ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) > 105 AND ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) <= 120 THEN 'Teacher Group 106-120'
+		WHEN ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) > 120 AND ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) <= 135 THEN 'Teacher Group 121-135'
+		WHEN ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) > 135 AND ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) <= 150 THEN 'Teacher Group 136-150'
+		WHEN ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) > 150 AND ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) <= 165 THEN 'Teacher Group 151-165'
+		WHEN ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) > 165 AND ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) <= 180 THEN 'Teacher Group 166-180'
+		WHEN ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) > 180 AND ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) <= 195 THEN 'Teacher Group 181-195'
+		WHEN ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) > 195 AND ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) <= 210 THEN 'Teacher Group 196-210'
+		WHEN ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) > 210 AND ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) <= 225 THEN 'Teacher Group 211-225'
+		WHEN ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) > 225 AND ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) <= 240 THEN 'Teacher Group 226-240'
+		WHEN ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) > 240 AND ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) <= 255 THEN 'Teacher Group 241-255'
+		WHEN ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) > 255 AND ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) <= 270 THEN 'Teacher Group 256-270'
+		WHEN ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) > 270 AND ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) <= 285 THEN 'Teacher Group 271-285'
+		WHEN ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) > 285 AND ROW_NUMBER() OVER(PARTITION BY [examID] ORDER BY [examID]) <= 300 THEN 'Teacher Group 286-300'
+		ELSE 'Teacher Group 301 and more' 
+		END [TeacherGroup]
+  FROM [warehouse].[ExamResultsTeacherTestNationX] AS ERTTNX
+  ) T
+  WHERE [examYear] = $P{Year}
+  GROUP BY [examCode]
+	  ,[examName]
+      ,[examYear]
+	  ,[tID]
+	  ,[teacher]
+	  ,[examID]
+	  ,[TeacherGroup]
+  ORDER BY   
+	CASE 
+		WHEN [examCode] = 'A03' then 1
+        WHEN [examCode] = 'B03' then 2
+        WHEN [examCode] = 'M03' then 3
+        WHEN [examCode] = 'A06' then 4
+        WHEN [examCode] = 'B06' then 5
+        WHEN [examCode] = 'M06' then 6
+		WHEN [examCode] = 'H08' then 7
+		WHEN [examCode] = 'E10' then 8
+		WHEN [examCode] = 'A10' then 9
+		WHEN [examCode] = 'B10' then 10
+        WHEN [examCode] = 'M10' then 11
+		WHEN [examCode] = 'E12' then 12
+		WHEN [examCode] = 'A12' then 13
+		WHEN [examCode] = 'B12' then 14        
+		WHEN [examCode] = 'M12' then 15
+        ELSE 16
+	END ASC, 
+	CASE 
+		WHEN [TeacherGroup] = 'Teacher Group 1-15' then 1
+		WHEN [TeacherGroup] = 'Teacher Group 16-30' then 2
+		WHEN [TeacherGroup] = 'Teacher Group 31-45' then 3
+		WHEN [TeacherGroup] = 'Teacher Group 46-60' then 4
+		WHEN [TeacherGroup] = 'Teacher Group 61-75' then 5
+		WHEN [TeacherGroup] = 'Teacher Group 76-90' then 6
+		WHEN [TeacherGroup] = 'Teacher Group 91-105' then 7
+		WHEN [TeacherGroup] = 'Teacher Group 106-120' then 8
+		WHEN [TeacherGroup] = 'Teacher Group 121-135' then 9
+		WHEN [TeacherGroup] = 'Teacher Group 136-150' then 10
+		WHEN [TeacherGroup] = 'Teacher Group 151-165' then 11
+		WHEN [TeacherGroup] = 'Teacher Group 166-180' then 12
+		WHEN [TeacherGroup] = 'Teacher Group 181-195' then 13
+		WHEN [TeacherGroup] = 'Teacher Group 196-210' then 14
+		WHEN [TeacherGroup] = 'Teacher Group 211-225' then 15
+		WHEN [TeacherGroup] = 'Teacher Group 226-240' then 16
+		WHEN [TeacherGroup] = 'Teacher Group 241-255' then 17
+		WHEN [TeacherGroup] = 'Teacher Group 256-270' then 18
+		WHEN [TeacherGroup] = 'Teacher Group 271-285' then 19
+		WHEN [TeacherGroup] = 'Teacher Group 286-300' then 20
+        ELSE 21
+	END ASC, [teacher] ASC]]>
+	</queryString>
+	<field name="examCode" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="examCode"/>
+		<property name="com.jaspersoft.studio.field.label" value="examCode"/>
+	</field>
+	<field name="examName" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="examName"/>
+		<property name="com.jaspersoft.studio.field.label" value="examName"/>
+	</field>
+	<field name="Exam" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Exam"/>
+		<property name="com.jaspersoft.studio.field.label" value="Exam"/>
+	</field>
+	<field name="examYear" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="examYear"/>
+		<property name="com.jaspersoft.studio.field.label" value="examYear"/>
+	</field>
+	<field name="tID" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="tID"/>
+		<property name="com.jaspersoft.studio.field.label" value="tID"/>
+	</field>
+	<field name="teacher" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="teacher"/>
+		<property name="com.jaspersoft.studio.field.label" value="teacher"/>
+	</field>
+	<field name="examID" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="examID"/>
+		<property name="com.jaspersoft.studio.field.label" value="examID"/>
+	</field>
+	<field name="Candidates" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="Candidates"/>
+		<property name="com.jaspersoft.studio.field.label" value="Candidates"/>
+	</field>
+	<field name="Tot2" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="Tot2"/>
+		<property name="com.jaspersoft.studio.field.label" value="Tot2"/>
+	</field>
+	<field name="Tot1" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="Tot1"/>
+		<property name="com.jaspersoft.studio.field.label" value="Tot1"/>
+	</field>
+	<field name="Tot3" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="Tot3"/>
+		<property name="com.jaspersoft.studio.field.label" value="Tot3"/>
+	</field>
+	<field name="Tot4" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="Tot4"/>
+		<property name="com.jaspersoft.studio.field.label" value="Tot4"/>
+	</field>
+	<field name="1" class="java.lang.Double">
+		<property name="com.jaspersoft.studio.field.name" value="1"/>
+		<property name="com.jaspersoft.studio.field.label" value="1"/>
+	</field>
+	<field name="2" class="java.lang.Double">
+		<property name="com.jaspersoft.studio.field.name" value="2"/>
+		<property name="com.jaspersoft.studio.field.label" value="2"/>
+	</field>
+	<field name="3" class="java.lang.Double">
+		<property name="com.jaspersoft.studio.field.name" value="3"/>
+		<property name="com.jaspersoft.studio.field.label" value="3"/>
+	</field>
+	<field name="4" class="java.lang.Double">
+		<property name="com.jaspersoft.studio.field.name" value="4"/>
+		<property name="com.jaspersoft.studio.field.label" value="4"/>
+	</field>
+	<field name="TeacherGroup" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="TeacherGroup"/>
+		<property name="com.jaspersoft.studio.field.label" value="TeacherGroup"/>
+	</field>
+	<group name="Exam Name">
+		<groupExpression><![CDATA[$F{examName}]]></groupExpression>
+		<groupHeader>
+			<band height="24">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<frame>
+					<reportElement style="Detail Header Dark" x="-21" y="0" width="793" height="24" uuid="f871ff1c-a634-42fe-a4be-f6f89704d9d1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<rectangle>
+						<reportElement style="Detail Header Darker" x="21" y="0" width="36" height="24" uuid="38c58cf7-f8f7-4663-a618-4c7d67066467"/>
+					</rectangle>
+					<textField>
+						<reportElement style="Group header" x="68" y="0" width="704" height="24" uuid="de5751e6-a4ee-4192-ab60-c78c9c05d5b8"/>
+						<textFieldExpression><![CDATA[$F{examName}]]></textFieldExpression>
+					</textField>
+				</frame>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="Teacher Group">
+		<groupExpression><![CDATA[$F{TeacherGroup}]]></groupExpression>
+		<groupHeader>
+			<band height="280">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<staticText>
+					<reportElement key="" style="Group header fields" x="0" y="268" width="552" height="12" uuid="8b5395d2-a023-4f54-ac67-f6cb5b1c244f">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Left"/>
+					<text><![CDATA[Teacher]]></text>
+				</staticText>
+				<staticText>
+					<reportElement key="" style="Group header fields" x="602" y="268" width="50" height="12" uuid="d08665d5-9b99-46ab-9ae5-a92e9034ea73">
+						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right"/>
+					<text><![CDATA[Developing]]></text>
+				</staticText>
+				<staticText>
+					<reportElement key="" style="Group header fields" x="702" y="268" width="50" height="12" uuid="8868a8e4-058e-4afa-926a-2313b87a2147">
+						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right"/>
+					<text><![CDATA[Advanced]]></text>
+				</staticText>
+				<staticText>
+					<reportElement key="" style="Group header fields" x="652" y="268" width="50" height="12" uuid="6edc49dc-6d3a-4ead-865e-4a601c5ad459">
+						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right"/>
+					<text><![CDATA[Proficient]]></text>
+				</staticText>
+				<staticText>
+					<reportElement key="" style="Group header fields" x="552" y="268" width="50" height="12" uuid="ae1852f1-0378-4697-a82e-cbc784a1c867">
+						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right"/>
+					<text><![CDATA[Beginning]]></text>
+				</staticText>
+				<stackedBarChart>
+					<chart isShowLegend="false" evaluationTime="Group" evaluationGroup="Teacher Group" theme="default">
+						<reportElement x="1" y="27" width="752" height="220" uuid="0909bc2b-4b08-4741-9f28-46bf6e7bbb0f">
+							<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<propertyExpression name="lines.to.show"><![CDATA["3"]]></propertyExpression>
+							<propertyExpression name="category.margin"><![CDATA["0.05"]]></propertyExpression>
+							<propertyExpression name="item.margin"><![CDATA["0.05"]]></propertyExpression>
+							<propertyExpression name="label.position.offset"><![CDATA["15"]]></propertyExpression>
+							<propertyExpression name="category.width.ratio"><![CDATA["0.5"]]></propertyExpression>
+							<propertyExpression name="category.font.name"><![CDATA["SansSerif"]]></propertyExpression>
+							<propertyExpression name="category.font.size"><![CDATA["8"]]></propertyExpression>
+						</reportElement>
+						<box rightPadding="20">
+							<pen lineWidth="0.0"/>
+						</box>
+						<chartTitle/>
+						<chartSubtitle/>
+						<chartLegend/>
+					</chart>
+					<categoryDataset>
+						<dataset resetType="Group" resetGroup="Teacher Group"/>
+						<categorySeries>
+							<seriesExpression><![CDATA["Developing"]]></seriesExpression>
+							<categoryExpression><![CDATA[$F{teacher}]]></categoryExpression>
+							<valueExpression><![CDATA[$F{2}]]></valueExpression>
+							<labelExpression><![CDATA[Integer.toString(new BigDecimal(ABS($F{2}*100).doubleValue()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue())+"%";]]></labelExpression>
+						</categorySeries>
+						<categorySeries>
+							<seriesExpression><![CDATA["Beginning"]]></seriesExpression>
+							<categoryExpression><![CDATA[$F{teacher}]]></categoryExpression>
+							<valueExpression><![CDATA[$F{1}]]></valueExpression>
+							<labelExpression><![CDATA[Integer.toString(new BigDecimal(ABS($F{1}*100).doubleValue()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue())+"%";]]></labelExpression>
+						</categorySeries>
+						<categorySeries>
+							<seriesExpression><![CDATA["Proficient"]]></seriesExpression>
+							<categoryExpression><![CDATA[$F{teacher}]]></categoryExpression>
+							<valueExpression><![CDATA[$F{3}]]></valueExpression>
+							<labelExpression><![CDATA[Integer.toString(new BigDecimal(ABS($F{3}*100).doubleValue()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue())+"%";]]></labelExpression>
+						</categorySeries>
+						<categorySeries>
+							<seriesExpression><![CDATA["Advanced"]]></seriesExpression>
+							<categoryExpression><![CDATA[$F{teacher}]]></categoryExpression>
+							<valueExpression><![CDATA[$F{4}]]></valueExpression>
+							<labelExpression><![CDATA[Integer.toString(new BigDecimal(ABS($F{4}*100).doubleValue()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue())+"%";]]></labelExpression>
+						</categorySeries>
+					</categoryDataset>
+					<barPlot isShowLabels="true">
+						<plot orientation="Horizontal">
+							<seriesColor seriesOrder="0" color="#FFD966"/>
+							<seriesColor seriesOrder="1" color="#C00000"/>
+							<seriesColor seriesOrder="2" color="#92D050"/>
+							<seriesColor seriesOrder="3" color="#00B050"/>
+						</plot>
+						<itemLabel>
+							<font size="6"/>
+						</itemLabel>
+						<categoryAxisFormat>
+							<axisFormat labelColor="#000000" tickLabelColor="#000000" axisLineColor="#000000">
+								<labelFont>
+									<font fontName="Open Sans" size="6"/>
+								</labelFont>
+								<tickLabelFont>
+									<font fontName="Open Sans" size="6"/>
+								</tickLabelFont>
+							</axisFormat>
+						</categoryAxisFormat>
+						<valueAxisFormat>
+							<axisFormat labelColor="#000000" tickLabelColor="#000000" tickLabelMask="#,##0.##%; #,##0.##%" axisLineColor="#000000">
+								<labelFont>
+									<font fontName="Open Sans" size="6"/>
+								</labelFont>
+								<tickLabelFont>
+									<font fontName="Open Sans" size="6"/>
+								</tickLabelFont>
+							</axisFormat>
+						</valueAxisFormat>
+						<rangeAxisMinValueExpression><![CDATA[-1]]></rangeAxisMinValueExpression>
+						<rangeAxisMaxValueExpression><![CDATA[1]]></rangeAxisMaxValueExpression>
+					</barPlot>
+				</stackedBarChart>
+				<rectangle>
+					<reportElement x="81" y="248" width="600" height="17" uuid="d566784c-9575-474e-87e0-0d34c0ef2f13"/>
+					<graphicElement>
+						<pen lineWidth="0.35"/>
+					</graphicElement>
+				</rectangle>
+				<rectangle>
+					<reportElement x="84" y="250" width="13" height="13" forecolor="#C00000" backcolor="#C00000" uuid="06aed39c-d6d4-418d-8438-72854c223ed4"/>
+					<graphicElement>
+						<pen lineWidth="0.0"/>
+					</graphicElement>
+				</rectangle>
+				<rectangle>
+					<reportElement x="231" y="250" width="13" height="13" forecolor="#FFD966" backcolor="#FFD966" uuid="8eb16678-f5ad-4964-b1d3-b6102e28190b"/>
+					<graphicElement>
+						<pen lineWidth="0.0"/>
+					</graphicElement>
+				</rectangle>
+				<rectangle>
+					<reportElement x="531" y="250" width="13" height="13" forecolor="#00B050" backcolor="#00B050" uuid="7182647c-d242-4ac3-b58b-2f6fbf4b2950"/>
+					<graphicElement>
+						<pen lineWidth="0.0"/>
+					</graphicElement>
+				</rectangle>
+				<rectangle>
+					<reportElement x="381" y="250" width="13" height="13" forecolor="#92D050" backcolor="#92D050" uuid="d3340536-255c-4790-b613-aca79b83974c"/>
+					<graphicElement>
+						<pen lineWidth="0.0"/>
+					</graphicElement>
+				</rectangle>
+				<staticText>
+					<reportElement x="99" y="249" width="130" height="16" uuid="3a9a75a5-108d-495c-9608-c8b63b947f28">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement verticalAlignment="Middle">
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Beginning]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="246" y="249" width="134" height="16" uuid="68eaa237-a1e1-4c58-b34b-6e935ec8ff3b">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement verticalAlignment="Middle">
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Developing]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="396" y="249" width="134" height="16" uuid="6ad4116a-6c03-40cb-b8ce-e8de0cf8e7e2">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement verticalAlignment="Middle">
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Proficient]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="546" y="249" width="134" height="16" uuid="60592d0b-7ada-4836-86da-a43f7c32b1eb">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement verticalAlignment="Middle">
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Advanced]]></text>
+				</staticText>
+				<frame>
+					<reportElement style="Detail Header Light" x="-21" y="0" width="793" height="24" uuid="ffd2e503-327c-4821-b872-1ec5c989df44">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<rectangle>
+						<reportElement style="Detail Header Dark" x="21" y="0" width="36" height="24" uuid="e8788ab8-d451-4608-a53e-7f7cd9ee8835"/>
+					</rectangle>
+					<textField>
+						<reportElement style="Group header" x="68" y="0" width="704" height="24" uuid="202deb0e-7c94-46c1-bf7c-9e63dec851e6"/>
+						<textFieldExpression><![CDATA[$F{TeacherGroup}]]></textFieldExpression>
+					</textField>
+				</frame>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="160" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<image>
+				<reportElement x="0" y="0" width="126" height="126" uuid="1c003177-754c-448f-8ce1-16868856f545">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<imageExpression><![CDATA["repo:/images/rmi_seal.png"]]></imageExpression>
+			</image>
+			<image>
+				<reportElement x="625" y="0" width="126" height="126" uuid="4aa6f4d1-27dc-4b34-9227-59e19ce2c959">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<imageExpression><![CDATA["repo:/images/rmi_pss.png"]]></imageExpression>
+			</image>
+			<rectangle>
+				<reportElement mode="Opaque" x="-21" y="-20" width="793" height="10" forecolor="#08298C" backcolor="#08298C" uuid="a879b5ed-22f8-4e7b-9093-811aaea43211"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="-21" y="-10" width="20" height="10" forecolor="#08298C" backcolor="#08298C" uuid="0a58d963-ec76-492f-9d28-8419cff95766">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+			</rectangle>
+			<rectangle>
+				<reportElement x="753" y="-10" width="20" height="10" forecolor="#08298C" backcolor="#08298C" uuid="f0a00416-98e9-4650-b25b-a7e2a9f68561">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+				</reportElement>
+			</rectangle>
+			<ellipse>
+				<reportElement x="-21" y="-9" width="38" height="38" forecolor="#FFFFFF" uuid="503401c2-412f-4738-a96a-cf6a43061701">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+			</ellipse>
+			<ellipse>
+				<reportElement x="733" y="-9" width="38" height="38" forecolor="#FFFFFF" uuid="70a1c065-3f91-4751-8e67-c995a73a7656">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+				</reportElement>
+			</ellipse>
+			<textField>
+				<reportElement style="SubTitle" x="126" y="62" width="499" height="41" uuid="30a210b9-837f-4e2f-aa05-c97d082534e6"/>
+				<textFieldExpression><![CDATA["MISAT Exam Results (for Teachers) " + $P{Year}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Title text" x="126" y="103" width="499" height="57" uuid="3b29677a-78cd-474f-9341-f88a508eccf4"/>
+				<textFieldExpression><![CDATA["The teacher results (candidate count) by exams for the whole nation and year " + $F{examYear}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Title" x="126" y="0" width="499" height="62" uuid="aa17a44a-4579-423c-8bf0-0fdd18baf49e"/>
+				<text><![CDATA[Teachers Performance]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<textField>
+				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="702" y="0" width="50" height="20" uuid="dface132-4811-4f9d-bb4f-530310d7c523">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<box rightPadding="0">
+					<bottomPen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Open Sans" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Tot4}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="652" y="0" width="50" height="20" uuid="ae40772a-fd8b-4fff-ac23-2613b41171ad">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<box>
+					<bottomPen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Open Sans" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Tot3}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="602" y="0" width="50" height="20" uuid="28cb5d71-6c36-4c76-a1ef-ae1fe0d8beea">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<box>
+					<bottomPen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Open Sans" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Tot2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="552" y="0" width="50" height="20" uuid="e21ae40c-4ae1-45b7-8cb1-d9987de00d3e">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<box>
+					<bottomPen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Open Sans" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Tot1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="552" height="20" uuid="f93cd998-e20e-43c1-8689-118407b3998e">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box>
+					<bottomPen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Open Sans" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{teacher}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="25" splitType="Stretch">
+			<frame>
+				<reportElement style="Page footer" x="-21" y="1" width="793" height="24" uuid="5d8169bd-4a75-48c8-8a68-6d3ad5ba9402">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textField evaluationTime="Report">
+					<reportElement style="Page footer" x="726" y="1" width="40" height="20" uuid="e5e27efa-b599-499b-9ca3-848cb511cb7b"/>
+					<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement style="Page footer" x="646" y="1" width="80" height="20" uuid="18cfe1ca-f7d6-48b0-9827-28578b42a5e0"/>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+				</textField>
+				<textField pattern="EEEEE dd MMMMM yyyy">
+					<reportElement style="Page footer" x="22" y="1" width="288" height="20" uuid="fbce24bb-3cb1-44a3-8eec-8c067ddbe5b5"/>
+					<textFieldExpression><![CDATA["Generated by MIEMIS on " + new java.util.Date()]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</summary>
+</jasperReport>
