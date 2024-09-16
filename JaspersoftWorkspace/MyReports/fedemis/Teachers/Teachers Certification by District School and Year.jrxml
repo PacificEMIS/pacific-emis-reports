@@ -2,7 +2,7 @@
 <!-- Created with Jaspersoft Studio version 6.21.2.final using JasperReports Library version 6.21.2-8434a0bd7c3bbc37cbf916f2968d35e4b165821a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Teachers_Certification_By_District_School_Snd_Year" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="df013db5-f76e-44d3-b0df-bcbc46d93160">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="FEDEMIS-TEST"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MS SQL JDBC Driver"/>
 	<property name="ireport.jasperserver.url" value="http://fedemis.doe.fm:8080/jasperserver/"/>
 	<property name="ireport.jasperserver.user" value="jasperadmin"/>
 	<property name="ireport.jasperserver.reportUnit" value="/reports/fedemis/Teachers/Teachers_Certification_by_State_School_and_Year"/>
@@ -128,7 +128,7 @@
 	<queryString language="SQL">
 		<![CDATA[SELECT T.*
 	, CASE 
-		WHEN (T.trYear != T.trYearEffective) THEN 7 -- Teacher with certification year not matching the year in the effective date field
+		WHEN (T.trYear != T.trYearEffectiveCertified) THEN 7 -- Teacher with certification year not matching the year based on effective date cutoff
 		WHEN (T.Certified = T.Certified2) THEN 1 -- Certification status known with high certainty
 		WHEN (T.Certified = 1) AND (T.Certified2 = 0) THEN 2 -- Teacher shown as officialy certified but has an expired certificate on record (overridden through the survey in that year)
 		WHEN (T.Certified = 0) AND (T.Certified2 = 1) THEN 3 -- Teacher shown as not officially certified when perhaps it should be (Warning)
@@ -162,9 +162,12 @@ FROM
 		, ISNULL(TL.Qualified, -1) Qualified
 		, ISNULL(TL.TAMX, 'U') TAMX
 		, CASE
-			WHEN ($P{Year} < coalesce(common.SchoolYearInt(TT.trEffectiveDate, common.sysParam('TEACHERCERT_CUTOFFDATE')), TT.trYear, null, 0) + TT.codeDurationYears)
-				AND
-				($P{Year} >= (coalesce(common.SchoolYearInt(TT.trEffectiveDate, common.sysParam('TEACHERCERT_CUTOFFDATE')), TT.trYear, null, 0))) THEN 1
+			WHEN $P{Year} BETWEEN 
+			-- lower bound
+			coalesce(common.SchoolYearInt(TT.trEffectiveDate, common.sysParam('TEACHERCERT_CUTOFFDATE')), TT.trYear, null, 0)			
+			AND
+			-- upper bound
+			coalesce(common.SchoolYearInt(TT.trEffectiveDate, common.sysParam('TEACHERCERT_CUTOFFDATE')), TT.trYear, null, 0) + TT.codeDurationYears - 1 THEN 1
 			WHEN isnull(TT.codeDurationYears, 0) = 0 THEN 1 -- Duration of 0 is a permanent certification
 			ELSE 0
 			END Certified2 -- Auxiliary certified status. The only time is should not match the official certified one is 
@@ -584,7 +587,7 @@ ORDER BY CASE WHEN District IS NOT NULL THEN 0 ELSE 1 END, District, SurveySchNo
 				<textElement>
 					<font size="8"/>
 				</textElement>
-				<text><![CDATA[Teacher with certification year not matching the year in the effective date field]]></text>
+				<text><![CDATA[Teacher with certification year not matching the year based on effective date cutoff]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="20" y="220" width="732" height="10" uuid="9ef3ad5e-aaaa-47ad-8226-b97da1d5b898">
