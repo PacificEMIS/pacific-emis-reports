@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.21.2.final using JasperReports Library version 6.21.2-8434a0bd7c3bbc37cbf916f2968d35e4b165821a  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Teachers_Certification_By_District_School_Snd_Year" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="df013db5-f76e-44d3-b0df-bcbc46d93160">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Teachers_Assignments_By_District_School_And_Year" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="df013db5-f76e-44d3-b0df-bcbc46d93160">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="ireport.jasperserver.url" value="http://fedemis.doe.fm:8080/jasperserver/"/>
 	<property name="ireport.jasperserver.user" value="jasperadmin"/>
-	<property name="ireport.jasperserver.reportUnit" value="/reports/fedemis/Teachers/Teachers_Certification_by_State_School_and_Year"/>
-	<property name="ireport.jasperserver.report.resource" value="/reports/fedemis/Teachers/Teachers_Certification_by_State_School_and_Year_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/fedemis/Teachers/Teachers_Assignments_by_State_School_and_Year"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/fedemis/Teachers/Teachers_Assignments_by_State_School_and_Year_files/main_jrxml"/>
 	<property name="com.jaspersoft.studio.report.unit.description" value="Proportion of students at each level of achievement for chosen school and year (all exams)"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
@@ -17,7 +17,7 @@
 	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="FEDEMIS-TEST"/>
-	<template><![CDATA["../Templates/FedEMIS_Style.jrtx"]]></template>
+	<template><![CDATA["repo:/Templates/FedEMIS_Style.jrtx"]]></template>
 	<style name="Row" mode="Transparent">
 		<conditionalStyle>
 			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
@@ -122,113 +122,192 @@
 			</style>
 		</conditionalStyle>
 	</style>
+	<style name="NoSpecificGradesAssigned" mode="Transparent">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{Grades}.equals( "Unknown" )]]></conditionExpression>
+			<style mode="Opaque" forecolor="#C00000" fontName="Open Sans Semibold" fontSize="9">
+				<pen lineWidth="0.0"/>
+			</style>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
+			<style backcolor="#ECECEC"/>
+		</conditionalStyle>
+	</style>
 	<parameter name="Year" class="java.lang.Integer">
 		<defaultValueExpression><![CDATA[2024]]></defaultValueExpression>
 	</parameter>
 	<queryString language="SQL">
-		<![CDATA[SELECT 
-    TL.[TID],
-	TI.tFullName Teacher,
-    TL.[SurveyYear],
-	common.SchoolYearStr(CAST(CONCAT(TL.[SurveyYear], '-01-01') AS DATETIME), null) SchoolYear,
-    [GenderCode] G,
-    [SurveySchNo],
-    [SurveyRole] AS TeacherRoleCode,
-    TR.[codeDescription] AS TeacherRole,
-    [SurveyDataYear],
-    [Estimate],
-    TL.[SchNo] SchoolNo,
-	S.schName SchoolName,
-	D.dName District,
-	E.Enrolment,
-	1 TeacherCount,
-	1 Active,
-    [Certified],
-    [Qualified],
-	-- Most recently reported qualifications
-	TS.tchQual Qualification,
-	TS.tchEdQual Certification,
-    [Tpk] AS GPREK,
-    [T00] AS GK,
-    [T01] AS G1,
-    [T02] AS G2,
-    [T03] AS G3,
-    [T04] AS G4,
-    [T05] AS G5,
-    [T06] AS G6,
-    [T07] AS G7,
-    [T08] AS G8,
-    [T09] AS G9,
-    [T10] AS G10,
-    [T11] AS G11,
-    [T12] AS G12,
-    [T13] AS G13,
-    [T14] AS G14,
-    [T15] AS G15,
-    [T],
-    [A],
-    [X],
-    [Activities],
-    [TAMX],
-    -- Build the Grades column:
-    Grades = CASE 
-        WHEN (COALESCE([Tpk],0) + COALESCE([T00],0) + COALESCE([T01],0) +
-              COALESCE([T02],0) + COALESCE([T03],0) + COALESCE([T04],0) +
-              COALESCE([T05],0) + COALESCE([T06],0) + COALESCE([T07],0) +
-              COALESCE([T08],0) + COALESCE([T09],0) + COALESCE([T10],0) +
-              COALESCE([T11],0) + COALESCE([T12],0) + COALESCE([T13],0) +
-              COALESCE([T14],0) + COALESCE([T15],0)) = 0 
-        THEN 'Unknown'
-        ELSE STUFF(
-             (CASE WHEN [Tpk] = 1 THEN ', GPREK' ELSE '' END +
-              CASE WHEN [T00] = 1 THEN ', GK' ELSE '' END +
-              CASE WHEN [T01] = 1 THEN ', G1' ELSE '' END +
-              CASE WHEN [T02] = 1 THEN ', G2' ELSE '' END +
-              CASE WHEN [T03] = 1 THEN ', G3' ELSE '' END +
-              CASE WHEN [T04] = 1 THEN ', G4' ELSE '' END +
-              CASE WHEN [T05] = 1 THEN ', G5' ELSE '' END +
-              CASE WHEN [T06] = 1 THEN ', G6' ELSE '' END +
-              CASE WHEN [T07] = 1 THEN ', G7' ELSE '' END +
-              CASE WHEN [T08] = 1 THEN ', G8' ELSE '' END +
-              CASE WHEN [T09] = 1 THEN ', G9' ELSE '' END +
-              CASE WHEN [T10] = 1 THEN ', G10' ELSE '' END +
-              CASE WHEN [T11] = 1 THEN ', G11' ELSE '' END +
-              CASE WHEN [T12] = 1 THEN ', G12' ELSE '' END +
-              CASE WHEN [T13] = 1 THEN ', G13' ELSE '' END +
-              CASE WHEN [T14] = 1 THEN ', G14' ELSE '' END +
-              CASE WHEN [T15] = 1 THEN ', G15' ELSE '' END
-             ), 
-             1, 2, ''  -- Remove the leading comma and space
-         )
-    END
-FROM [warehouse].[TeacherLocation] TL
-INNER JOIN TeacherIdentity TI
-	ON TL.TID = TI.tID
-INNER JOIN TeacherSurvey TS -- Does not include any estimate teacher records from TeacherLocation
-	ON TL.TID = TS.tID
-INNER JOIN SchoolSurvey SS
-	ON TS.ssID = SS.ssID AND SS.svyYear = 2024
-INNER JOIN Schools S
-	ON TL.SchNo = S.schNo
-INNER JOIN Islands I
-	ON S.iCode = I.iCode
-INNER JOIN Districts D
-	ON I.iGroup = D.dID
-LEFT OUTER JOIN [dbo].[lkpTeacherRole] TR 
-    ON TL.SurveyRole = TR.codeCode
-INNER JOIN 
-(
-SELECT [SurveyYear]
-      ,[schNo]
-      ,SUM([Enrol]) Enrolment
-  FROM [warehouse].[EnrolSchool]
-  GROUP BY [SurveyYear]
-      ,[schNo]
-) E
-	ON TL.SchNo = E.schNo AND E.SurveyYear = 2024
-WHERE TL.SurveyYear = 2024
-  AND TAMX IN ('T','M')
-ORDER BY TID;]]>
+		<![CDATA[WITH TeacherData AS (
+    -- Your teacher query here
+    SELECT 
+        TL.[TID],
+        TI.tFullName AS Teacher,
+        TL.[SurveyYear],
+        common.SchoolYearStr(CAST(CONCAT(TL.[SurveyYear], '-01-01') AS DATETIME), null) AS SchoolYear,
+        [GenderCode] AS G,
+        [SurveySchNo],
+        [SurveyRole] AS TeacherRoleCode,
+        TR.[codeDescription] AS TeacherRole,
+        [SurveyDataYear],
+        [Estimate],
+        TL.[SchNo] AS SchoolNo,
+        S.schName AS SchoolName,
+        D.dName AS District,
+        E.Enrolment,
+        1 AS TeacherCount,
+        1 AS Active,
+        [Certified],
+        [Qualified],
+        TS.tchQual AS Qualification,
+        TS.tchEdQual AS Certification,
+        [Tpk] AS GPREK,
+        [T00] AS GK,
+        [T01] AS G1,
+        [T02] AS G2,
+        [T03] AS G3,
+        [T04] AS G4,
+        [T05] AS G5,
+        [T06] AS G6,
+        [T07] AS G7,
+        [T08] AS G8,
+        [T09] AS G9,
+        [T10] AS G10,
+        [T11] AS G11,
+        [T12] AS G12,
+        [T13] AS G13,
+        [T14] AS G14,
+        [T15] AS G15,
+        [T],
+        [A],
+        [X],
+        [Activities],
+        [TAMX],
+        Grades = CASE 
+            WHEN (COALESCE([Tpk],0) + COALESCE([T00],0) + COALESCE([T01],0) +
+                  COALESCE([T02],0) + COALESCE([T03],0) + COALESCE([T04],0) +
+                  COALESCE([T05],0) + COALESCE([T06],0) + COALESCE([T07],0) +
+                  COALESCE([T08],0) + COALESCE([T09],0) + COALESCE([T10],0) +
+                  COALESCE([T11],0) + COALESCE([T12],0) + COALESCE([T13],0) +
+                  COALESCE([T14],0) + COALESCE([T15],0)) = 0 
+            THEN 'Unknown'
+            ELSE STUFF(
+                 (CASE WHEN [Tpk] = 1 THEN ', GPREK' ELSE '' END +
+                  CASE WHEN [T00] = 1 THEN ', GK' ELSE '' END +
+                  CASE WHEN [T01] = 1 THEN ', G1' ELSE '' END +
+                  CASE WHEN [T02] = 1 THEN ', G2' ELSE '' END +
+                  CASE WHEN [T03] = 1 THEN ', G3' ELSE '' END +
+                  CASE WHEN [T04] = 1 THEN ', G4' ELSE '' END +
+                  CASE WHEN [T05] = 1 THEN ', G5' ELSE '' END +
+                  CASE WHEN [T06] = 1 THEN ', G6' ELSE '' END +
+                  CASE WHEN [T07] = 1 THEN ', G7' ELSE '' END +
+                  CASE WHEN [T08] = 1 THEN ', G8' ELSE '' END +
+                  CASE WHEN [T09] = 1 THEN ', G9' ELSE '' END +
+                  CASE WHEN [T10] = 1 THEN ', G10' ELSE '' END +
+                  CASE WHEN [T11] = 1 THEN ', G11' ELSE '' END +
+                  CASE WHEN [T12] = 1 THEN ', G12' ELSE '' END +
+                  CASE WHEN [T13] = 1 THEN ', G13' ELSE '' END +
+                  CASE WHEN [T14] = 1 THEN ', G14' ELSE '' END +
+                  CASE WHEN [T15] = 1 THEN ', G15' ELSE '' END
+                 ), 
+                 1, 2, ''  -- Remove the leading comma and space
+             )
+        END
+    FROM [warehouse].[TeacherLocation] TL
+    INNER JOIN TeacherIdentity TI ON TL.TID = TI.tID
+    INNER JOIN TeacherSurvey TS ON TL.TID = TS.tID
+    INNER JOIN SchoolSurvey SS ON TS.ssID = SS.ssID AND SS.svyYear = $P{Year}
+    INNER JOIN Schools S ON TL.SchNo = S.schNo
+    INNER JOIN Islands I ON S.iCode = I.iCode
+    INNER JOIN Districts D ON I.iGroup = D.dID
+    LEFT OUTER JOIN [dbo].[lkpTeacherRole] TR ON TL.SurveyRole = TR.codeCode
+    INNER JOIN (
+        SELECT [SurveyYear], [schNo], SUM([Enrol]) AS Enrolment
+        FROM [warehouse].[EnrolSchool]
+        GROUP BY [SurveyYear], [schNo]
+    ) E ON TL.SchNo = E.schNo AND E.SurveyYear = $P{Year}
+    WHERE TL.SurveyYear = $P{Year}
+      AND TAMX IN ('T','M')
+),
+SchoolList AS (
+    SELECT DISTINCT 
+         SurveyYear,
+         SchoolYear,
+         SurveySchNo,
+         SchoolNo,
+         SchoolName,
+         District
+    FROM TeacherData
+),
+ExtraRows AS (
+    SELECT 
+         s.SurveyYear,
+         s.SchoolYear,
+         s.SurveySchNo,
+         s.SchoolNo,
+         s.SchoolName,
+         s.District,
+         v.Number AS ExtraRowNumber
+    FROM SchoolList s
+    CROSS JOIN (VALUES (1),(2),(3),(4),(5)) v(Number)
+)
+-- Wrap the UNION query in a derived table so that the ORDER BY can refer to columns in the final select list.
+SELECT *
+FROM (
+    SELECT * FROM TeacherData
+    UNION ALL
+    SELECT 
+         NULL AS TID,
+         NULL AS Teacher,
+         er.SurveyYear,
+         er.SchoolYear,
+         NULL AS G,
+         er.SurveySchNo,
+         NULL AS TeacherRoleCode,
+         NULL AS TeacherRole,
+         er.SurveyYear AS SurveyDataYear,  -- adjust as needed
+         0 AS Estimate,
+         er.SchoolNo,
+         er.SchoolName,
+         er.District,
+         NULL AS Enrolment,
+         NULL AS TeacherCount,
+         NULL AS Active,
+         NULL AS Certified,
+         NULL AS Qualified,
+         NULL AS Qualification,
+         NULL AS Certification,
+         NULL AS GPREK,
+         NULL AS GK,
+         NULL AS G1,
+         NULL AS G2,
+         NULL AS G3,
+         NULL AS G4,
+         NULL AS G5,
+         NULL AS G6,
+         NULL AS G7,
+         NULL AS G8,
+         NULL AS G9,
+         NULL AS G10,
+         NULL AS G11,
+         NULL AS G12,
+         NULL AS G13,
+         NULL AS G14,
+         NULL AS G15,
+         NULL AS T,
+         NULL AS A,
+         NULL AS X,
+         NULL AS Activities,
+         NULL AS TAMX,
+         NULL AS Grades
+    FROM ExtraRows er
+) AS CombinedResults
+ORDER BY 
+    District, 
+    SchoolName, 
+    CASE WHEN Teacher IS NULL THEN 1 ELSE 0 END,
+    Teacher;
+]]>
 	</queryString>
 	<field name="TID" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="TID"/>
@@ -402,6 +481,24 @@ ORDER BY TID;]]>
 		<property name="com.jaspersoft.studio.field.name" value="Grades"/>
 		<property name="com.jaspersoft.studio.field.label" value="Grades"/>
 	</field>
+	<variable name="DistrictEnrolments" class="java.lang.Integer" resetType="Group" resetGroup="District" incrementType="Group" incrementGroup="School" calculation="Sum">
+		<variableExpression><![CDATA[$V{UniqueEnrolments}]]></variableExpression>
+	</variable>
+	<variable name="UniqueEnrolments" class="java.lang.Integer" resetType="Group" resetGroup="School" calculation="First">
+		<variableExpression><![CDATA[$F{Enrolment}]]></variableExpression>
+	</variable>
+	<variable name="DistrictTeachers" class="java.lang.Integer" resetType="Group" resetGroup="District" calculation="Sum">
+		<variableExpression><![CDATA[$F{TeacherCount}]]></variableExpression>
+	</variable>
+	<variable name="Teachers" class="java.lang.Integer" resetType="Group" resetGroup="School" calculation="Sum">
+		<variableExpression><![CDATA[$F{TeacherCount}]]></variableExpression>
+	</variable>
+	<variable name="DistrictPTR" class="java.lang.Double" resetType="Group" resetGroup="District" calculation="System">
+		<variableExpression><![CDATA[$V{DistrictEnrolments} / $V{DistrictTeachers}]]></variableExpression>
+	</variable>
+	<variable name="PTR" class="java.lang.Double" resetType="Group" resetGroup="School" calculation="System">
+		<variableExpression><![CDATA[$V{UniqueEnrolments} / $V{Teachers}]]></variableExpression>
+	</variable>
 	<group name="District">
 		<groupExpression><![CDATA[$F{District}]]></groupExpression>
 		<groupHeader>
@@ -415,8 +512,33 @@ ORDER BY TID;]]>
 						<reportElement style="Detail Header Darker" x="21" y="0" width="36" height="24" uuid="1816c3b2-4d4b-4221-b490-03f197a5d99e"/>
 					</rectangle>
 					<textField>
-						<reportElement style="Group header" x="68" y="0" width="524" height="24" uuid="ab0c7c87-df10-4fc6-9ad4-169f98f35f94"/>
+						<reportElement style="Group header" x="68" y="0" width="312" height="24" uuid="ab0c7c87-df10-4fc6-9ad4-169f98f35f94"/>
 						<textFieldExpression><![CDATA[$F{District} != null ? $F{District} : "School with no State"]]></textFieldExpression>
+					</textField>
+					<textField evaluationTime="Group" evaluationGroup="District">
+						<reportElement style="Group header" x="380" y="0" width="86" height="24" uuid="ce14fc78-5c2c-4719-b06c-c2bdadb32c98">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<textElement>
+							<font size="8"/>
+						</textElement>
+						<textFieldExpression><![CDATA["Enrolments: " + $V{DistrictEnrolments}]]></textFieldExpression>
+					</textField>
+					<textField evaluationTime="Group" evaluationGroup="District">
+						<reportElement style="Group header" x="466" y="0" width="85" height="24" uuid="083437d5-370b-42f2-85b2-acb726821e3e">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<textElement>
+							<font size="8"/>
+						</textElement>
+						<textFieldExpression><![CDATA["Teachers: " + $V{DistrictTeachers}]]></textFieldExpression>
+					</textField>
+					<textField evaluationTime="Group" evaluationGroup="District">
+						<reportElement style="Group header" x="551" y="0" width="154" height="24" uuid="f48a1ce5-20e7-4195-8e02-cda80c9aaa08"/>
+						<textElement>
+							<font size="8"/>
+						</textElement>
+						<textFieldExpression><![CDATA["Pupil/Teacher Ratio: " + $V{DistrictEnrolments} / $V{DistrictTeachers}]]></textFieldExpression>
 					</textField>
 				</frame>
 			</band>
@@ -425,7 +547,7 @@ ORDER BY TID;]]>
 	<group name="School">
 		<groupExpression><![CDATA[$F{SchoolName}]]></groupExpression>
 		<groupHeader>
-			<band height="41">
+			<band height="36">
 				<frame>
 					<reportElement style="Detail Header Lighter" x="-21" y="0" width="793" height="24" uuid="1339feee-b485-4723-be4b-57f900b07fc8">
 						<property name="com.jaspersoft.studio.unit.y" value="px"/>
@@ -435,12 +557,50 @@ ORDER BY TID;]]>
 						<reportElement style="Detail Header Light" x="21" y="0" width="47" height="24" uuid="4af90b7e-b918-49a5-8749-b6d388d6487f"/>
 					</rectangle>
 					<textField>
-						<reportElement style="Group header" x="80" y="0" width="512" height="24" uuid="52a17e0d-480f-4b3c-aeab-9c9776316f70"/>
+						<reportElement style="Group header" x="80" y="0" width="300" height="24" uuid="52a17e0d-480f-4b3c-aeab-9c9776316f70"/>
 						<textFieldExpression><![CDATA[$F{SchoolNo} != null ? $F{SchoolName} : "Teacher not in any school"]]></textFieldExpression>
 					</textField>
+					<textField evaluationTime="Group" evaluationGroup="School">
+						<reportElement style="Group header" x="380" y="0" width="86" height="24" uuid="0952718e-5dd6-493c-8484-715ab15c5cd3">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<textElement>
+							<font size="8"/>
+						</textElement>
+						<textFieldExpression><![CDATA["Enrolments: " + $V{UniqueEnrolments}]]></textFieldExpression>
+					</textField>
+					<textField evaluationTime="Group" evaluationGroup="School">
+						<reportElement style="Group header" x="551" y="0" width="154" height="24" uuid="8203a9e6-d19b-4458-94fe-d8ebdcd9688e"/>
+						<textElement>
+							<font size="8"/>
+						</textElement>
+						<textFieldExpression><![CDATA["Pupil/Teacher Ratio: " + $V{UniqueEnrolments} / $V{Teachers}]]></textFieldExpression>
+					</textField>
+					<textField evaluationTime="Group" evaluationGroup="School">
+						<reportElement style="Group header" x="466" y="0" width="85" height="24" uuid="8f6829d0-83a5-477c-b421-5ea62cf6d80d">
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+						<textElement>
+							<font size="8"/>
+						</textElement>
+						<textFieldExpression><![CDATA["Teachers: " + $V{Teachers}]]></textFieldExpression>
+					</textField>
+					<staticText>
+						<reportElement key="" style="Group header" x="705" y="0" width="44" height="24" uuid="0a8da795-9e8c-4b2d-8c56-e3023e3f63e0"/>
+						<textElement verticalAlignment="Middle">
+							<font size="8"/>
+						</textElement>
+						<text><![CDATA[Verified:]]></text>
+					</staticText>
+					<rectangle>
+						<reportElement x="755" y="5" width="13" height="14" uuid="fd7e4191-3c72-4990-8d5f-bf5fe7d8420b">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</reportElement>
+					</rectangle>
 				</frame>
 				<staticText>
-					<reportElement key="" style="Column header" x="232" y="29" width="98" height="12" uuid="30dd0b20-2200-46da-a7a6-350f43a9f054">
+					<reportElement key="" style="Column header" x="250" y="24" width="70" height="12" uuid="30dd0b20-2200-46da-a7a6-350f43a9f054">
 						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
 					</reportElement>
@@ -453,7 +613,7 @@ ORDER BY TID;]]>
 					<text><![CDATA[Qualification]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="" style="Column header" x="148" y="29" width="84" height="12" uuid="6a58999f-d685-4eb2-bb4c-bff89abc78d2">
+					<reportElement key="" style="Column header" x="148" y="24" width="102" height="12" uuid="6a58999f-d685-4eb2-bb4c-bff89abc78d2">
 						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					</reportElement>
@@ -466,7 +626,7 @@ ORDER BY TID;]]>
 					<text><![CDATA[Position]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="" style="Column header" x="130" y="29" width="18" height="12" uuid="fe73c076-1844-429f-b8f0-02d3135fdbf0">
+					<reportElement key="" style="Column header" x="130" y="24" width="18" height="12" uuid="fe73c076-1844-429f-b8f0-02d3135fdbf0">
 						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					</reportElement>
@@ -479,7 +639,7 @@ ORDER BY TID;]]>
 					<text><![CDATA[Sex]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="" style="Column header" x="0" y="29" width="130" height="12" uuid="7ddc4863-f183-4ad1-b2e8-e7e726888c12">
+					<reportElement key="" style="Column header" x="0" y="24" width="130" height="12" uuid="7ddc4863-f183-4ad1-b2e8-e7e726888c12">
 						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
@@ -494,7 +654,7 @@ ORDER BY TID;]]>
 					<text><![CDATA[Teacher]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="" style="Column header" x="370" y="29" width="30" height="12" uuid="005233b7-a074-4115-99dd-02773adaca0a">
+					<reportElement key="" style="Column header" x="360" y="24" width="30" height="12" uuid="005233b7-a074-4115-99dd-02773adaca0a">
 						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -508,7 +668,7 @@ ORDER BY TID;]]>
 					<text><![CDATA[Active]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="" style="Column header" x="330" y="29" width="40" height="12" uuid="10a9db13-3c4a-4bc7-8200-681ef12a1309">
+					<reportElement key="" style="Column header" x="320" y="24" width="40" height="12" uuid="10a9db13-3c4a-4bc7-8200-681ef12a1309">
 						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
 					</reportElement>
@@ -521,7 +681,7 @@ ORDER BY TID;]]>
 					<text><![CDATA[Qualified]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="" style="Column header" x="400" y="29" width="120" height="12" uuid="2a490f56-390e-4ae9-b3f2-89ae4ff3ad99">
+					<reportElement key="" style="Column header" x="390" y="24" width="140" height="12" uuid="2a490f56-390e-4ae9-b3f2-89ae4ff3ad99">
 						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -535,7 +695,7 @@ ORDER BY TID;]]>
 					<text><![CDATA[Grade Levels]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="" style="Column header" x="685" y="29" width="67" height="12" uuid="1a3f31a1-0568-4278-9550-3cd84c65901f">
+					<reportElement key="" style="Column header" x="684" y="24" width="68" height="12" uuid="1a3f31a1-0568-4278-9550-3cd84c65901f">
 						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -546,10 +706,10 @@ ORDER BY TID;]]>
 					<textElement textAlignment="Left">
 						<font size="8"/>
 					</textElement>
-					<text><![CDATA[Duties Reported]]></text>
+					<text><![CDATA[Payroll Active?]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="" style="Column header" x="520" y="29" width="164" height="12" uuid="7fc556e2-171c-424a-943d-6d86e3523a13">
+					<reportElement key="" style="Column header" x="530" y="24" width="154" height="12" uuid="7fc556e2-171c-424a-943d-6d86e3523a13">
 						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -577,7 +737,7 @@ ORDER BY TID;]]>
 				<reportElement x="0" y="0" width="126" height="126" uuid="1c003177-754c-448f-8ce1-16868856f545">
 					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 				</reportElement>
-				<imageExpression><![CDATA["../images/fsm_seal.png"]]></imageExpression>
+				<imageExpression><![CDATA["repo:/images/fsm_seal.png"]]></imageExpression>
 			</image>
 			<staticText>
 				<reportElement style="Title" x="126" y="0" width="499" height="62" uuid="bc1ce1da-8232-46ea-be55-cec4abb986dd">
@@ -595,7 +755,7 @@ ORDER BY TID;]]>
 				<textElement>
 					<font size="10"/>
 				</textElement>
-				<text><![CDATA[A list of teachers as reported by school in the annual census roster submissions. This should be verified by schools and any incorrect data should be reported (marked in a printed copy of this report) and properly re-entered in the MIEMIS workbook and reloaded.]]></text>
+				<text><![CDATA[A list of teachers as reported by school in the annual census roster submissions. This should be verified by schools and any incorrect data should be reported (marked in a printed copy of this report) and properly re-entered in the FedEMIS workbook and reloaded.]]></text>
 			</staticText>
 			<image>
 				<reportElement x="625" y="0" width="126" height="126" uuid="4aa6f4d1-27dc-4b34-9227-59e19ce2c959">
@@ -603,7 +763,7 @@ ORDER BY TID;]]>
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
-				<imageExpression><![CDATA["../images/fsm_ndoe.png"]]></imageExpression>
+				<imageExpression><![CDATA["repo:/images/fsm_ndoe.png"]]></imageExpression>
 			</image>
 			<rectangle>
 				<reportElement mode="Opaque" x="-21" y="-20" width="793" height="10" forecolor="#08298C" backcolor="#08298C" uuid="a879b5ed-22f8-4e7b-9093-811aaea43211">
@@ -652,9 +812,9 @@ ORDER BY TID;]]>
 		<band splitType="Stretch"/>
 	</columnHeader>
 	<detail>
-		<band height="20" splitType="Stretch">
+		<band height="15" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
-			<textField textAdjust="StretchHeight">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="130" y="1" width="18" height="14" uuid="6596f86e-3347-462e-b1b8-a5113eed991a">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
@@ -668,7 +828,7 @@ ORDER BY TID;]]>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{G}]]></textFieldExpression>
 			</textField>
-			<textField textAdjust="StretchHeight">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="1" width="130" height="14" uuid="afe58eca-7a4d-4313-9799-a1e34359040d">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
@@ -682,8 +842,8 @@ ORDER BY TID;]]>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{Teacher}]]></textFieldExpression>
 			</textField>
-			<textField textAdjust="StretchHeight">
-				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="148" y="1" width="84" height="14" uuid="47e82f2e-a61f-4faa-963f-ecf2b80b1fb1">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="148" y="1" width="102" height="14" uuid="47e82f2e-a61f-4faa-963f-ecf2b80b1fb1">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
@@ -697,8 +857,8 @@ ORDER BY TID;]]>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{TeacherRole}]]></textFieldExpression>
 			</textField>
-			<textField textAdjust="StretchHeight" pattern="MMM d, yyyy" isBlankWhenNull="true">
-				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="232" y="1" width="98" height="14" uuid="329fdd70-4466-4a7f-b3df-f6d3dcf76201">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="250" y="1" width="70" height="14" uuid="329fdd70-4466-4a7f-b3df-f6d3dcf76201">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -711,8 +871,8 @@ ORDER BY TID;]]>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{Qualification}]]></textFieldExpression>
 			</textField>
-			<textField textAdjust="StretchHeight" pattern="MMM d, yyyy" isBlankWhenNull="true">
-				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="370" y="1" width="30" height="14" uuid="03fb1f15-7c60-4260-92af-5253604ab433">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="360" y="1" width="30" height="14" uuid="03fb1f15-7c60-4260-92af-5253604ab433">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -723,10 +883,11 @@ ORDER BY TID;]]>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Open Sans Semibold" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{Active}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{Active} == 1 ? "Yes" : 
+$F{Active} == 0 ? "No" : "N/A"]]></textFieldExpression>
 			</textField>
-			<textField textAdjust="StretchHeight">
-				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="400" y="1" width="120" height="14" uuid="331a0dbe-c082-4122-992c-b3a5ca073e2d">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="NoSpecificGradesAssigned" stretchType="RelativeToTallestObject" mode="Opaque" x="390" y="1" width="140" height="14" uuid="331a0dbe-c082-4122-992c-b3a5ca073e2d">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
@@ -735,14 +896,14 @@ ORDER BY TID;]]>
 					<bottomPen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Open Sans Semibold" size="9"/>
+					<font fontName="Open Sans Semibold" size="6"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{Grades}]]></textFieldExpression>
 			</textField>
-			<textField textAdjust="StretchHeight" pattern="M/d/yy">
-				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="685" y="1" width="67" height="14" uuid="168958d5-3ae1-45e0-9013-a2b0b749bbdd">
+			<textField textAdjust="StretchHeight" pattern="M/d/yy" isBlankWhenNull="true">
+				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="684" y="1" width="68" height="14" uuid="168958d5-3ae1-45e0-9013-a2b0b749bbdd">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<box>
@@ -751,14 +912,9 @@ ORDER BY TID;]]>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Open Sans Semibold" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{TAMX}.equals("T") ? "Teacher" :
-$F{TAMX}.equals("A") ? "Admin" :
-$F{TAMX}.equals("M") ? "Mixed" :
-$F{TAMX}.equals("X") ? "Other" : 
-$F{TAMX}.equals("U") ? "No duties" : "N/A"]]></textFieldExpression>
 			</textField>
-			<textField textAdjust="StretchHeight" isBlankWhenNull="false">
-				<reportElement style="NotCertified" stretchType="RelativeToTallestObject" mode="Opaque" x="330" y="1" width="40" height="14" uuid="361b0a1f-6d86-4633-9131-d20cad9c6965">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="NotQualified" stretchType="RelativeToTallestObject" mode="Opaque" x="320" y="1" width="40" height="14" uuid="361b0a1f-6d86-4633-9131-d20cad9c6965">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
@@ -772,8 +928,8 @@ $F{TAMX}.equals("U") ? "No duties" : "N/A"]]></textFieldExpression>
 				<textFieldExpression><![CDATA[$F{Qualified} == 1 ? "Yes" : 
 $F{Qualified} == 0 ? "No" : "N/A"]]></textFieldExpression>
 			</textField>
-			<textField textAdjust="StretchHeight">
-				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="520" y="1" width="164" height="14" uuid="e482f014-5ee5-4192-a8cf-e9035509f406">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="530" y="1" width="154" height="14" uuid="e482f014-5ee5-4192-a8cf-e9035509f406">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
