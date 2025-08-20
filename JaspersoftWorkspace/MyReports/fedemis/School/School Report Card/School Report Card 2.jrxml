@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.4.3.final using JasperReports Library version 6.4.3  -->
+<!-- Created with Jaspersoft Studio version 6.21.2.final using JasperReports Library version 6.21.2-8434a0bd7c3bbc37cbf916f2968d35e4b165821a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="School_Report_Card" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="df013db5-f76e-44d3-b0df-bcbc46d93160">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="FEDEMIS"/>
@@ -194,7 +194,7 @@
 				<textElement textAlignment="Left" verticalAlignment="Bottom"/>
 				<text><![CDATA[School Type]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="0" y="152" width="180" height="21" uuid="3cee6f40-33ee-462f-813a-73bc6d91f600">
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
@@ -204,7 +204,7 @@
 				<textElement textAlignment="Left" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{schPh1}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="190" y="152" width="175" height="21" uuid="f4105d3b-4a0c-447f-847a-ec7c934f1bf9">
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 				</reportElement>
@@ -212,7 +212,7 @@
 				<textElement textAlignment="Left" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{schEmail}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="0" y="219" width="180" height="20" uuid="754ea6c9-9ec7-41f7-bdde-af18af74a12c">
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
@@ -221,7 +221,7 @@
 				<textElement textAlignment="Left" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{authName}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="190" y="219" width="175" height="20" uuid="373cc92d-5f21-4a20-bf66-7db75f0eabc6">
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 				</reportElement>
@@ -229,7 +229,7 @@
 				<textElement textAlignment="Left" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{schLandOwner}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="374" y="219" width="170" height="20" uuid="5fda7ce7-3d0d-48e9-b176-61d950e38cac">
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
@@ -276,7 +276,7 @@
 				<textElement textAlignment="Left" verticalAlignment="Bottom"/>
 				<text><![CDATA[Address]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" mode="Transparent" x="0" y="87" width="180" height="21" uuid="b2c794ad-efae-431c-a256-132766d4ea9c">
 					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
 				</reportElement>
@@ -286,7 +286,7 @@
 				<textElement textAlignment="Left" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{iName}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" mode="Transparent" x="190" y="87" width="175" height="21" uuid="e8bbf3df-c467-4aae-a950-aed2878d5ebf">
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
@@ -297,7 +297,7 @@
 				<textElement textAlignment="Left" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{dName}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" mode="Transparent" x="374" y="87" width="170" height="21" uuid="838f3b36-be29-482f-94fe-1ce0b65da48c">
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
@@ -319,7 +319,7 @@
 				</textElement>
 				<text><![CDATA[School ID]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="0" y="19" width="180" height="21" uuid="e53f255c-2a83-4be8-96d2-97d0dc2eec13">
 					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
 				</reportElement>
@@ -337,7 +337,7 @@
 				<textElement textAlignment="Left" verticalAlignment="Bottom"/>
 				<text><![CDATA[School Name]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="190" y="19" width="175" height="21" uuid="4ca63161-8b65-46cd-8925-a563029a2eb4">
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 				</reportElement>
@@ -667,11 +667,14 @@
 				</textField>
 			</frame>
 			<subreport>
-				<reportElement positionType="Float" x="0" y="30" width="555" height="10" uuid="6cb91e72-3756-4fc9-a226-e4d219bbb7ff">
+				<reportElement positionType="Float" x="0" y="30" width="570" height="10" uuid="6cb91e72-3756-4fc9-a226-e4d219bbb7ff">
 					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 				</reportElement>
 				<subreportParameter name="SchoolNo">
 					<subreportParameterExpression><![CDATA[$P{SchoolNo}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="Year">
+					<subreportParameterExpression><![CDATA[$P{Year}]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 				<subreportExpression><![CDATA["School Teachers Subreport.jrxml"]]></subreportExpression>
@@ -696,11 +699,14 @@
 				</textField>
 			</frame>
 			<subreport>
-				<reportElement positionType="Float" x="0" y="30" width="555" height="10" uuid="dc42fcb2-9729-4ef2-bdab-e88bda094c8c">
+				<reportElement positionType="Float" x="0" y="30" width="570" height="10" uuid="dc42fcb2-9729-4ef2-bdab-e88bda094c8c">
 					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 				</reportElement>
 				<subreportParameter name="SchoolNo">
 					<subreportParameterExpression><![CDATA[$P{SchoolNo}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="Year">
+					<subreportParameterExpression><![CDATA[$P{Year}]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 				<subreportExpression><![CDATA["School Teacher Qualifications.jrxml"]]></subreportExpression>

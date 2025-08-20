@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="School_Teacher_Qualifications_Summary_Subreport" pageWidth="612" pageHeight="792" columnWidth="612" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="df013db5-f76e-44d3-b0df-bcbc46d93160">
+<!-- Created with Jaspersoft Studio version 6.21.2.final using JasperReports Library version 6.21.2-8434a0bd7c3bbc37cbf916f2968d35e4b165821a  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="School_Teacher_Qualifications_Summary_Subreport" pageWidth="570" pageHeight="792" columnWidth="570" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="df013db5-f76e-44d3-b0df-bcbc46d93160">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="FEDEMIS-NEW"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="FEDEMIS-TEST"/>
 	<property name="ireport.jasperserver.url" value="http://localhost:8080/jasperserver/"/>
 	<property name="ireport.jasperserver.user" value="jasperadmin"/>
 	<property name="ireport.jasperserver.reportUnit" value="/reports/MIEMIS_Reports/Student_Reports/Student_Enrol_by_Age_Level_EA"/>
-	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="404"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="586"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<template><![CDATA["repo:/Templates/"+$P{SchoolNo}.substring( 0, 3 )+".jrtx"]]></template>
 	<style name="Row" mode="Transparent">
 		<conditionalStyle>
@@ -40,31 +40,95 @@
 	<style name="Row_Crosstab"/>
 	<subDataset name="Teachers Qualifications" uuid="f5250031-b344-40a9-b57d-963f3bce41e5">
 		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="FEDEMIS"/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="FEDEMIS-TEST"/>
 		<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="228"/>
 		<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="762"/>
 		<parameter name="SchoolNo" class="java.lang.String">
 			<defaultValueExpression><![CDATA["CHK006"]]></defaultValueExpression>
 		</parameter>
+		<parameter name="Year" class="java.lang.Integer">
+			<defaultValueExpression><![CDATA[2024]]></defaultValueExpression>
+		</parameter>
 		<queryString language="SQL">
-			<![CDATA[SELECT 
- TLA.Gender ,
- convert(int,TLA.Qualified) Qualified ,
- isnull(TLA.codeDescription,'N/A') codeDescription,
- sum(case when Qualified=1 then 1 else 0 end ) as enroll
- FROM [warehouse].[TempSchoolTeacherDetails] TLA
-   WHERE TLA.trComplete = 'true' 
-   and TLA.SchNo = $P{SchoolNo}
-    
-   AND  taDate = (SELECT MAX(TLA.taDate) FROM [warehouse].[TempSchoolTeacherDetails] AS TLA WHERE TLA.SchNo= $P{SchoolNo})
-   
-    GROUP BY TLA.Gender ,TLA.Qualified,TLA.codeDescription
-    order by TLA.Gender ,TLA.codeDescription]]>
+			<![CDATA[WITH source_data AS (
+    SELECT
+        TL.tID,
+        TI.tSurname,
+        TI.tGiven,
+        TI.tSex AS Gender,
+        TL.Qualified AS Qualified,
+        TT.trQual AS QualificationCode,
+        LTQ.codeDescription AS Qualification,
+        'Web UI' AS Source
+    FROM warehouse.TeacherLocation TL
+    LEFT JOIN TeacherIdentity TI   ON TL.tID = TI.tID
+    LEFT JOIN dbo.TeacherTraining TT ON TL.tID = TT.tID
+    INNER JOIN dbo.lkpTeacherQual LTQ ON TT.trQual = LTQ.codeCode
+    WHERE TL.SchNo = $P{SchoolNo}
+      AND TL.SurveyYear = $P{Year}
+      AND LTQ.codeGroup = 'Academic Degree'
+
+    UNION ALL
+
+    SELECT
+        TS.tID,
+        TI.tSurname,
+        TI.tGiven,
+        TI.tSex AS Gender,
+        LTQ.codeQualified AS Qualified,
+        TS.tchQual AS QualificationCode,
+        LTQ.codeDescription AS Qualification,
+        'Annual Survey' AS Source
+    FROM TeacherSurvey TS
+    INNER JOIN TeacherIdentity TI   ON TS.tID = TI.tID
+    INNER JOIN dbo.lkpTeacherQual LTQ ON TS.tchQual = LTQ.codeCode
+    INNER JOIN dbo.SchoolSurvey SS  ON TS.ssID = SS.ssID
+    WHERE SS.schNo  = $P{SchoolNo}
+      AND SS.svyYear = $P{Year}
+),
+pick_one AS (
+    SELECT
+        sd.*,
+        ROW_NUMBER() OVER (
+            PARTITION BY sd.tID, sd.tSurname, sd.tGiven
+            ORDER BY CASE sd.Source
+                        WHEN 'Web UI' THEN 1
+                        WHEN 'Annual Survey' THEN 2
+                        ELSE 3
+                     END
+        ) AS rn
+    FROM source_data sd
+)
+SELECT
+    Gender,
+    Qualified,
+    Qualification,
+    COUNT(*) AS Num
+FROM pick_one
+WHERE rn = 1
+GROUP BY
+    Gender,
+    Qualified,
+    Qualification
+ORDER BY
+    Gender, Qualified, Qualification;]]>
 		</queryString>
-		<field name="Gender" class="java.lang.String"/>
-		<field name="Qualified" class="java.lang.Integer"/>
-		<field name="codeDescription" class="java.lang.String"/>
-		<field name="enroll" class="java.lang.Integer"/>
+		<field name="Gender" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="Gender"/>
+			<property name="com.jaspersoft.studio.field.label" value="Gender"/>
+		</field>
+		<field name="Qualified" class="java.lang.Integer">
+			<property name="com.jaspersoft.studio.field.name" value="Qualified"/>
+			<property name="com.jaspersoft.studio.field.label" value="Qualified"/>
+		</field>
+		<field name="Qualification" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="Qualification"/>
+			<property name="com.jaspersoft.studio.field.label" value="Qualification"/>
+		</field>
+		<field name="Num" class="java.lang.Integer">
+			<property name="com.jaspersoft.studio.field.name" value="Num"/>
+			<property name="com.jaspersoft.studio.field.label" value="Num"/>
+		</field>
 	</subDataset>
 	<parameter name="Year" class="java.lang.Integer">
 		<defaultValueExpression><![CDATA[2015]]></defaultValueExpression>
@@ -74,31 +138,69 @@
 		<defaultValueExpression><![CDATA["CHK006"]]></defaultValueExpression>
 	</parameter>
 	<queryString language="SQL">
-		<![CDATA[Select
-TLA.tID ,
- TLA.tSurname ,
- TLA.tGiven ,
- TLA.Gender ,
-convert(int,TLA.Qualified) Qualified,
- TLA.codeDescription
+		<![CDATA[SELECT TL.tID
+	, TI.tSurname
+	, TI.tGiven
+	, TI.tSex Gender
+	, TL.Qualified Qualified
+	, TT.trQual QualificationCode
+	, LTQ.codeDescription Qualification
+	, 'Web UI' Source
+FROM warehouse.TeacherLocation TL
+LEFT JOIN TeacherIdentity TI ON TL.TID = TI.tID
+LEFT JOIN dbo.TeacherTraining TT ON TL.TID = TT.tID
+INNER JOIN dbo.lkpTeacherQual LTQ ON TT.trQual = LTQ.codeCode
+WHERE SchNo = $P{SchoolNo} AND SurveyYear = $P{Year} AND LTQ.codeGroup = 'Academic Degree'
 
-from [warehouse].[TempSchoolTeacherDetails] TLA
-WHERE TLA.trComplete = 'true' 
-   and TLA.SchNo = $P{SchoolNo}
-   AND  TLA.taDate = (SELECT MAX(TLA.taDate) FROM [warehouse].[TempSchoolTeacherDetails] AS TLA WHERE TLA.SchNo= $P{SchoolNo})
-    group by TLA.tID ,
- TLA.tSurname ,
- TLA.tGiven ,
- TLA.Gender ,
-TLA.Qualified,
- TLA.codeDescription]]>
+UNION
+
+SELECT TS.tID
+	, TI.tSurname
+	, TI.tGiven
+	, TI.tSex Gender
+	, LTQ.codeQualified Qualified
+	, TS.tchQual QualificationCode
+	, LTQ.codeDescription Qualification
+	, 'Annual Survey' Source
+FROM TeacherSurvey TS
+INNER JOIN TeacherIdentity TI ON TS.TID = TI.tID
+INNER JOIN dbo.lkpTeacherQual LTQ ON TS.tchQual = LTQ.codeCode
+INNER JOIN dbo.SchoolSurvey SS ON TS.ssID = SS.ssID
+WHERE SS.schNo = $P{SchoolNo} AND SS.svyYear = $P{Year}
+ORDER BY Source DESC, tSurname, tGiven]]>
 	</queryString>
-	<field name="tID" class="java.lang.Integer"/>
-	<field name="tSurname" class="java.lang.String"/>
-	<field name="tGiven" class="java.lang.String"/>
-	<field name="Gender" class="java.lang.String"/>
-	<field name="Qualified" class="java.lang.Integer"/>
-	<field name="codeDescription" class="java.lang.String"/>
+	<field name="tID" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="tID"/>
+		<property name="com.jaspersoft.studio.field.label" value="tID"/>
+	</field>
+	<field name="tSurname" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="tSurname"/>
+		<property name="com.jaspersoft.studio.field.label" value="tSurname"/>
+	</field>
+	<field name="tGiven" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="tGiven"/>
+		<property name="com.jaspersoft.studio.field.label" value="tGiven"/>
+	</field>
+	<field name="Gender" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Gender"/>
+		<property name="com.jaspersoft.studio.field.label" value="Gender"/>
+	</field>
+	<field name="Qualified" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="Qualified"/>
+		<property name="com.jaspersoft.studio.field.label" value="Qualified"/>
+	</field>
+	<field name="QualificationCode" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="QualificationCode"/>
+		<property name="com.jaspersoft.studio.field.label" value="QualificationCode"/>
+	</field>
+	<field name="Qualification" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Qualification"/>
+		<property name="com.jaspersoft.studio.field.label" value="Qualification"/>
+	</field>
+	<field name="Source" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Source"/>
+		<property name="com.jaspersoft.studio.field.label" value="Source"/>
+	</field>
 	<variable name="Year" class="java.lang.Integer"/>
 	<group name="Group1">
 		<groupExpression><![CDATA[$P{SchoolNo}]]></groupExpression>
@@ -148,7 +250,7 @@ TLA.Qualified,
 		<band height="352" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 			<crosstab>
-				<reportElement x="0" y="8" width="595" height="30" uuid="e5afe4f1-409d-4c87-81e6-dcae2e1a0469">
+				<reportElement x="0" y="8" width="570" height="30" uuid="e5afe4f1-409d-4c87-81e6-dcae2e1a0469">
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
 					<property name="com.jaspersoft.studio.crosstab.style.header" value="Crosstab_CH"/>
 					<property name="com.jaspersoft.studio.crosstab.style.group" value="Crosstab_CG"/>
@@ -160,7 +262,7 @@ TLA.Qualified,
 					<cellContents>
 						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 						<frame>
-							<reportElement mode="Transparent" x="0" y="0" width="562" height="15" forecolor="#666666" backcolor="#F2F2F2" uuid="1a17df7c-3f5d-4df0-9535-9d806413ad87">
+							<reportElement mode="Transparent" x="0" y="0" width="537" height="15" forecolor="#666666" backcolor="#F2F2F2" uuid="1a17df7c-3f5d-4df0-9535-9d806413ad87">
 								<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 							</reportElement>
 							<box>
@@ -224,7 +326,7 @@ TLA.Qualified,
 								<textFieldExpression><![CDATA["Qualified"]]></textFieldExpression>
 							</textField>
 							<textField>
-								<reportElement mode="Transparent" x="392" y="0" width="168" height="15" forecolor="#000000" backcolor="#F2F2F2" uuid="e184e62f-3422-40db-8904-e1b9912b6331"/>
+								<reportElement mode="Transparent" x="392" y="0" width="88" height="15" forecolor="#000000" backcolor="#F2F2F2" uuid="e184e62f-3422-40db-8904-e1b9912b6331"/>
 								<box leftPadding="4">
 									<pen lineWidth="0.0"/>
 									<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#C8C8C8"/>
@@ -237,7 +339,7 @@ TLA.Qualified,
 						</frame>
 					</cellContents>
 				</crosstabHeaderCell>
-				<rowGroup name="tID" width="42" totalPosition="End">
+				<rowGroup name="tID" width="17" totalPosition="End">
 					<bucket class="java.lang.Integer">
 						<bucketExpression><![CDATA[$F{tID}]]></bucketExpression>
 					</bucket>
@@ -245,7 +347,7 @@ TLA.Qualified,
 						<cellContents mode="Opaque" style="Row_Crosstab">
 							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 							<frame>
-								<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="42" height="15" uuid="28a19c6b-8170-43e7-8a8a-d0d328bead5b"/>
+								<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="17" height="15" uuid="28a19c6b-8170-43e7-8a8a-d0d328bead5b"/>
 								<box>
 									<bottomPen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
 								</box>
@@ -266,7 +368,7 @@ TLA.Qualified,
 						<cellContents mode="Opaque" style="Crosstab_CT">
 							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 							<staticText>
-								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="562" height="0" forecolor="#FFFFFF" uuid="167c1b51-88d3-44b3-b6a3-494c348c47d6"/>
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="537" height="0" forecolor="#FFFFFF" uuid="167c1b51-88d3-44b3-b6a3-494c348c47d6"/>
 								<box>
 									<bottomPen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
 								</box>
@@ -400,13 +502,13 @@ TLA.Qualified,
 						</cellContents>
 					</crosstabTotalRowHeader>
 				</rowGroup>
-				<rowGroup name="codeDescription" width="170" totalPosition="End">
+				<rowGroup name="Qualification" width="170" totalPosition="End">
 					<bucket class="java.lang.String">
-						<bucketExpression><![CDATA[$F{codeDescription}]]></bucketExpression>
+						<bucketExpression><![CDATA[$F{Qualification}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents mode="Opaque" style="Row_Crosstab">
-							<textField isStretchWithOverflow="true">
+							<textField textAdjust="StretchHeight">
 								<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="170" height="15" uuid="677c6af7-32cc-4b06-b571-da6cd8eb5509">
 									<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 								</reportElement>
@@ -416,7 +518,7 @@ TLA.Qualified,
 								<textElement textAlignment="Left" verticalAlignment="Middle">
 									<font fontName="Open Sans" size="10"/>
 								</textElement>
-								<textFieldExpression><![CDATA[$V{codeDescription}]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$V{Qualification}]]></textFieldExpression>
 							</textField>
 						</cellContents>
 					</crosstabRowHeader>
@@ -427,7 +529,7 @@ TLA.Qualified,
 								<box>
 									<bottomPen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
 								</box>
-								<text><![CDATA[Total codeDescription]]></text>
+								<text><![CDATA[Total Qualification]]></text>
 							</staticText>
 						</cellContents>
 					</crosstabTotalRowHeader>
@@ -444,13 +546,13 @@ TLA.Qualified,
 								<pen lineWidth="0.0" lineColor="#FFFFFF"/>
 							</box>
 							<textField>
-								<reportElement x="0" y="0" width="10" height="15" forecolor="#FFFFFF" uuid="163c1ff4-4b00-4753-8247-ddd7d38f8aeb">
+								<reportElement x="0" y="0" width="12" height="15" forecolor="#FFFFFF" uuid="163c1ff4-4b00-4753-8247-ddd7d38f8aeb">
 									<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 								</reportElement>
 								<box>
 									<pen lineWidth="0.0"/>
 								</box>
-								<textFieldExpression><![CDATA[$V{codeDescription_MEASURE}]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$V{Qualification_MEASURE}]]></textFieldExpression>
 							</textField>
 						</cellContents>
 					</crosstabColumnHeader>
@@ -462,126 +564,126 @@ TLA.Qualified,
 						</cellContents>
 					</crosstabTotalColumnHeader>
 				</columnGroup>
-				<measure name="codeDescription_MEASURE" class="java.lang.Integer" calculation="Count">
-					<measureExpression><![CDATA[$F{codeDescription}]]></measureExpression>
+				<measure name="Qualification_MEASURE" class="java.lang.Integer" calculation="Count">
+					<measureExpression><![CDATA[$F{Qualification}]]></measureExpression>
 				</measure>
-				<crosstabCell width="10" height="15">
+				<crosstabCell width="12" height="15">
 					<cellContents mode="Opaque" style="Crosstab_CD">
 						<textField>
-							<reportElement key="" x="0" y="0" width="10" height="15" forecolor="#FFFFFF" uuid="48ace900-bdb1-4fc2-b0e2-5e178aa61c3c">
+							<reportElement key="" x="0" y="0" width="12" height="15" forecolor="#FFFFFF" uuid="48ace900-bdb1-4fc2-b0e2-5e178aa61c3c">
 								<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 							</reportElement>
-							<textFieldExpression><![CDATA[$V{codeDescription_MEASURE}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{Qualification_MEASURE}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="10" height="0" rowTotalGroup="tID">
+				<crosstabCell width="12" height="0" rowTotalGroup="tID">
 					<cellContents mode="Opaque" style="Crosstab_CT">
 						<textField>
-							<reportElement x="0" y="0" width="10" height="0" forecolor="#FFFFFF" uuid="b6781a06-811c-4c35-b882-0a52e8fff528"/>
-							<textFieldExpression><![CDATA[$V{codeDescription_MEASURE}]]></textFieldExpression>
+							<reportElement x="0" y="0" width="12" height="0" forecolor="#FFFFFF" uuid="b6781a06-811c-4c35-b882-0a52e8fff528"/>
+							<textFieldExpression><![CDATA[$V{Qualification_MEASURE}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="10" height="0" rowTotalGroup="tSurname">
+				<crosstabCell width="12" height="0" rowTotalGroup="tSurname">
 					<cellContents mode="Opaque" style="Crosstab_CG">
 						<textField>
-							<reportElement x="0" y="0" width="10" height="0" uuid="a5908510-1816-43d9-9bc1-b32dc43b32a9"/>
-							<textFieldExpression><![CDATA[$V{codeDescription_MEASURE}]]></textFieldExpression>
+							<reportElement x="0" y="0" width="12" height="0" uuid="a5908510-1816-43d9-9bc1-b32dc43b32a9"/>
+							<textFieldExpression><![CDATA[$V{Qualification_MEASURE}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="10" height="0" rowTotalGroup="tGiven">
+				<crosstabCell width="12" height="0" rowTotalGroup="tGiven">
 					<cellContents mode="Opaque" style="Crosstab_CG">
 						<textField>
-							<reportElement x="0" y="0" width="10" height="0" uuid="7cf1fc46-38bc-4215-84d8-b9d798237cd5"/>
-							<textFieldExpression><![CDATA[$V{codeDescription_MEASURE}]]></textFieldExpression>
+							<reportElement x="0" y="0" width="12" height="0" uuid="7cf1fc46-38bc-4215-84d8-b9d798237cd5"/>
+							<textFieldExpression><![CDATA[$V{Qualification_MEASURE}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="10" height="0" rowTotalGroup="Gender">
+				<crosstabCell width="12" height="0" rowTotalGroup="Gender">
 					<cellContents mode="Opaque" style="Crosstab_CG">
 						<textField>
-							<reportElement x="0" y="0" width="10" height="0" uuid="6c345a1f-2b83-4795-8f3a-414e18237272"/>
-							<textFieldExpression><![CDATA[$V{codeDescription_MEASURE}]]></textFieldExpression>
+							<reportElement x="0" y="0" width="12" height="0" uuid="6c345a1f-2b83-4795-8f3a-414e18237272"/>
+							<textFieldExpression><![CDATA[$V{Qualification_MEASURE}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="10" height="0" rowTotalGroup="Qualified">
+				<crosstabCell width="12" height="0" rowTotalGroup="Qualified">
 					<cellContents mode="Opaque" style="Crosstab_CG">
 						<textField>
-							<reportElement x="0" y="0" width="10" height="0" uuid="e2aeb288-7809-46a4-8894-6d8830be3a5a"/>
-							<textFieldExpression><![CDATA[$V{codeDescription_MEASURE}]]></textFieldExpression>
+							<reportElement x="0" y="0" width="12" height="0" uuid="e2aeb288-7809-46a4-8894-6d8830be3a5a"/>
+							<textFieldExpression><![CDATA[$V{Qualification_MEASURE}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="10" height="0" rowTotalGroup="codeDescription">
+				<crosstabCell width="12" height="0" rowTotalGroup="Qualification">
 					<cellContents mode="Opaque" style="Crosstab_CG">
 						<textField>
-							<reportElement x="0" y="0" width="10" height="0" uuid="6a165e30-9339-49bb-8338-5a5c81f7a073"/>
-							<textFieldExpression><![CDATA[$V{codeDescription_MEASURE}]]></textFieldExpression>
+							<reportElement x="0" y="0" width="12" height="0" uuid="6a165e30-9339-49bb-8338-5a5c81f7a073"/>
+							<textFieldExpression><![CDATA[$V{Qualification_MEASURE}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="23" height="15" columnTotalGroup="Year">
+				<crosstabCell width="21" height="15" columnTotalGroup="Year">
 					<cellContents mode="Opaque" style="Crosstab_CT">
 						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="23" height="0" rowTotalGroup="tID" columnTotalGroup="Year">
+				<crosstabCell width="21" height="0" rowTotalGroup="tID" columnTotalGroup="Year">
 					<cellContents mode="Opaque" style="Crosstab_CT">
 						<textField>
-							<reportElement x="0" y="0" width="23" height="0" forecolor="#FFFFFF" uuid="8bcb38de-6eb9-49d8-8cb2-9f297c1d3ec1"/>
-							<textFieldExpression><![CDATA[$V{codeDescription_MEASURE}]]></textFieldExpression>
+							<reportElement x="0" y="0" width="21" height="0" forecolor="#FFFFFF" uuid="8bcb38de-6eb9-49d8-8cb2-9f297c1d3ec1"/>
+							<textFieldExpression><![CDATA[$V{Qualification_MEASURE}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="23" height="0" rowTotalGroup="tSurname" columnTotalGroup="Year">
+				<crosstabCell width="21" height="0" rowTotalGroup="tSurname" columnTotalGroup="Year">
 					<cellContents mode="Opaque" style="Crosstab_CT">
 						<textField>
-							<reportElement x="0" y="0" width="23" height="0" forecolor="#FFFFFF" uuid="9dc89ef7-249b-44fe-9335-ff0899cc2bea"/>
-							<textFieldExpression><![CDATA[$V{codeDescription_MEASURE}]]></textFieldExpression>
+							<reportElement x="0" y="0" width="21" height="0" forecolor="#FFFFFF" uuid="9dc89ef7-249b-44fe-9335-ff0899cc2bea"/>
+							<textFieldExpression><![CDATA[$V{Qualification_MEASURE}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="23" height="0" rowTotalGroup="tGiven" columnTotalGroup="Year">
+				<crosstabCell width="21" height="0" rowTotalGroup="tGiven" columnTotalGroup="Year">
 					<cellContents mode="Opaque" style="Crosstab_CT">
 						<textField>
-							<reportElement x="0" y="0" width="23" height="0" forecolor="#FFFFFF" uuid="a728b5ac-fe38-49b1-9444-3e5eb4d93dcb"/>
-							<textFieldExpression><![CDATA[$V{codeDescription_MEASURE}]]></textFieldExpression>
+							<reportElement x="0" y="0" width="21" height="0" forecolor="#FFFFFF" uuid="a728b5ac-fe38-49b1-9444-3e5eb4d93dcb"/>
+							<textFieldExpression><![CDATA[$V{Qualification_MEASURE}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="23" height="0" rowTotalGroup="Gender" columnTotalGroup="Year">
+				<crosstabCell width="21" height="0" rowTotalGroup="Gender" columnTotalGroup="Year">
 					<cellContents mode="Opaque" style="Crosstab_CT">
 						<textField>
-							<reportElement x="0" y="0" width="23" height="0" forecolor="#FFFFFF" uuid="3aacd06a-2c4a-4e22-be78-7fa2119599f2"/>
-							<textFieldExpression><![CDATA[$V{codeDescription_MEASURE}]]></textFieldExpression>
+							<reportElement x="0" y="0" width="21" height="0" forecolor="#FFFFFF" uuid="3aacd06a-2c4a-4e22-be78-7fa2119599f2"/>
+							<textFieldExpression><![CDATA[$V{Qualification_MEASURE}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="23" height="0" rowTotalGroup="Qualified" columnTotalGroup="Year">
+				<crosstabCell width="21" height="0" rowTotalGroup="Qualified" columnTotalGroup="Year">
 					<cellContents mode="Opaque" style="Crosstab_CT">
 						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 						<textField>
-							<reportElement x="0" y="0" width="23" height="0" forecolor="#FFFFFF" uuid="8bdde6c4-908c-4daa-aae5-0db3be756dc7"/>
-							<textFieldExpression><![CDATA[$V{codeDescription_MEASURE}]]></textFieldExpression>
+							<reportElement x="0" y="0" width="21" height="0" forecolor="#FFFFFF" uuid="8bdde6c4-908c-4daa-aae5-0db3be756dc7"/>
+							<textFieldExpression><![CDATA[$V{Qualification_MEASURE}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="23" height="0" rowTotalGroup="codeDescription" columnTotalGroup="Year">
+				<crosstabCell width="21" height="0" rowTotalGroup="Qualification" columnTotalGroup="Year">
 					<cellContents mode="Opaque" style="Crosstab_CT">
 						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 						<textField>
-							<reportElement x="0" y="0" width="23" height="0" forecolor="#FFFFFF" uuid="e54eb290-506e-457e-8147-79c65d3c6b5e"/>
-							<textFieldExpression><![CDATA[$V{codeDescription_MEASURE}]]></textFieldExpression>
+							<reportElement x="0" y="0" width="21" height="0" forecolor="#FFFFFF" uuid="e54eb290-506e-457e-8147-79c65d3c6b5e"/>
+							<textFieldExpression><![CDATA[$V{Qualification_MEASURE}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
 			</crosstab>
 			<stackedBarChart>
 				<chart isShowLegend="true" evaluationTime="Report" theme="aegean">
-					<reportElement positionType="Float" x="0" y="50" width="577" height="285" uuid="f1a2f56c-385a-4286-9d4b-4e7ad2da3b73">
+					<reportElement positionType="Float" x="0" y="50" width="570" height="285" uuid="f1a2f56c-385a-4286-9d4b-4e7ad2da3b73">
 						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					</reportElement>
@@ -594,16 +696,19 @@ TLA.Qualified,
 				</chart>
 				<categoryDataset>
 					<dataset>
-						<datasetRun subDataset="Teachers Qualifications" uuid="9860cad9-6c4c-4c18-b930-29178a9aa24f">
+						<datasetRun subDataset="Teachers Qualifications" uuid="63cac1a7-999a-44eb-9ec9-75b6cad9682b">
 							<datasetParameter name="SchoolNo">
 								<datasetParameterExpression><![CDATA[$P{SchoolNo}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="Year">
+								<datasetParameterExpression><![CDATA[$P{Year}]]></datasetParameterExpression>
 							</datasetParameter>
 						</datasetRun>
 					</dataset>
 					<categorySeries>
 						<seriesExpression><![CDATA[$F{Gender}]]></seriesExpression>
-						<categoryExpression><![CDATA[$F{codeDescription}]]></categoryExpression>
-						<valueExpression><![CDATA[$F{enroll}]]></valueExpression>
+						<categoryExpression><![CDATA[$F{Qualification}]]></categoryExpression>
+						<valueExpression><![CDATA[$F{Num}]]></valueExpression>
 					</categorySeries>
 				</categoryDataset>
 				<barPlot>
