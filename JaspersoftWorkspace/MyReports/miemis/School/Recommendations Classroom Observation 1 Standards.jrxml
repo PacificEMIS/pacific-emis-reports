@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<!-- Created with Jaspersoft Studio version 6.21.2.final using JasperReports Library version 6.21.2-8434a0bd7c3bbc37cbf916f2968d35e4b165821a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Recommendations Classroom Observation 1 Standards" pageWidth="752" pageHeight="572" orientation="Landscape" columnWidth="752" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="3565900d-ed24-4a70-aba5-defc5a84704b">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MIEMIS-NEW"/>
@@ -223,7 +223,7 @@ from
 								<bottomPen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
 								<rightPen lineWidth="0.0" lineStyle="Dotted" lineColor="#000000"/>
 							</box>
-							<textField isStretchWithOverflow="true">
+							<textField textAdjust="StretchHeight">
 								<reportElement x="0" y="0" width="300" height="20" uuid="60db0604-79a6-4ca5-bdcb-43002e264e5c"/>
 								<box leftPadding="2"/>
 								<textElement textAlignment="Left" verticalAlignment="Middle">
@@ -249,7 +249,7 @@ from
 					<crosstabColumnHeader>
 						<cellContents mode="Opaque" style="Crosstab_CH">
 							<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
-							<textField isStretchWithOverflow="true">
+							<textField textAdjust="StretchHeight">
 								<reportElement x="0" y="0" width="30" height="0" uuid="31cf8974-fbb3-489a-a113-9aae71206f03"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font fontName="Open Sans"/>
@@ -317,7 +317,7 @@ $V{Level}==7 ? "C3" : "C4"]]></textFieldExpression>
 							<bottomPen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
 							<rightPen lineWidth="0.0" lineStyle="Dotted" lineColor="#000000"/>
 						</box>
-						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 							<reportElement style="StandardColor" x="0" y="0" width="30" height="20" uuid="43952dcb-d2e4-419c-a887-863bd9b3af22"/>
 							<box leftPadding="0">
 								<bottomPen lineWidth="1.0" lineColor="#C8C8C8"/>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<!-- Created with Jaspersoft Studio version 6.21.2.final using JasperReports Library version 6.21.2-8434a0bd7c3bbc37cbf916f2968d35e4b165821a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Summary of Classroom Observation 1 Scores" pageWidth="792" pageHeight="555" orientation="Landscape" columnWidth="792" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="69324236-0924-48a3-8f70-bbb7f07e367e">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MIEMIS-NEW"/>
@@ -83,165 +83,165 @@ $V{totalStandards}.intValue()>30 && $V{totalStandards}.intValue()<=45 ? "Level 3
 	<style name="LevelColorSE1" mode="Opaque">
 		<conditionalStyle>
 			<conditionExpression><![CDATA[($F{S1}==null ? "N/A" :(
-$V{SE.1}.intValue()>=0 && $V{SE.1}.intValue()<=50 ? "Level 1" : 
-$V{SE.1}.intValue()>50 && $V{SE.1}.intValue()<=75 ? "Level 2" : 
-$V{SE.1}.intValue()>75 && $V{SE.1}.intValue()<=90 ? "Level 3" : "Level 4")).equals("N/A")]]></conditionExpression>
+$V{SE.1}.intValue()>=0 && $V{SE.1}.intValue()<=25 ? "Level 1" : 
+$V{SE.1}.intValue()>25 && $V{SE.1}.intValue()<=50 ? "Level 2" : 
+$V{SE.1}.intValue()>50 && $V{SE.1}.intValue()<=75 ? "Level 3" : "Level 4")).equals("N/A")]]></conditionExpression>
 			<style mode="Opaque" forecolor="#000000" backcolor="#FFFFFF"/>
 		</conditionalStyle>
 		<conditionalStyle>
-			<conditionExpression><![CDATA[($V{SE.1}.intValue()>=0 && $V{SE.1}.intValue()<=50 ? "Level 1" : 
-$V{SE.1}.intValue()>50 && $V{SE.1}.intValue()<=75 ? "Level 2" : 
-$V{SE.1}.intValue()>75 && $V{SE.1}.intValue()<=90 ? "Level 3" : "Level 4").equals("Level 1")]]></conditionExpression>
+			<conditionExpression><![CDATA[($V{SE.1}.intValue()>=0 && $V{SE.1}.intValue()<=25 ? "Level 1" : 
+$V{SE.1}.intValue()>25 && $V{SE.1}.intValue()<=50 ? "Level 2" : 
+$V{SE.1}.intValue()>50 && $V{SE.1}.intValue()<=75 ? "Level 3" : "Level 4").equals("Level 1")]]></conditionExpression>
 			<style mode="Opaque" backcolor="#DE0404"/>
 		</conditionalStyle>
 		<conditionalStyle>
-			<conditionExpression><![CDATA[($V{SE.1}.intValue()>=0 && $V{SE.1}.intValue()<=50 ? "Level 1" : 
-$V{SE.1}.intValue()>50 && $V{SE.1}.intValue()<=75 ? "Level 2" : 
-$V{SE.1}.intValue()>75 && $V{SE.1}.intValue()<=90 ? "Level 3" : "Level 4").equals("Level 2")]]></conditionExpression>
+			<conditionExpression><![CDATA[($V{SE.1}.intValue()>=0 && $V{SE.1}.intValue()<=25 ? "Level 1" : 
+$V{SE.1}.intValue()>25 && $V{SE.1}.intValue()<=50 ? "Level 2" : 
+$V{SE.1}.intValue()>50 && $V{SE.1}.intValue()<=75 ? "Level 3" : "Level 4").equals("Level 2")]]></conditionExpression>
 			<style mode="Opaque" backcolor="#F5DD87"/>
 		</conditionalStyle>
 		<conditionalStyle>
-			<conditionExpression><![CDATA[($V{SE.1}.intValue()>=0 && $V{SE.1}.intValue()<=50 ? "Level 1" : 
-$V{SE.1}.intValue()>50 && $V{SE.1}.intValue()<=75 ? "Level 2" : 
-$V{SE.1}.intValue()>75 && $V{SE.1}.intValue()<=90 ? "Level 3" : "Level 4").equals("Level 3")]]></conditionExpression>
+			<conditionExpression><![CDATA[($V{SE.1}.intValue()>=0 && $V{SE.1}.intValue()<=25 ? "Level 1" : 
+$V{SE.1}.intValue()>25 && $V{SE.1}.intValue()<=50 ? "Level 2" : 
+$V{SE.1}.intValue()>50 && $V{SE.1}.intValue()<=75 ? "Level 3" : "Level 4").equals("Level 3")]]></conditionExpression>
 			<style mode="Opaque" backcolor="#8ED15E"/>
 		</conditionalStyle>
 		<conditionalStyle>
-			<conditionExpression><![CDATA[($V{SE.1}.intValue()>=0 && $V{SE.1}.intValue()<=50 ? "Level 1" : 
-$V{SE.1}.intValue()>50 && $V{SE.1}.intValue()<=75 ? "Level 2" : 
-$V{SE.1}.intValue()>75 && $V{SE.1}.intValue()<=90 ? "Level 3" : "Level 4").equals("Level 4")]]></conditionExpression>
+			<conditionExpression><![CDATA[($V{SE.1}.intValue()>=0 && $V{SE.1}.intValue()<=25 ? "Level 1" : 
+$V{SE.1}.intValue()>25 && $V{SE.1}.intValue()<=50 ? "Level 2" : 
+$V{SE.1}.intValue()>50 && $V{SE.1}.intValue()<=75 ? "Level 3" : "Level 4").equals("Level 4")]]></conditionExpression>
 			<style mode="Opaque" backcolor="#5DA658"/>
 		</conditionalStyle>
 	</style>
 	<style name="LevelColorSE2">
 		<conditionalStyle>
 			<conditionExpression><![CDATA[($F{S2}==null ? "N/A" :(
-$V{SE.1}.intValue()>=0 && $V{SE.1}.intValue()<=50 ? "Level 1" : 
-$V{SE.1}.intValue()>50 && $V{SE.1}.intValue()<=75 ? "Level 2" : 
-$V{SE.1}.intValue()>75 && $V{SE.1}.intValue()<=90 ? "Level 3" : "Level 4")).equals("N/A")]]></conditionExpression>
+$V{SE.1}.intValue()>=0 && $V{SE.1}.intValue()<=25 ? "Level 1" : 
+$V{SE.1}.intValue()>25 && $V{SE.1}.intValue()<=50 ? "Level 2" : 
+$V{SE.1}.intValue()>50 && $V{SE.1}.intValue()<=75 ? "Level 3" : "Level 4")).equals("N/A")]]></conditionExpression>
 			<style mode="Opaque" forecolor="#000000" backcolor="#FFFFFF"/>
 		</conditionalStyle>
 		<conditionalStyle>
-			<conditionExpression><![CDATA[($V{SE.2}.intValue()>=0 && $V{SE.2}.intValue()<=50 ? "Level 1" : 
-$V{SE.2}.intValue()>50 && $V{SE.2}.intValue()<=75 ? "Level 2" : 
-$V{SE.2}.intValue()>75 && $V{SE.2}.intValue()<=90 ? "Level 3" : "Level 4")==("Level 1")]]></conditionExpression>
+			<conditionExpression><![CDATA[($V{SE.2}.intValue()>=0 && $V{SE.2}.intValue()<=25 ? "Level 1" : 
+$V{SE.2}.intValue()>25 && $V{SE.2}.intValue()<=50 ? "Level 2" : 
+$V{SE.2}.intValue()>50 && $V{SE.2}.intValue()<=75 ? "Level 3" : "Level 4")==("Level 1")]]></conditionExpression>
 			<style mode="Opaque" backcolor="#DE0404"/>
 		</conditionalStyle>
 		<conditionalStyle>
-			<conditionExpression><![CDATA[($V{SE.2}.intValue()>=0 && $V{SE.2}.intValue()<=50 ? "Level 1" : 
-$V{SE.2}.intValue()>50 && $V{SE.2}.intValue()<=75 ? "Level 2" : 
-$V{SE.2}.intValue()>75 && $V{SE.2}.intValue()<=90 ? "Level 3" : "Level 4").equals("Level 2")]]></conditionExpression>
+			<conditionExpression><![CDATA[($V{SE.2}.intValue()>=0 && $V{SE.2}.intValue()<=25 ? "Level 1" : 
+$V{SE.2}.intValue()>25 && $V{SE.2}.intValue()<=50 ? "Level 2" : 
+$V{SE.2}.intValue()>50 && $V{SE.2}.intValue()<=75 ? "Level 3" : "Level 4").equals("Level 2")]]></conditionExpression>
 			<style mode="Opaque" backcolor="#F5DD87"/>
 		</conditionalStyle>
 		<conditionalStyle>
-			<conditionExpression><![CDATA[($V{SE.2}.intValue()>=0 && $V{SE.2}.intValue()<=50 ? "Level 1" : 
-$V{SE.2}.intValue()>50 && $V{SE.2}.intValue()<=75 ? "Level 2" : 
-$V{SE.2}.intValue()>75 && $V{SE.2}.intValue()<=90 ? "Level 3" : "Level 4")==("Level 3")]]></conditionExpression>
+			<conditionExpression><![CDATA[($V{SE.2}.intValue()>=0 && $V{SE.2}.intValue()<=25 ? "Level 1" : 
+$V{SE.2}.intValue()>25 && $V{SE.2}.intValue()<=50 ? "Level 2" : 
+$V{SE.2}.intValue()>50 && $V{SE.2}.intValue()<=75 ? "Level 3" : "Level 4")==("Level 3")]]></conditionExpression>
 			<style mode="Opaque" backcolor="#8ED15E"/>
 		</conditionalStyle>
 		<conditionalStyle>
-			<conditionExpression><![CDATA[($V{SE.2}.intValue()>=0 && $V{SE.2}.intValue()<=50 ? "Level 1" : 
-$V{SE.2}.intValue()>50 && $V{SE.2}.intValue()<=75 ? "Level 2" : 
-$V{SE.2}.intValue()>75 && $V{SE.2}.intValue()<=90 ? "Level 3" : "Level 4").equals("Level 4")]]></conditionExpression>
+			<conditionExpression><![CDATA[($V{SE.2}.intValue()>=0 && $V{SE.2}.intValue()<=25 ? "Level 1" : 
+$V{SE.2}.intValue()>25 && $V{SE.2}.intValue()<=50 ? "Level 2" : 
+$V{SE.2}.intValue()>50 && $V{SE.2}.intValue()<=75 ? "Level 3" : "Level 4").equals("Level 4")]]></conditionExpression>
 			<style mode="Opaque" backcolor="#5DA658"/>
 		</conditionalStyle>
 	</style>
 	<style name="LevelColorSE3" mode="Opaque">
 		<conditionalStyle>
 			<conditionExpression><![CDATA[($F{S3}==null ? "N/A" :(
-$V{SE.1}.intValue()>=0 && $V{SE.1}.intValue()<=50 ? "Level 1" : 
-$V{SE.1}.intValue()>50 && $V{SE.1}.intValue()<=75 ? "Level 2" : 
-$V{SE.1}.intValue()>75 && $V{SE.1}.intValue()<=90 ? "Level 3" : "Level 4")).equals("N/A")]]></conditionExpression>
+$V{SE.1}.intValue()>=0 && $V{SE.1}.intValue()<=25 ? "Level 1" : 
+$V{SE.1}.intValue()>25 && $V{SE.1}.intValue()<=50 ? "Level 2" : 
+$V{SE.1}.intValue()>50 && $V{SE.1}.intValue()<=75 ? "Level 3" : "Level 4")).equals("N/A")]]></conditionExpression>
 			<style mode="Opaque" forecolor="#000000" backcolor="#FFFFFF"/>
 		</conditionalStyle>
 		<conditionalStyle>
-			<conditionExpression><![CDATA[($V{SE.3}.intValue()>=0 && $V{SE.3}.intValue()<=50 ? "Level 1" : 
-$V{SE.3}.intValue()>50 && $V{SE.3}.intValue()<=75 ? "Level 2" : 
-$V{SE.3}.intValue()>75 && $V{SE.3}.intValue()<=90 ? "Level 3" : "Level 4").equals("Level 1")]]></conditionExpression>
+			<conditionExpression><![CDATA[($V{SE.3}.intValue()>=0 && $V{SE.3}.intValue()<=25 ? "Level 1" : 
+$V{SE.3}.intValue()>25 && $V{SE.3}.intValue()<=50 ? "Level 2" : 
+$V{SE.3}.intValue()>50 && $V{SE.3}.intValue()<=75 ? "Level 3" : "Level 4").equals("Level 1")]]></conditionExpression>
 			<style mode="Opaque" backcolor="#DE0404"/>
 		</conditionalStyle>
 		<conditionalStyle>
-			<conditionExpression><![CDATA[($V{SE.3}.intValue()>=0 && $V{SE.3}.intValue()<=50 ? "Level 1" : 
-$V{SE.3}.intValue()>50 && $V{SE.3}.intValue()<=75 ? "Level 2" : 
-$V{SE.3}.intValue()>75 && $V{SE.3}.intValue()<=90 ? "Level 3" : "Level 4").equals("Level 2")]]></conditionExpression>
+			<conditionExpression><![CDATA[($V{SE.3}.intValue()>=0 && $V{SE.3}.intValue()<=25 ? "Level 1" : 
+$V{SE.3}.intValue()>25 && $V{SE.3}.intValue()<=50 ? "Level 2" : 
+$V{SE.3}.intValue()>50 && $V{SE.3}.intValue()<=75 ? "Level 3" : "Level 4").equals("Level 2")]]></conditionExpression>
 			<style mode="Opaque" backcolor="#F5DD87"/>
 		</conditionalStyle>
 		<conditionalStyle>
-			<conditionExpression><![CDATA[($V{SE.3}.intValue()>=0 && $V{SE.3}.intValue()<=50 ? "Level 1" : 
-$V{SE.3}.intValue()>50 && $V{SE.3}.intValue()<=75 ? "Level 2" : 
-$V{SE.3}.intValue()>75 && $V{SE.3}.intValue()<=90 ? "Level 3" : "Level 4").equals("Level 3")]]></conditionExpression>
+			<conditionExpression><![CDATA[($V{SE.3}.intValue()>=0 && $V{SE.3}.intValue()<=25 ? "Level 1" : 
+$V{SE.3}.intValue()>25 && $V{SE.3}.intValue()<=50 ? "Level 2" : 
+$V{SE.3}.intValue()>50 && $V{SE.3}.intValue()<=75 ? "Level 3" : "Level 4").equals("Level 3")]]></conditionExpression>
 			<style mode="Opaque" backcolor="#8ED15E"/>
 		</conditionalStyle>
 		<conditionalStyle>
-			<conditionExpression><![CDATA[($V{SE.3}.intValue()>=0 && $V{SE.3}.intValue()<=50 ? "Level 1" : 
-$V{SE.3}.intValue()>50 && $V{SE.3}.intValue()<=75 ? "Level 2" : 
-$V{SE.3}.intValue()>75 && $V{SE.3}.intValue()<=90 ? "Level 3" : "Level 4").equals("Level 4")]]></conditionExpression>
+			<conditionExpression><![CDATA[($V{SE.3}.intValue()>=0 && $V{SE.3}.intValue()<=25 ? "Level 1" : 
+$V{SE.3}.intValue()>25 && $V{SE.3}.intValue()<=50 ? "Level 2" : 
+$V{SE.3}.intValue()>50 && $V{SE.3}.intValue()<=75 ? "Level 3" : "Level 4").equals("Level 4")]]></conditionExpression>
 			<style mode="Opaque" backcolor="#5DA658"/>
 		</conditionalStyle>
 	</style>
 	<style name="LevelColorSE4" mode="Opaque">
 		<conditionalStyle>
 			<conditionExpression><![CDATA[($F{S4}==null ? "N/A" :(
-$V{SE.1}.intValue()>=0 && $V{SE.1}.intValue()<=50 ? "Level 1" : 
-$V{SE.1}.intValue()>50 && $V{SE.1}.intValue()<=75 ? "Level 2" : 
-$V{SE.1}.intValue()>75 && $V{SE.1}.intValue()<=90 ? "Level 3" : "Level 4")).equals("N/A")]]></conditionExpression>
+$V{SE.1}.intValue()>=0 && $V{SE.1}.intValue()<=25 ? "Level 1" : 
+$V{SE.1}.intValue()>25 && $V{SE.1}.intValue()<=50 ? "Level 2" : 
+$V{SE.1}.intValue()>50 && $V{SE.1}.intValue()<=75 ? "Level 3" : "Level 4")).equals("N/A")]]></conditionExpression>
 			<style mode="Opaque" forecolor="#000000" backcolor="#FFFFFF"/>
 		</conditionalStyle>
 		<conditionalStyle>
-			<conditionExpression><![CDATA[($V{SE.4}.intValue()>=0 && $V{SE.4}.intValue()<=50 ? "Level 1" : 
-$V{SE.4}.intValue()>50 && $V{SE.4}.intValue()<=75 ? "Level 2" : 
-$V{SE.4}.intValue()>75 && $V{SE.4}.intValue()<=90 ? "Level 3" : "Level 4").equals("Level 1")]]></conditionExpression>
+			<conditionExpression><![CDATA[($V{SE.4}.intValue()>=0 && $V{SE.4}.intValue()<=25 ? "Level 1" : 
+$V{SE.4}.intValue()>25 && $V{SE.4}.intValue()<=50 ? "Level 2" : 
+$V{SE.4}.intValue()>50 && $V{SE.4}.intValue()<=75 ? "Level 3" : "Level 4").equals("Level 1")]]></conditionExpression>
 			<style mode="Opaque" backcolor="#DE0404"/>
 		</conditionalStyle>
 		<conditionalStyle>
-			<conditionExpression><![CDATA[($V{SE.4}.intValue()>=0 && $V{SE.4}.intValue()<=50 ? "Level 1" : 
-$V{SE.4}.intValue()>50 && $V{SE.4}.intValue()<=75 ? "Level 2" : 
-$V{SE.4}.intValue()>75 && $V{SE.4}.intValue()<=90 ? "Level 3" : "Level 4").equals("Level 2")]]></conditionExpression>
+			<conditionExpression><![CDATA[($V{SE.4}.intValue()>=0 && $V{SE.4}.intValue()<=25 ? "Level 1" : 
+$V{SE.4}.intValue()>25 && $V{SE.4}.intValue()<=50 ? "Level 2" : 
+$V{SE.4}.intValue()>50 && $V{SE.4}.intValue()<=75 ? "Level 3" : "Level 4").equals("Level 2")]]></conditionExpression>
 			<style mode="Opaque" backcolor="#F5DD87"/>
 		</conditionalStyle>
 		<conditionalStyle>
-			<conditionExpression><![CDATA[($V{SE.4}.intValue()>=0 && $V{SE.4}.intValue()<=50 ? "Level 1" : 
-$V{SE.4}.intValue()>50 && $V{SE.4}.intValue()<=75 ? "Level 2" : 
-$V{SE.4}.intValue()>75 && $V{SE.4}.intValue()<=90 ? "Level 3" : "Level 4").equals("Level 3")]]></conditionExpression>
+			<conditionExpression><![CDATA[($V{SE.4}.intValue()>=0 && $V{SE.4}.intValue()<=25 ? "Level 1" : 
+$V{SE.4}.intValue()>25 && $V{SE.4}.intValue()<=50 ? "Level 2" : 
+$V{SE.4}.intValue()>50 && $V{SE.4}.intValue()<=75 ? "Level 3" : "Level 4").equals("Level 3")]]></conditionExpression>
 			<style mode="Opaque" backcolor="#8ED15E"/>
 		</conditionalStyle>
 		<conditionalStyle>
-			<conditionExpression><![CDATA[($V{SE.4}.intValue()>=0 && $V{SE.4}.intValue()<=50 ? "Level 1" : 
-$V{SE.4}.intValue()>50 && $V{SE.4}.intValue()<=75 ? "Level 2" : 
-$V{SE.4}.intValue()>75 && $V{SE.4}.intValue()<=90 ? "Level 3" : "Level 4").equals("Level 4")]]></conditionExpression>
+			<conditionExpression><![CDATA[($V{SE.4}.intValue()>=0 && $V{SE.4}.intValue()<=25 ? "Level 1" : 
+$V{SE.4}.intValue()>25 && $V{SE.4}.intValue()<=50 ? "Level 2" : 
+$V{SE.4}.intValue()>50 && $V{SE.4}.intValue()<=75 ? "Level 3" : "Level 4").equals("Level 4")]]></conditionExpression>
 			<style mode="Opaque" backcolor="#5DA658"/>
 		</conditionalStyle>
 	</style>
 	<style name="LevelColorSE5" mode="Opaque">
 		<conditionalStyle>
 			<conditionExpression><![CDATA[($F{S5}==null ? "N/A" :(
-$V{SE.1}.intValue()>=0 && $V{SE.1}.intValue()<=50 ? "Level 1" : 
-$V{SE.1}.intValue()>50 && $V{SE.1}.intValue()<=75 ? "Level 2" : 
-$V{SE.1}.intValue()>75 && $V{SE.1}.intValue()<=90 ? "Level 3" : "Level 4")).equals("N/A")]]></conditionExpression>
+$V{SE.1}.intValue()>=0 && $V{SE.1}.intValue()<=25 ? "Level 1" : 
+$V{SE.1}.intValue()>25 && $V{SE.1}.intValue()<=50 ? "Level 2" : 
+$V{SE.1}.intValue()>50 && $V{SE.1}.intValue()<=75 ? "Level 3" : "Level 4")).equals("N/A")]]></conditionExpression>
 			<style mode="Opaque" forecolor="#000000" backcolor="#FFFFFF"/>
 		</conditionalStyle>
 		<conditionalStyle>
-			<conditionExpression><![CDATA[($V{SE.5}.intValue()>=0 && $V{SE.5}.intValue()<=50 ? "Level 1" : 
-$V{SE.5}.intValue()>50 && $V{SE.5}.intValue()<=75 ? "Level 2" : 
-$V{SE.5}.intValue()>75 && $V{SE.5}.intValue()<=90 ? "Level 3" : "Level 4").equals("Level 1")]]></conditionExpression>
+			<conditionExpression><![CDATA[($V{SE.5}.intValue()>=0 && $V{SE.5}.intValue()<=25 ? "Level 1" : 
+$V{SE.5}.intValue()>25 && $V{SE.5}.intValue()<=50 ? "Level 2" : 
+$V{SE.5}.intValue()>50 && $V{SE.5}.intValue()<=75 ? "Level 3" : "Level 4").equals("Level 1")]]></conditionExpression>
 			<style mode="Opaque" backcolor="#DE0404"/>
 		</conditionalStyle>
 		<conditionalStyle>
-			<conditionExpression><![CDATA[($V{SE.5}.intValue()>=0 && $V{SE.5}.intValue()<=50 ? "Level 1" : 
-$V{SE.5}.intValue()>50 && $V{SE.5}.intValue()<=75 ? "Level 2" : 
-$V{SE.5}.intValue()>75 && $V{SE.5}.intValue()<=90 ? "Level 3" : "Level 4").equals("Level 2")]]></conditionExpression>
+			<conditionExpression><![CDATA[($V{SE.5}.intValue()>=0 && $V{SE.5}.intValue()<=25 ? "Level 1" : 
+$V{SE.5}.intValue()>25 && $V{SE.5}.intValue()<=50 ? "Level 2" : 
+$V{SE.5}.intValue()>50 && $V{SE.5}.intValue()<=75 ? "Level 3" : "Level 4").equals("Level 2")]]></conditionExpression>
 			<style mode="Opaque" backcolor="#F5DD87"/>
 		</conditionalStyle>
 		<conditionalStyle>
-			<conditionExpression><![CDATA[($V{SE.5}.intValue()>=0 && $V{SE.5}.intValue()<=50 ? "Level 1" : 
-$V{SE.5}.intValue()>50 && $V{SE.5}.intValue()<=75 ? "Level 2" : 
-$V{SE.5}.intValue()>75 && $V{SE.5}.intValue()<=90 ? "Level 3" : "Level 4").equals("Level 3")]]></conditionExpression>
+			<conditionExpression><![CDATA[($V{SE.5}.intValue()>=0 && $V{SE.5}.intValue()<=25 ? "Level 1" : 
+$V{SE.5}.intValue()>25 && $V{SE.5}.intValue()<=50 ? "Level 2" : 
+$V{SE.5}.intValue()>50 && $V{SE.5}.intValue()<=75 ? "Level 3" : "Level 4").equals("Level 3")]]></conditionExpression>
 			<style mode="Opaque" backcolor="#8ED15E"/>
 		</conditionalStyle>
 		<conditionalStyle>
-			<conditionExpression><![CDATA[($V{SE.5}.intValue()>=0 && $V{SE.5}.intValue()<=50 ? "Level 1" : 
-$V{SE.5}.intValue()>50 && $V{SE.5}.intValue()<=75 ? "Level 2" : 
-$V{SE.5}.intValue()>75 && $V{SE.5}.intValue()<=90 ? "Level 3" : "Level 4").equals("Level 4")]]></conditionExpression>
+			<conditionExpression><![CDATA[($V{SE.5}.intValue()>=0 && $V{SE.5}.intValue()<=25 ? "Level 1" : 
+$V{SE.5}.intValue()>25 && $V{SE.5}.intValue()<=50 ? "Level 2" : 
+$V{SE.5}.intValue()>50 && $V{SE.5}.intValue()<=75 ? "Level 3" : "Level 4").equals("Level 4")]]></conditionExpression>
 			<style mode="Opaque" backcolor="#5DA658"/>
 		</conditionalStyle>
 	</style>
@@ -408,7 +408,7 @@ select
 	</variable>
 	<title>
 		<band height="49">
-			<textField isStretchWithOverflow="true">
+			<textField textAdjust="StretchHeight">
 				<reportElement mode="Opaque" x="80" y="22" width="100" height="27" backcolor="#E3E3E3" uuid="913b1ae9-eac5-4424-acbb-7257fb07bf75">
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 				</reportElement>
@@ -424,7 +424,7 @@ select
 				</textElement>
 				<textFieldExpression><![CDATA["Standard 1"]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
+			<textField textAdjust="StretchHeight">
 				<reportElement x="180" y="22" width="200" height="27" uuid="71c16cf0-1716-4c0c-a903-9d0265b9fe3a"/>
 				<box>
 					<pen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
@@ -438,7 +438,7 @@ select
 				</textElement>
 				<textFieldExpression><![CDATA["Standard 2"]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
+			<textField textAdjust="StretchHeight">
 				<reportElement mode="Opaque" x="380" y="22" width="200" height="27" backcolor="#E3E3E3" uuid="afd738bb-d0ff-4d5e-8bfd-9ffbbb2bfac1"/>
 				<box>
 					<pen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
@@ -452,7 +452,7 @@ select
 				</textElement>
 				<textFieldExpression><![CDATA["Standard 3"]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
+			<textField textAdjust="StretchHeight">
 				<reportElement x="580" y="22" width="50" height="27" uuid="0fdbc886-d3d9-4b8c-bb3f-c5e6b3b5ea85"/>
 				<box>
 					<pen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
@@ -466,7 +466,7 @@ select
 				</textElement>
 				<textFieldExpression><![CDATA["Standard 4"]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
+			<textField textAdjust="StretchHeight">
 				<reportElement mode="Opaque" x="630" y="22" width="50" height="27" backcolor="#E3E3E3" uuid="912c123d-eced-41dd-97ac-45ee57ed0960">
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 				</reportElement>
@@ -815,7 +815,7 @@ $V{Level}.equals("Level 4") ? "d": "e"]]></textFieldExpression>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{totalStandards}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="0" y="0" width="80" height="28" uuid="88f68f64-1ce7-4917-b01a-f5e3e37863c6">
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 				</reportElement>
@@ -831,7 +831,7 @@ $V{Level}.equals("Level 4") ? "d": "e"]]></textFieldExpression>
 				</textElement>
 				<textFieldExpression><![CDATA["Total by Standards"]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="0" y="28" width="80" height="19" uuid="dcb4e32b-0ede-4472-9750-5d5f399ae5ae">
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 				</reportElement>
@@ -860,9 +860,9 @@ $V{Level}.equals("Level 4") ? "d": "e"]]></textFieldExpression>
 					<font fontName="Open Sans" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{S1}==null ? "N/A" :(
-$V{SE.1}.intValue()>=0 && $V{SE.1}.intValue()<=50 ? "Level 1" : 
-$V{SE.1}.intValue()>50 && $V{SE.1}.intValue()<=75 ? "Level 2" : 
-$V{SE.1}.intValue()>75 && $V{SE.1}.intValue()<=90 ? "Level 3" : "Level 4")]]></textFieldExpression>
+$V{SE.1}.intValue()>=0 && $V{SE.1}.intValue()<=25 ? "Level 1" : 
+$V{SE.1}.intValue()>25 && $V{SE.1}.intValue()<=50 ? "Level 2" : 
+$V{SE.1}.intValue()>50 && $V{SE.1}.intValue()<=75 ? "Level 3" : "Level 4")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement key="" style="LevelColorSE2" mode="Opaque" x="180" y="28" width="200" height="19" uuid="a60257e1-984b-491e-83ed-887102092050"/>
@@ -877,9 +877,9 @@ $V{SE.1}.intValue()>75 && $V{SE.1}.intValue()<=90 ? "Level 3" : "Level 4")]]></t
 					<font fontName="Open Sans" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{S2}==null ? "N/A" :(
-$V{SE.2}.intValue()>=0 && $V{SE.2}.intValue()<=50 ? "Level 1" : 
-$V{SE.2}.intValue()>50 && $V{SE.2}.intValue()<=75 ? "Level 2" : 
-$V{SE.2}.intValue()>75 && $V{SE.2}.intValue()<=90 ? "Level 3" : "Level 4")]]></textFieldExpression>
+$V{SE.2}.intValue()>=0 && $V{SE.2}.intValue()<=25 ? "Level 1" : 
+$V{SE.2}.intValue()>25 && $V{SE.2}.intValue()<=50 ? "Level 2" : 
+$V{SE.2}.intValue()>50 && $V{SE.2}.intValue()<=75 ? "Level 3" : "Level 4")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement key="" style="LevelColorSE3" mode="Opaque" x="380" y="28" width="200" height="19" uuid="d9ce8e8f-b4d6-4008-8e02-c373e967c4aa"/>
@@ -894,9 +894,9 @@ $V{SE.2}.intValue()>75 && $V{SE.2}.intValue()<=90 ? "Level 3" : "Level 4")]]></t
 					<font fontName="Open Sans" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{S3}==null ? "N/A" :(
-$V{SE.3}.intValue()>=0 && $V{SE.3}.intValue()<=50 ? "Level 1" : 
-$V{SE.3}.intValue()>50 && $V{SE.3}.intValue()<=75 ? "Level 2" : 
-$V{SE.3}.intValue()>75 && $V{SE.3}.intValue()<=90 ? "Level 3" : "Level 4")]]></textFieldExpression>
+$V{SE.3}.intValue()>=0 && $V{SE.3}.intValue()<=25 ? "Level 1" : 
+$V{SE.3}.intValue()>25 && $V{SE.3}.intValue()<=50 ? "Level 2" : 
+$V{SE.3}.intValue()>50 && $V{SE.3}.intValue()<=75 ? "Level 3" : "Level 4")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement key="" style="LevelColorSE4" mode="Opaque" x="580" y="28" width="50" height="19" uuid="5f38595c-9378-4f8b-98f2-e2bc7604f2d5"/>
@@ -911,9 +911,9 @@ $V{SE.3}.intValue()>75 && $V{SE.3}.intValue()<=90 ? "Level 3" : "Level 4")]]></t
 					<font fontName="Open Sans" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{S4}==null ? "N/A" :(
-$V{SE.4}.intValue()>=0 && $V{SE.4}.intValue()<=50 ? "Level 1" : 
-$V{SE.4}.intValue()>50 && $V{SE.4}.intValue()<=75 ? "Level 2" : 
-$V{SE.4}.intValue()>75 && $V{SE.4}.intValue()<=90 ? "Level 3" : "Level 4")]]></textFieldExpression>
+$V{SE.4}.intValue()>=0 && $V{SE.4}.intValue()<=25 ? "Level 1" : 
+$V{SE.4}.intValue()>25 && $V{SE.4}.intValue()<=50 ? "Level 2" : 
+$V{SE.4}.intValue()>50 && $V{SE.4}.intValue()<=75 ? "Level 3" : "Level 4")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement key="" style="LevelColorSE5" mode="Opaque" x="630" y="28" width="50" height="19" uuid="50deb87d-ae7f-4f31-9e32-f842b82758aa"/>
@@ -928,9 +928,9 @@ $V{SE.4}.intValue()>75 && $V{SE.4}.intValue()<=90 ? "Level 3" : "Level 4")]]></t
 					<font fontName="Open Sans" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{S5}==null ? "N/A" :(
-$V{SE.5}.intValue()>=0 && $V{SE.5}.intValue()<=50 ? "Level 1" : 
-$V{SE.5}.intValue()>50 && $V{SE.5}.intValue()<=75 ? "Level 2" : 
-$V{SE.5}.intValue()>75 && $V{SE.5}.intValue()<=90 ? "Level 3" : "Level 4")]]></textFieldExpression>
+$V{SE.5}.intValue()>=0 && $V{SE.5}.intValue()<=25 ? "Level 1" : 
+$V{SE.5}.intValue()>25 && $V{SE.5}.intValue()<=50 ? "Level 2" : 
+$V{SE.5}.intValue()>50 && $V{SE.5}.intValue()<=75 ? "Level 3" : "Level 4")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement key="" style="totalStandardLevel" x="680" y="28" width="40" height="19" uuid="5f1aa1be-51a3-4ff8-a2a2-e106aae581ae">

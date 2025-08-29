@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<!-- Created with Jaspersoft Studio version 6.21.2.final using JasperReports Library version 6.21.2-8434a0bd7c3bbc37cbf916f2968d35e4b165821a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="School Accreditation Form B Report" pageWidth="792" pageHeight="612" orientation="Landscape" whenNoDataType="NoDataSection" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="cb21c16a-5d69-46c1-8856-f9ca1789aced">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MIEMIS-NEW"/>
@@ -14,11 +14,11 @@
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="136"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="856"/>
-	<property name="ireport.jasperserver.url" value="http://data.pss.edu.mh:8080/jasperserver/"/>
+	<property name="ireport.jasperserver.url" value="http://miemis.pss.edu.mh:8080/jasperserver/"/>
 	<property name="ireport.jasperserver.user" value="jasperadmin"/>
 	<property name="ireport.jasperserver.report.resource" value="/reports/miemis/School/School_Accreditation_Form_B_Report_files/main_jrxml"/>
 	<property name="ireport.jasperserver.reportUnit" value="/reports/miemis/School/School_Accreditation_Form_B_Report"/>
-	<template><![CDATA["miemis/Templates/MIEMIS_Style.jrtx"]]></template>
+	<template><![CDATA["repo:/Templates/MIEMIS_Style.jrtx"]]></template>
 	<style name="levelColor">
 		<conditionalStyle>
 			<conditionExpression><![CDATA[($V{totalStandardSum}.intValue()==0 ? "":
@@ -548,7 +548,7 @@ left join (
 				<reportElement x="0" y="0" width="126" height="126" uuid="7bd16303-e210-44c0-92aa-fa671930bdc3">
 					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 				</reportElement>
-				<imageExpression><![CDATA["miemis/Images/rmi-seal.png"]]></imageExpression>
+				<imageExpression><![CDATA["repo:/images/rmi_pss.png"]]></imageExpression>
 			</image>
 			<staticText>
 				<reportElement style="Title" x="126" y="0" width="499" height="62" uuid="dae748ed-1caf-4910-96a5-23df1ad5e384">
@@ -572,7 +572,7 @@ left join (
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
-				<imageExpression><![CDATA["miemis/Images/rmi-pss.png"]]></imageExpression>
+				<imageExpression><![CDATA["repo:/images/rmi_pss.png"]]></imageExpression>
 			</image>
 			<rectangle>
 				<reportElement mode="Opaque" x="-21" y="-20" width="793" height="10" forecolor="#08298C" backcolor="#08298C" uuid="273e361e-fde3-463d-a4d5-67130e315102">
@@ -694,7 +694,7 @@ left join (
 							<textFieldExpression><![CDATA["School Name "]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement x="330" y="20" width="170" height="20" uuid="5a98390d-51c3-4c19-adb6-11abd426fb41"/>
+							<reportElement x="330" y="20" width="170" height="20" forecolor="#FFFFFF" uuid="5a98390d-51c3-4c19-adb6-11abd426fb41"/>
 							<box leftPadding="2">
 								<pen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
 								<topPen lineWidth="0.0" lineStyle="Dotted" lineColor="#000000"/>
@@ -718,7 +718,7 @@ left join (
 							<text><![CDATA[:]]></text>
 						</staticText>
 						<staticText>
-							<reportElement x="500" y="20" width="10" height="20" uuid="e67f4982-ec07-4c80-8203-e45e413491fa"/>
+							<reportElement x="500" y="20" width="10" height="20" forecolor="#FFFFFF" uuid="e67f4982-ec07-4c80-8203-e45e413491fa"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle"/>
 							<text><![CDATA[:]]></text>
 						</staticText>
@@ -2125,7 +2125,7 @@ $V{L1}>3 ? "Level 1" :"")))]]></textFieldExpression>
 	<pageFooter>
 		<band height="25">
 			<frame>
-				<reportElement mode="Opaque" x="-21" y="1" width="793" height="24" forecolor="#D0B48E" backcolor="#CDD4E8" uuid="1845f7a5-03dd-4d06-baaf-98f806b5e03a"/>
+				<reportElement key="" style="Page footer" x="-21" y="1" width="793" height="24" uuid="1845f7a5-03dd-4d06-baaf-98f806b5e03a"/>
 				<textField evaluationTime="Report">
 					<reportElement style="Page footer" x="726" y="1" width="40" height="20" uuid="8cd49973-0fa8-4006-b0fb-be3ec6c38b6f">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
