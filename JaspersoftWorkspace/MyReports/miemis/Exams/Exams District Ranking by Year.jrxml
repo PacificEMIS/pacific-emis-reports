@@ -31,99 +31,126 @@
 		<defaultValueExpression><![CDATA["PRI"]]></defaultValueExpression>
 	</parameter>
 	<queryString language="SQL">
-		<![CDATA[SELECT [examCode]
-      ,[examName]
-      ,[examYear]
-      ,[examNameShort]
-      ,[ExamClassLevel]
-      ,[ExamClassLevelYear]
-      ,[EdLevelCode]
-      ,[EdLevelMaxYear]
-      ,[EdLevelMinYear]
-      ,ER.[DistrictCode]
-      ,ER.[District]
-      ,SUM([MinimumProficiencyC]) [MinimumProficiencyC]
-      ,SUM([TotalCandidates]) [TotalCandidates]
-	  ,SUM([MinimumProficiencyC]) / SUM([TotalCandidates]) [MinimumProficiencyP]
-      ,AVG([MinimumProficiencyP]) [MinimumProficiencyP2]
-	  ,RN.RANK [Rank]
-	  ,RN.ROW_NUMBER [Row_Number]
-	  ,RN.DENSE_RANK [Dense_Rank]
+		<![CDATA[SELECT 
+      ER.[examCode]
+    , ER.[examName]
+    , ER.[examYear]
+    , ER.[examNameShort]
+    , ER.[ExamClassLevel]
+    , ER.[ExamClassLevelYear]
+    , ER.[EdLevelCode]
+    , ER.[EdLevelMaxYear]
+    , ER.[EdLevelMinYear]
+    , ER.[DistrictCode]
+    , ER.[District]
+    , SUM(ER.[MinimumProficiencyC])                             AS [MinimumProficiencyC]
+    , SUM(ER.[TotalCandidates])                                 AS [TotalCandidates]
+    , SUM(ER.[MinimumProficiencyC]) * 1.0
+        / NULLIF(SUM(ER.[TotalCandidates]), 0)                  AS [MinimumProficiencyP]
+    , AVG(ER.[MinimumProficiencyP])                             AS [MinimumProficiencyP2]
+    , RN.[RANK]                                                 AS [Rank]
+    , RN.[ROW_NUMBER]                                           AS [Row_Number]
+    , RN.[DENSE_RANK]                                           AS [Dense_Rank]
+    , ET.exSeq                                                  AS [exSeq]
 FROM (
-	SELECT ERPS.[schNo]
-		  ,[schName]
-		  ,[examCode]
-		  ,[examName]
-		  ,[examYear]
-		  ,[examNameShort]
-		  ,[ExamClassLevel]
-		  ,[ExamClassLevelYear]
-		  ,[EdLevelCode]
-		  ,[EdLevelMaxYear]
-		  ,[EdLevelMinYear]
-		  ,CASE
-				WHEN [AuthorityGroup] = 'Public' THEN ERPS.[DistrictCode]
-				WHEN [AuthorityGroup] = 'Private' THEN 0
-				ELSE ERPS.[DistrictCode]
-			END [DistrictCode]
-		  ,CASE
-				WHEN [AuthorityGroup] = 'Public' THEN ERPS.[District]
-				WHEN [AuthorityGroup] = 'Private' THEN 'Private Schools'
-				ELSE ERPS.[District]
-			END [District]
-		  ,[MinimumProficiencyC]
-		  ,[TotalCandidates]
-		  ,[MinimumProficiencyP]
-	FROM [warehouse].[ExamResultsTestMinimumProficiencySchool] ERPS
-	LEFT OUTER JOIN DimensionSchoolSurvey DSS ON ERPS.schNo = DSS.[School No] AND ERPS.examYear = DSS.[Survey Year]
-	WHERE examYear = $P{Year} AND edLevelCode = $P{Education_Levels}
+    SELECT 
+          ERPS.[schNo]
+        , ERPS.[schName]
+        , ERPS.[examCode]
+        , ERPS.[examName]
+        , ERPS.[examYear]
+        , ERPS.[examNameShort]
+        , ERPS.[ExamClassLevel]
+        , ERPS.[ExamClassLevelYear]
+        , ERPS.[EdLevelCode]
+        , ERPS.[EdLevelMaxYear]
+        , ERPS.[EdLevelMinYear]
+        , CASE
+              WHEN DSS.[AuthorityGroup] = 'Public' THEN ERPS.[DistrictCode]
+              WHEN DSS.[AuthorityGroup] = 'Private' THEN 0
+              ELSE ERPS.[DistrictCode]
+          END AS [DistrictCode]
+        , CASE
+              WHEN DSS.[AuthorityGroup] = 'Public' THEN ERPS.[District]
+              WHEN DSS.[AuthorityGroup] = 'Private' THEN 'Private Schools'
+              ELSE ERPS.[District]
+          END AS [District]
+        , ERPS.[MinimumProficiencyC]
+        , ERPS.[TotalCandidates]
+        , ERPS.[MinimumProficiencyP]
+    FROM [warehouse].[ExamResultsTestMinimumProficiencySchool] ERPS
+    LEFT JOIN DimensionSchoolSurvey DSS
+        ON ERPS.schNo    = DSS.[School No]
+       AND ERPS.examYear = DSS.[Survey Year]
+    WHERE ERPS.examYear    = $P{Year}
+      AND ERPS.edLevelCode = $P{Education_Levels}
+      AND ERPS.examNameShort NOT LIKE '%v2%'
 ) ER
 INNER JOIN (
-	SELECT CASE
-			WHEN [AuthorityGroup] = 'Public' THEN [DistrictCode]
-			WHEN [AuthorityGroup] = 'Private' THEN 0
-			ELSE [DistrictCode]
-			END [DistrictCode]
-		,CASE
-			WHEN [AuthorityGroup] = 'Public' THEN ES.[District]
-			WHEN [AuthorityGroup] = 'Private' THEN 'Private Schools'
-			ELSE ES.[District]
-			END [District]
-		,SUM([MinimumProficiencyC]) TotMinimumProficiencyC
-		,SUM([TotalCandidates]) TotTotalCandidates
-		,SUM([MinimumProficiencyC]) / SUM([TotalCandidates]) TotScore
-		,RANK() OVER(ORDER BY SUM([MinimumProficiencyC]) / SUM([TotalCandidates]) DESC) 'RANK'
-		,ROW_NUMBER() OVER(ORDER BY SUM([MinimumProficiencyC]) / SUM([TotalCandidates]) DESC) 'ROW_NUMBER'
-		,DENSE_RANK() OVER(ORDER BY SUM([MinimumProficiencyC]) / SUM([TotalCandidates]) DESC) 'DENSE_RANK'
-	FROM [warehouse].[ExamResultsTestMinimumProficiencySchool] ES
-	LEFT OUTER JOIN DimensionSchoolSurvey DSS ON ES.schNo = DSS.[School No] AND ES.examYear = DSS.[Survey Year]
-	WHERE examYear = $P{Year} AND edLevelCode = $P{Education_Levels}
-	GROUP BY CASE
-			WHEN [AuthorityGroup] = 'Public' THEN ES.[DistrictCode]
-			WHEN [AuthorityGroup] = 'Private' THEN 0
-			ELSE ES.[DistrictCode]
-			END
-		,CASE
-			WHEN [AuthorityGroup] = 'Public' THEN ES.[District]
-			WHEN [AuthorityGroup] = 'Private' THEN 'Private Schools'
-			ELSE ES.[District]
-			END
-) RN ON ER.DistrictCode = RN.DistrictCode
-GROUP BY [examCode]
-      ,[examName]
-      ,[examYear]
-      ,[examNameShort]
-      ,[ExamClassLevel]
-      ,[ExamClassLevelYear]
-      ,[EdLevelCode]
-      ,[EdLevelMaxYear]
-      ,[EdLevelMinYear]
-      ,ER.[DistrictCode]
-      ,ER.[District]
-	  ,RN.RANK
-	  ,RN.ROW_NUMBER
-	  ,RN.DENSE_RANK
-ORDER BY RN.Rank ASC]]>
+    SELECT 
+          CASE
+              WHEN DSS.[AuthorityGroup] = 'Public' THEN ES.[DistrictCode]
+              WHEN DSS.[AuthorityGroup] = 'Private' THEN 0
+              ELSE ES.[DistrictCode]
+          END AS [DistrictCode]
+        , CASE
+              WHEN DSS.[AuthorityGroup] = 'Public' THEN ES.[District]
+              WHEN DSS.[AuthorityGroup] = 'Private' THEN 'Private Schools'
+              ELSE ES.[District]
+          END AS [District]
+        , SUM(ES.[MinimumProficiencyC])                               AS TotMinimumProficiencyC
+        , SUM(ES.[TotalCandidates])                                   AS TotTotalCandidates
+        , SUM(ES.[MinimumProficiencyC]) * 1.0
+            / NULLIF(SUM(ES.[TotalCandidates]), 0)                     AS TotScore
+        , RANK()       OVER (ORDER BY SUM(ES.[MinimumProficiencyC]) * 1.0
+                                        / NULLIF(SUM(ES.[TotalCandidates]), 0) DESC) AS [RANK]
+        , ROW_NUMBER() OVER (ORDER BY SUM(ES.[MinimumProficiencyC]) * 1.0
+                                        / NULLIF(SUM(ES.[TotalCandidates]), 0) DESC) AS [ROW_NUMBER]
+        , DENSE_RANK() OVER (ORDER BY SUM(ES.[MinimumProficiencyC]) * 1.0
+                                        / NULLIF(SUM(ES.[TotalCandidates]), 0) DESC) AS [DENSE_RANK]
+    FROM [warehouse].[ExamResultsTestMinimumProficiencySchool] ES
+    LEFT JOIN DimensionSchoolSurvey DSS
+        ON ES.schNo    = DSS.[School No]
+       AND ES.examYear = DSS.[Survey Year]
+    WHERE ES.examYear    = $P{Year}
+      AND ES.edLevelCode = $P{Education_Levels}
+      AND ES.examNameShort NOT LIKE '%v2%'
+    GROUP BY 
+          CASE
+              WHEN DSS.[AuthorityGroup] = 'Public' THEN ES.[DistrictCode]
+              WHEN DSS.[AuthorityGroup] = 'Private' THEN 0
+              ELSE ES.[DistrictCode]
+          END
+        , CASE
+              WHEN DSS.[AuthorityGroup] = 'Public' THEN ES.[District]
+              WHEN DSS.[AuthorityGroup] = 'Private' THEN 'Private Schools'
+              ELSE ES.[District]
+          END
+) RN 
+    ON ER.DistrictCode = RN.DistrictCode
+LEFT JOIN dbo.lkpExamTypes ET
+    ON ER.examCode = ET.exCode   -- using your PK
+
+GROUP BY
+      ER.[examCode]
+    , ER.[examName]
+    , ER.[examYear]
+    , ER.[examNameShort]
+    , ER.[ExamClassLevel]
+    , ER.[ExamClassLevelYear]
+    , ER.[EdLevelCode]
+    , ER.[EdLevelMaxYear]
+    , ER.[EdLevelMinYear]
+    , ER.[DistrictCode]
+    , ER.[District]
+    , RN.[RANK]
+    , RN.[ROW_NUMBER]
+    , RN.[DENSE_RANK]
+    , ET.exSeq
+ORDER BY 
+    ET.exSeq,
+    RN.[RANK];
+]]>
 	</queryString>
 	<field name="examCode" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="examCode"/>
@@ -181,6 +208,10 @@ ORDER BY RN.Rank ASC]]>
 		<property name="com.jaspersoft.studio.field.name" value="MinimumProficiencyP"/>
 		<property name="com.jaspersoft.studio.field.label" value="MinimumProficiencyP"/>
 	</field>
+	<field name="MinimumProficiencyP2" class="java.lang.Double">
+		<property name="com.jaspersoft.studio.field.name" value="MinimumProficiencyP2"/>
+		<property name="com.jaspersoft.studio.field.label" value="MinimumProficiencyP2"/>
+	</field>
 	<field name="Rank" class="java.lang.Long">
 		<property name="com.jaspersoft.studio.field.name" value="Rank"/>
 		<property name="com.jaspersoft.studio.field.label" value="Rank"/>
@@ -192,6 +223,10 @@ ORDER BY RN.Rank ASC]]>
 	<field name="Dense_Rank" class="java.lang.Long">
 		<property name="com.jaspersoft.studio.field.name" value="Dense_Rank"/>
 		<property name="com.jaspersoft.studio.field.label" value="Dense_Rank"/>
+	</field>
+	<field name="exSeq" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="exSeq"/>
+		<property name="com.jaspersoft.studio.field.label" value="exSeq"/>
 	</field>
 	<background>
 		<band splitType="Stretch"/>
@@ -339,9 +374,8 @@ ORDER BY RN.Rank ASC]]>
 					</crosstabTotalRowHeader>
 				</rowGroup>
 				<columnGroup name="examNameShort" height="20" totalPosition="End">
-					<bucket class="java.lang.String">
+					<bucket order="None" class="java.lang.String">
 						<bucketExpression><![CDATA[$F{examNameShort}]]></bucketExpression>
-						<orderByExpression><![CDATA[$V{examNameShortForSorting}]]></orderByExpression>
 					</bucket>
 					<crosstabColumnHeader>
 						<cellContents mode="Opaque">
