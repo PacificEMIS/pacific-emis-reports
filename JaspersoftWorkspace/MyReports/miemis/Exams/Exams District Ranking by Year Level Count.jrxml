@@ -49,6 +49,7 @@
 	  ,RN.RANK [Rank]
 	  ,RN.ROW_NUMBER [Row_Number]
 	  ,RN.DENSE_RANK [Dense_Rank]
+      ,ET.exSeq [exSeq]
 FROM (
 	SELECT ERPS.[schNo]
 		  ,[schName]
@@ -76,7 +77,7 @@ FROM (
 		  ,[MinimumProficiencyP]
 	FROM [warehouse].[ExamResultsTestMinimumProficiencyIndicatorCountSchool] ERPS
 	LEFT OUTER JOIN DimensionSchoolSurvey DSS ON ERPS.schNo = DSS.[School No] AND ERPS.examYear = DSS.[Survey Year]
-	WHERE examYear = $P{Year} AND edLevelCode = $P{Education_Levels}
+	WHERE examYear = $P{Year} AND edLevelCode = $P{Education_Levels} AND ERPS.examNameShort NOT LIKE '%v2%'
 ) ER
 INNER JOIN (
 	SELECT CASE
@@ -97,7 +98,7 @@ INNER JOIN (
 		,DENSE_RANK() OVER(ORDER BY SUM([MinimumProficiencyC]) / SUM([TotalLevelCount]) DESC) 'DENSE_RANK'
 	FROM [warehouse].[ExamResultsTestMinimumProficiencyIndicatorCountSchool] ES
 	LEFT OUTER JOIN DimensionSchoolSurvey DSS ON ES.schNo = DSS.[School No] AND ES.examYear = DSS.[Survey Year]
-	WHERE examYear = $P{Year} AND edLevelCode = $P{Education_Levels}
+	WHERE examYear = $P{Year} AND edLevelCode = $P{Education_Levels} AND ES.examNameShort NOT LIKE '%v2%'
 	GROUP BY CASE
 			WHEN [AuthorityGroup] = 'Public' THEN ES.[DistrictCode]
 			WHEN [AuthorityGroup] = 'Private' THEN 0
@@ -109,6 +110,7 @@ INNER JOIN (
 			ELSE ES.[District]
 			END
 ) RN ON ER.DistrictCode = RN.DistrictCode
+LEFT JOIN dbo.lkpExamTypes ET ON ER.examCode = ET.exCode
 GROUP BY [examCode]
       ,[examName]
       ,[examYear]
@@ -123,7 +125,9 @@ GROUP BY [examCode]
 	  ,RN.RANK
 	  ,RN.ROW_NUMBER
 	  ,RN.DENSE_RANK
-ORDER BY RN.Rank ASC]]>
+      ,ET.exSeq
+ORDER BY ET.exSeq ASC
+	  ,RN.[RANK] ASC;]]>
 	</queryString>
 	<field name="examCode" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="examCode"/>
@@ -181,6 +185,10 @@ ORDER BY RN.Rank ASC]]>
 		<property name="com.jaspersoft.studio.field.name" value="MinimumProficiencyP"/>
 		<property name="com.jaspersoft.studio.field.label" value="MinimumProficiencyP"/>
 	</field>
+	<field name="MinimumProficiencyP2" class="java.lang.Double">
+		<property name="com.jaspersoft.studio.field.name" value="MinimumProficiencyP2"/>
+		<property name="com.jaspersoft.studio.field.label" value="MinimumProficiencyP2"/>
+	</field>
 	<field name="Rank" class="java.lang.Long">
 		<property name="com.jaspersoft.studio.field.name" value="Rank"/>
 		<property name="com.jaspersoft.studio.field.label" value="Rank"/>
@@ -192,6 +200,10 @@ ORDER BY RN.Rank ASC]]>
 	<field name="Dense_Rank" class="java.lang.Long">
 		<property name="com.jaspersoft.studio.field.name" value="Dense_Rank"/>
 		<property name="com.jaspersoft.studio.field.label" value="Dense_Rank"/>
+	</field>
+	<field name="exSeq" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="exSeq"/>
+		<property name="com.jaspersoft.studio.field.label" value="exSeq"/>
 	</field>
 	<background>
 		<band splitType="Stretch"/>
@@ -339,9 +351,8 @@ ORDER BY RN.Rank ASC]]>
 					</crosstabTotalRowHeader>
 				</rowGroup>
 				<columnGroup name="examNameShort" height="20" totalPosition="End">
-					<bucket class="java.lang.String">
+					<bucket order="None" class="java.lang.String">
 						<bucketExpression><![CDATA[$F{examNameShort}]]></bucketExpression>
-						<orderByExpression><![CDATA[$V{examNameShortForSorting}]]></orderByExpression>
 					</bucket>
 					<crosstabColumnHeader>
 						<cellContents mode="Opaque">

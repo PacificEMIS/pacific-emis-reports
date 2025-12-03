@@ -2,7 +2,7 @@
 <!-- Created with Jaspersoft Studio version 6.21.2.final using JasperReports Library version 6.21.2-8434a0bd7c3bbc37cbf916f2968d35e4b165821a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Exams_District_Results_by_Year" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="df013db5-f76e-44d3-b0df-bcbc46d93160">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="FedEMIS"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="FEDEMIS-TEST"/>
 	<property name="ireport.jasperserver.url" value="http://fedemis.doe.fm:8080/jasperserver/"/>
 	<property name="ireport.jasperserver.user" value="jasperadmin"/>
 	<property name="ireport.jasperserver.reportUnit" value="/reports/fedemis/Exams/Exams_State_Ranking_by_Year"/>
@@ -49,6 +49,7 @@
 	  ,RN.RANK [Rank]
 	  ,RN.ROW_NUMBER [Row_Number]
 	  ,RN.DENSE_RANK [Dense_Rank]
+	  ,ET.exSeq
 FROM [warehouse].[ExamResultsTestMinimumProficiencySchool] ER
 INNER JOIN (
 	SELECT [DistrictCode]
@@ -64,7 +65,8 @@ INNER JOIN (
 	GROUP BY [DistrictCode]
 		,District
 ) RN ON ER.DistrictCode = RN.DistrictCode
-WHERE examYear = $P{Year} AND edLevelCode = $P{Education_Levels}
+LEFT JOIN [dbo].[lkpExamTypes] ET ON ER.examCode = ET.exCode
+WHERE examYear = $P{Year} AND edLevelCode = $P{Education_Levels} AND examNameShort NOT LIKE '%v2%'
 GROUP BY [examCode]
       ,[examName]
       ,[examYear]
@@ -79,7 +81,8 @@ GROUP BY [examCode]
 	  ,RN.RANK
 	  ,RN.ROW_NUMBER
 	  ,RN.DENSE_RANK
-ORDER BY Rank ASC]]>
+	  ,ET.exSeq
+ORDER BY ET.exSeq ASC, Rank ASC]]>
 	</queryString>
 	<field name="examCode" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="examCode"/>
@@ -137,6 +140,10 @@ ORDER BY Rank ASC]]>
 		<property name="com.jaspersoft.studio.field.name" value="MinimumProficiencyP"/>
 		<property name="com.jaspersoft.studio.field.label" value="MinimumProficiencyP"/>
 	</field>
+	<field name="MinimumProficiencyP2" class="java.lang.Double">
+		<property name="com.jaspersoft.studio.field.name" value="MinimumProficiencyP2"/>
+		<property name="com.jaspersoft.studio.field.label" value="MinimumProficiencyP2"/>
+	</field>
 	<field name="Rank" class="java.lang.Long">
 		<property name="com.jaspersoft.studio.field.name" value="Rank"/>
 		<property name="com.jaspersoft.studio.field.label" value="Rank"/>
@@ -148,6 +155,10 @@ ORDER BY Rank ASC]]>
 	<field name="Dense_Rank" class="java.lang.Long">
 		<property name="com.jaspersoft.studio.field.name" value="Dense_Rank"/>
 		<property name="com.jaspersoft.studio.field.label" value="Dense_Rank"/>
+	</field>
+	<field name="exSeq" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="exSeq"/>
+		<property name="com.jaspersoft.studio.field.label" value="exSeq"/>
 	</field>
 	<background>
 		<band splitType="Stretch"/>
@@ -295,9 +306,8 @@ ORDER BY Rank ASC]]>
 					</crosstabTotalRowHeader>
 				</rowGroup>
 				<columnGroup name="examNameShort" height="20" totalPosition="End">
-					<bucket class="java.lang.String">
+					<bucket order="None" class="java.lang.String">
 						<bucketExpression><![CDATA[$F{examNameShort}]]></bucketExpression>
-						<orderByExpression><![CDATA[$V{examNameShortForSorting}]]></orderByExpression>
 					</bucket>
 					<crosstabColumnHeader>
 						<cellContents mode="Opaque">
