@@ -240,7 +240,7 @@ FROM (
 		, ABS((CAST(SUM(TotalTeachers) AS DECIMAL(10,2))) / SUM(TotalTeachersReal)) PercOfRealTeachers
 		, ABS(SUM(NumTeachersHouseProvidedTotal) / NULLIF((CAST(SUM(ISNULL(TotalTeachers,0)) AS DECIMAL(10,2)) - SUM(ISNULL(NumTeachersInHousingNotOfficiallyProvided,0))), 0)) PercTeachersWithHouse
 		, ABS((CAST(SUM(NumTeachersWithHouseRequiringMaintenance) AS DECIMAL(10,2))) / NULLIF(SUM(NumTeachersHouseProvidedTotal),0)) PercHouseRequiringMaintenance
-	FROM [warehouse].[TeacherHousingX]
+	FROM [warehouse].[TeacherHousingSchoolDimension]
 	WHERE TotalTeachersReal != 0
 	GROUP BY SurveyYear
 		, [District]
@@ -286,7 +286,7 @@ ORDER BY SurveyYear DESC, District;]]>
 		<defaultValueExpression><![CDATA["District Central"]]></defaultValueExpression>
 	</parameter>
 	<queryString language="SQL">
-		<![CDATA[--SELECT * FROM [warehouse].[TeacherHousingX] ORDER BY SurveyYear DESC;
+		<![CDATA[--SELECT * FROM [warehouse].[TeacherHousingSchoolDimension] ORDER BY SurveyYear DESC;
 
 SELECT SurveyYear
 	, TotalTeachersReal
@@ -337,7 +337,7 @@ FROM (
 		, ABS((CAST(SUM(TotalTeachers) AS DECIMAL(10,2))) / SUM(TotalTeachersReal)) PercOfRealTeachers
 		, ABS(SUM(NumTeachersHouseProvidedTotal) / NULLIF((CAST(SUM(ISNULL(TotalTeachers,0)) AS DECIMAL(10,2)) - SUM(ISNULL(NumTeachersInHousingNotOfficiallyProvided,0))), 0)) PercTeachersWithHouse
 		, ABS((CAST(SUM(NumTeachersWithHouseRequiringMaintenance) AS DECIMAL(10,2))) / NULLIF(SUM(NumTeachersHouseProvidedTotal),0)) PercHouseRequiringMaintenance
-	FROM [warehouse].[TeacherHousingX]
+	FROM [warehouse].[TeacherHousingSchoolDimension]
 	WHERE TotalTeachersReal != 0
 	GROUP BY SurveyYear
 		, [District]
