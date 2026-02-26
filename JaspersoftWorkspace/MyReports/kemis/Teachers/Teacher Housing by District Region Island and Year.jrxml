@@ -235,8 +235,8 @@ FROM (
 		, SUM(TotalSubmittedData) TotalSubmittedData
 		, CAST(SUM(TotalSubmittedData) AS DECIMAL(10,2)) / SUM(TotalPossibleData) TeacherHousingDataSubmissionRate
 		, [District]
-		, [Region Code] [Region]
-		, [Island]	
+		, RegionCode [Region]
+		, [Island]
 		, ABS((CAST(SUM(TotalTeachers) AS DECIMAL(10,2))) / SUM(TotalTeachersReal)) PercOfRealTeachers
 		, ABS(SUM(NumTeachersHouseProvidedTotal) / NULLIF((CAST(SUM(ISNULL(TotalTeachers,0)) AS DECIMAL(10,2)) - SUM(ISNULL(NumTeachersInHousingNotOfficiallyProvided,0))), 0)) PercTeachersWithHouse
 		, ABS((CAST(SUM(NumTeachersWithHouseRequiringMaintenance) AS DECIMAL(10,2))) / NULLIF(SUM(NumTeachersHouseProvidedTotal),0)) PercHouseRequiringMaintenance
@@ -244,10 +244,10 @@ FROM (
 	WHERE TotalTeachersReal != 0
 	GROUP BY SurveyYear
 		, [District]
-		, [Region Code]
+		, RegionCode
 		, [Island]
-) T   
-   
+) T
+
    ) AS src
 UNPIVOT
    (Value FOR HouseCategory IN 
@@ -332,8 +332,8 @@ FROM (
 		, SUM(TotalSubmittedData) TotalSubmittedData
 		, CAST(SUM(TotalSubmittedData) AS DECIMAL(10,2)) / SUM(TotalPossibleData) TeacherHousingDataSubmissionRate
 		, [District]
-		, [Region Code] [Region]
-		, [Island]	
+		, RegionCode [Region]
+		, [Island]
 		, ABS((CAST(SUM(TotalTeachers) AS DECIMAL(10,2))) / SUM(TotalTeachersReal)) PercOfRealTeachers
 		, ABS(SUM(NumTeachersHouseProvidedTotal) / NULLIF((CAST(SUM(ISNULL(TotalTeachers,0)) AS DECIMAL(10,2)) - SUM(ISNULL(NumTeachersInHousingNotOfficiallyProvided,0))), 0)) PercTeachersWithHouse
 		, ABS((CAST(SUM(NumTeachersWithHouseRequiringMaintenance) AS DECIMAL(10,2))) / NULLIF(SUM(NumTeachersHouseProvidedTotal),0)) PercHouseRequiringMaintenance
@@ -341,7 +341,7 @@ FROM (
 	WHERE TotalTeachersReal != 0
 	GROUP BY SurveyYear
 		, [District]
-		, [Region Code]
+		, RegionCode
 		, [Island]
 ) T
 WHERE SurveyYear = $P{Year}
