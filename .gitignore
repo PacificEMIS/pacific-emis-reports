@@ -41,3 +41,4 @@ JaspersoftWorkspace/MyReports/**/.classpath
 JaspersoftWorkspace/MyReports/**/.project
 JaspersoftWorkspace/MyReports/**/.settings
 *.jasper
+/.metadata/
