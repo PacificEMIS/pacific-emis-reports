@@ -234,11 +234,11 @@
 		<band splitType="Stretch"/>
 	</pageHeader>
 	<columnHeader>
-		<band height="84" splitType="Stretch">
+		<band height="64" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 			<stackedBarChart>
 				<chart evaluationTime="Group" evaluationGroup="Exam Name" theme="default">
-					<reportElement x="0" y="0" width="572" height="84" uuid="57e8d379-7a9d-4310-9d44-15667af2c05c">
+					<reportElement x="0" y="0" width="572" height="64" uuid="57e8d379-7a9d-4310-9d44-15667af2c05c">
 						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
@@ -246,7 +246,7 @@
 						<propertyExpression name="category.margin"><![CDATA["0.05"]]></propertyExpression>
 						<propertyExpression name="item.margin"><![CDATA["0.05"]]></propertyExpression>
 						<propertyExpression name="label.position.offset"><![CDATA["15"]]></propertyExpression>
-						<propertyExpression name="category.width.ratio"><![CDATA["0.5"]]></propertyExpression>
+						<propertyExpression name="category.width.ratio"><![CDATA["0.7"]]></propertyExpression>
 						<propertyExpression name="category.font.name"><![CDATA["SansSerif"]]></propertyExpression>
 						<propertyExpression name="category.font.size"><![CDATA["8"]]></propertyExpression>
 					</reportElement>

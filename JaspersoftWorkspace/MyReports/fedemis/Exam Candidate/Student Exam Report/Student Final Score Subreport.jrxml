@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.2.final using JasperReports Library version 6.21.2-8434a0bd7c3bbc37cbf916f2968d35e4b165821a  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Student Final Score Subreport" pageWidth="572" pageHeight="792" columnWidth="572" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="a7f1c2d3-1111-4a2b-9c3d-0011223344aa">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="FEDEMIS-TEST"/>
+	<property name="ireport.jasperserver.url" value="http://data.doe.fm:8080/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/fedemis/Exams/Student_Exam_Report"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/fedemis/Exams/Student_Exam_Report_files/Student_Final_Score_Subreport.jrxml"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<template><![CDATA["repo:/Templates/FedEMIS_Style.jrtx"]]></template>
+	<parameter name="CandidateID" class="java.lang.String">
+		<defaultValueExpression><![CDATA["CE0C1AA3-CAD6-4B10-BBC0-0005832F50D1"]]></defaultValueExpression>
+	</parameter>
+	<queryString language="SQL">
+		<![CDATA[SELECT CAST(ROUND(100.0 * SUM(exciResult) / NULLIF(COUNT(*), 0), 0) AS int) AS FinalScore
+FROM [dbo].[ExamCandidateItems]
+WHERE excID = $P{CandidateID}]]>
+	</queryString>
+	<field name="FinalScore" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="FinalScore"/>
+		<property name="com.jaspersoft.studio.field.label" value="FinalScore"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField>
+				<reportElement x="0" y="0" width="572" height="30" forecolor="#073C78" uuid="b1c2d3e4-2222-4b3c-8d4e-1122334455bb">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Open Sans Semibold" size="22" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Final Score: " + ($F{FinalScore} == null ? "N/A" : ($F{FinalScore} + "%"))]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.19.0.final using JasperReports Library version 6.19.0-646c68931cebf1a58bc65c4359d1f0ca223c5e94  -->
+<!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5-74d586df47b25dbd05bd0957999819196e59934a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Exams School Results by Year ExamName" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="df013db5-f76e-44d3-b0df-bcbc46d93160">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="FEDEMIS-TEST"/>
@@ -41,8 +41,8 @@
 	  ,ISNULL([1] , 0) AS [Tot1]
 	  ,ISNULL([3], 0) AS [Tot3]
 	  ,ISNULL([4], 0) AS [Tot4]
-	  ,ROUND(ISNULL(convert(float, [1] )/ Candidates, 0), 2) as [1]
-      ,ROUND(ISNULL(convert(float, [2] )/ Candidates, 0), 2) as [2]
+	  ,ROUND(ISNULL(convert(float, [1]*-1 )/ Candidates, 0), 2) as [1]
+      ,ROUND(ISNULL(convert(float, [2]*-1 )/ Candidates, 0), 2) as [2]
 	  ,ROUND(ISNULL(convert(float, [3] ) / Candidates, 0), 2) as [3]
 	  ,ROUND(ISNULL(convert(float, [4] ) / Candidates, 0), 2) as [4]
   FROM warehouse.ExamResultsBenchmarksSchoolX AS ERBSX
@@ -246,6 +246,8 @@ INNER JOIN [dbo].[ExamStandards] AS ES ON EB.exID = ES.exID AND EB.exstdID = ES.
 								</tickLabelFont>
 							</axisFormat>
 						</valueAxisFormat>
+						<rangeAxisMinValueExpression><![CDATA[-1]]></rangeAxisMinValueExpression>
+						<rangeAxisMaxValueExpression><![CDATA[1]]></rangeAxisMaxValueExpression>
 					</barPlot>
 				</stackedBarChart>
 			</band>
