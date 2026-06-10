@@ -24,37 +24,45 @@
 		<defaultValueExpression><![CDATA["AIL100"]]></defaultValueExpression>
 	</parameter>
 	<queryString language="SQL">
-		<![CDATA[SELECT [examCode]
-	  ,[examName]
-	  ,CONCAT([examCode],': ',[examName]) AS Exam
-      ,[examYear]
-      ,[schNo]
+		<![CDATA[SELECT ERTSX.[examCode]
+	  ,ERTSX.[examName]
+	  ,CONCAT(ERTSX.[examCode],': ',ERTSX.[examName]) AS Exam
+	  ,ISNULL(LVL.[codeDescription], LKPET.[exLevel]) AS [GradeDesc]
+	  ,LKPET.[exLevel] AS [Grade]
+      ,ERTSX.[examYear]
+      ,ERTSX.[schNo]
 	  --,isnull(cast([Gender] as nvarchar(5)),'N/A') as [Gender]
-	  ,SUM([Candidates]) AS [Candidates]
-	  ,SUM(ISNULL([2], 0)) AS [Tot2]
-	  ,SUM(ISNULL([1], 0)) AS [Tot1]
-	  ,SUM(ISNULL([3], 0)) AS [Tot3]
-	  ,SUM(ISNULL([4], 0)) AS [Tot4]
-	  ,ROUND(ISNULL(convert(float, SUM([1])) / SUM(Candidates), 0), 2) * -1 as [1]
-      ,ROUND(ISNULL(convert(float, SUM([2])) / SUM(Candidates), 0), 2) * -1 as [2]
-	  ,ROUND(ISNULL(convert(float, SUM([3])) / SUM(Candidates), 0), 2) as [3]
-	  ,ROUND(ISNULL(convert(float, SUM([4])) / SUM(Candidates), 0), 2) as [4]
+	  ,SUM(ERTSX.[Candidates]) AS [Candidates]
+	  ,SUM(ISNULL(ERTSX.[2], 0)) AS [Tot2]
+	  ,SUM(ISNULL(ERTSX.[1], 0)) AS [Tot1]
+	  ,SUM(ISNULL(ERTSX.[3], 0)) AS [Tot3]
+	  ,SUM(ISNULL(ERTSX.[4], 0)) AS [Tot4]
+	  ,ROUND(ISNULL(convert(float, SUM(ERTSX.[1])) / SUM(ERTSX.Candidates), 0), 2) * -1 as [1]
+      ,ROUND(ISNULL(convert(float, SUM(ERTSX.[2])) / SUM(ERTSX.Candidates), 0), 2) * -1 as [2]
+	  ,ROUND(ISNULL(convert(float, SUM(ERTSX.[3])) / SUM(ERTSX.Candidates), 0), 2) as [3]
+	  ,ROUND(ISNULL(convert(float, SUM(ERTSX.[4])) / SUM(ERTSX.Candidates), 0), 2) as [4]
   FROM [warehouse].[ExamResultsTestSchoolX] AS ERTSX
-  WHERE [schNo] = $P{SchoolNo} AND [examYear] = $P{Year}
-  GROUP BY [examCode]
-	  ,[examName]
-      ,[examYear]
-      ,[schNo]
-  ORDER BY CASE 
-		WHEN [examCode] = 'M04' then 1
-        WHEN [examCode] = 'R06' then 2
-        WHEN [examCode] = 'M06' then 3
-        WHEN [examCode] = 'R08' then 4
-        WHEN [examCode] = 'M08' then 5
-        WHEN [examCode] = 'R10' then 6
-		WHEN [examCode] = 'M10' then 7
+  INNER JOIN [dbo].[lkpExamTypes] AS LKPET ON ERTSX.[examCode] = LKPET.[exCode]
+  LEFT JOIN [dbo].[lkpLevels] AS LVL ON LKPET.[exLevel] = LVL.[codeCode]
+  WHERE ERTSX.[schNo] = $P{SchoolNo} AND ERTSX.[examYear] = $P{Year}
+  GROUP BY ERTSX.[examCode]
+	  ,ERTSX.[examName]
+	  ,LKPET.[exLevel]
+	  ,LVL.[codeDescription]
+	  ,LVL.[codeSeq]
+      ,ERTSX.[examYear]
+      ,ERTSX.[schNo]
+  ORDER BY ISNULL(LVL.[codeSeq], 2147483647) ASC,
+	CASE
+		WHEN ERTSX.[examCode] = 'M04' then 1
+        WHEN ERTSX.[examCode] = 'R06' then 2
+        WHEN ERTSX.[examCode] = 'M06' then 3
+        WHEN ERTSX.[examCode] = 'R08' then 4
+        WHEN ERTSX.[examCode] = 'M08' then 5
+        WHEN ERTSX.[examCode] = 'R10' then 6
+		WHEN ERTSX.[examCode] = 'M10' then 7
         ELSE 8
-	END ASC]]>
+	END ASC, ERTSX.[examCode] ASC]]>
 	</queryString>
 	<field name="examCode" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="examCode"/>
@@ -67,6 +75,14 @@
 	<field name="Exam" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="Exam"/>
 		<property name="com.jaspersoft.studio.field.label" value="Exam"/>
+	</field>
+	<field name="GradeDesc" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="GradeDesc"/>
+		<property name="com.jaspersoft.studio.field.label" value="GradeDesc"/>
+	</field>
+	<field name="Grade" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Grade"/>
+		<property name="com.jaspersoft.studio.field.label" value="Grade"/>
 	</field>
 	<field name="examYear" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="examYear"/>
@@ -112,40 +128,40 @@
 		<property name="com.jaspersoft.studio.field.name" value="4"/>
 		<property name="com.jaspersoft.studio.field.label" value="4"/>
 	</field>
-	<variable name="PERC1_AVG_EXAM" class="java.lang.Integer" resetType="Group" resetGroup="Exam Name">
+	<variable name="PERC1_AVG_EXAM" class="java.lang.Integer" resetType="Group" resetGroup="Grade">
 		<variableExpression><![CDATA[$V{TOT1_EXAM} / $V{CANDIDATES_EXAM} * 100]]></variableExpression>
 	</variable>
-	<variable name="PERC2_AVG_EXAM" class="java.lang.Integer" resetType="Group" resetGroup="Exam Name">
+	<variable name="PERC2_AVG_EXAM" class="java.lang.Integer" resetType="Group" resetGroup="Grade">
 		<variableExpression><![CDATA[$V{TOT2_EXAM} / $V{CANDIDATES_EXAM} * 100]]></variableExpression>
 	</variable>
-	<variable name="PERC3_AVG_EXAM" class="java.lang.Integer" resetType="Group" resetGroup="Exam Name">
+	<variable name="PERC3_AVG_EXAM" class="java.lang.Integer" resetType="Group" resetGroup="Grade">
 		<variableExpression><![CDATA[$V{TOT3_EXAM} / $V{CANDIDATES_EXAM} * 100]]></variableExpression>
 	</variable>
-	<variable name="PERC4_AVG_EXAM" class="java.lang.Integer" resetType="Group" resetGroup="Exam Name">
+	<variable name="PERC4_AVG_EXAM" class="java.lang.Integer" resetType="Group" resetGroup="Grade">
 		<variableExpression><![CDATA[$V{TOT4_EXAM} / $V{CANDIDATES_EXAM} * 100]]></variableExpression>
 	</variable>
-	<variable name="TOT1_EXAM" class="java.lang.Integer" resetType="Group" resetGroup="Exam Name" calculation="Sum">
+	<variable name="TOT1_EXAM" class="java.lang.Integer" resetType="Group" resetGroup="Grade" calculation="Sum">
 		<variableExpression><![CDATA[$F{Tot1}]]></variableExpression>
 	</variable>
-	<variable name="TOT2_EXAM" class="java.lang.Integer" resetType="Group" resetGroup="Exam Name" calculation="Sum">
+	<variable name="TOT2_EXAM" class="java.lang.Integer" resetType="Group" resetGroup="Grade" calculation="Sum">
 		<variableExpression><![CDATA[$F{Tot2}]]></variableExpression>
 	</variable>
-	<variable name="TOT3_EXAM" class="java.lang.Integer" resetType="Group" resetGroup="Exam Name" calculation="Sum">
+	<variable name="TOT3_EXAM" class="java.lang.Integer" resetType="Group" resetGroup="Grade" calculation="Sum">
 		<variableExpression><![CDATA[$F{Tot3}]]></variableExpression>
 	</variable>
-	<variable name="TOT4_EXAM" class="java.lang.Integer" resetType="Group" resetGroup="Exam Name" calculation="Sum">
+	<variable name="TOT4_EXAM" class="java.lang.Integer" resetType="Group" resetGroup="Grade" calculation="Sum">
 		<variableExpression><![CDATA[$F{Tot4}]]></variableExpression>
 	</variable>
-	<variable name="CANDIDATES_EXAM" class="java.lang.Integer" resetType="Group" resetGroup="Exam Name" calculation="Sum">
+	<variable name="CANDIDATES_EXAM" class="java.lang.Integer" resetType="Group" resetGroup="Grade" calculation="Sum">
 		<variableExpression><![CDATA[$F{Candidates}]]></variableExpression>
 	</variable>
-	<group name="Exam Name">
-		<groupExpression><![CDATA[$F{examName}]]></groupExpression>
+	<group name="Grade">
+		<groupExpression><![CDATA[$F{Grade}]]></groupExpression>
 		<groupHeader>
-			<band height="170">
+			<band height="147">
 				<stackedBarChart>
-					<chart isShowLegend="false" evaluationTime="Group" evaluationGroup="Exam Name">
-						<reportElement x="0" y="23" width="572" height="105" uuid="ebbab379-a83c-4fed-96c9-92803484539c">
+					<chart isShowLegend="false" evaluationTime="Group" evaluationGroup="Grade">
+						<reportElement x="0" y="26" width="572" height="75" uuid="ebbab379-a83c-4fed-96c9-92803484539c">
 							<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
 							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 							<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
@@ -165,7 +181,7 @@
 						<chartLegend/>
 					</chart>
 					<categoryDataset>
-						<dataset resetType="Group" resetGroup="Exam Name"/>
+						<dataset resetType="Group" resetGroup="Grade"/>
 						<categorySeries>
 							<seriesExpression><![CDATA["Developing"]]></seriesExpression>
 							<categoryExpression><![CDATA[$F{examName}]]></categoryExpression>
@@ -243,11 +259,11 @@
 						<textElement>
 							<font fontName="Open Sans"/>
 						</textElement>
-						<textFieldExpression><![CDATA[$F{examName}]]></textFieldExpression>
+						<textFieldExpression><![CDATA[$F{GradeDesc}]]></textFieldExpression>
 					</textField>
 				</frame>
 				<staticText>
-					<reportElement key="" style="Group header fields" x="364" y="156" width="52" height="14" uuid="96af8d67-04d7-4608-b94e-591dfdb9e313">
+					<reportElement key="" style="Group header fields" x="364" y="132" width="52" height="14" uuid="96af8d67-04d7-4608-b94e-591dfdb9e313">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					</reportElement>
@@ -255,7 +271,7 @@
 					<text><![CDATA[Beginning]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="" style="Group header fields" x="416" y="156" width="52" height="14" uuid="00a2e23f-6556-4be0-b9bf-9a0df5ff4150">
+					<reportElement key="" style="Group header fields" x="416" y="132" width="52" height="14" uuid="00a2e23f-6556-4be0-b9bf-9a0df5ff4150">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					</reportElement>
@@ -263,7 +279,7 @@
 					<text><![CDATA[Developing]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="" style="Group header fields" x="468" y="156" width="52" height="14" uuid="8fa7fdbd-0a1c-48f1-b1ca-9c35d6390285">
+					<reportElement key="" style="Group header fields" x="468" y="132" width="52" height="14" uuid="8fa7fdbd-0a1c-48f1-b1ca-9c35d6390285">
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
@@ -271,7 +287,7 @@
 					<text><![CDATA[Proficient]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="" style="Group header fields" x="520" y="156" width="52" height="14" uuid="97f0eb0b-fd47-4bf8-9707-0f26ec55d040">
+					<reportElement key="" style="Group header fields" x="520" y="132" width="52" height="14" uuid="97f0eb0b-fd47-4bf8-9707-0f26ec55d040">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					</reportElement>
@@ -280,14 +296,22 @@
 					<text><![CDATA[Advanced]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="" style="Group header fields" x="0" y="156" width="364" height="14" uuid="042e472f-dc41-48d2-a8d7-c5ca53f720c4">
+					<reportElement key="" style="Group header fields" x="0" y="132" width="300" height="14" uuid="042e472f-dc41-48d2-a8d7-c5ca53f720c4">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
 					<textElement textAlignment="Left"/>
+					<text><![CDATA[Exam]]></text>
+				</staticText>
+				<staticText>
+					<reportElement key="" style="Group header fields" x="300" y="132" width="64" height="14" uuid="b9e8d7c6-5a4f-4b3a-8c2d-1e0f9a8b7c6d">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement textAlignment="Right"/>
 					<text><![CDATA[Candidates]]></text>
 				</staticText>
 				<rectangle>
-					<reportElement x="37" y="132" width="504" height="17" uuid="ed075227-d1b5-457d-9217-1a9f7824a738">
+					<reportElement x="37" y="108" width="504" height="17" uuid="ed075227-d1b5-457d-9217-1a9f7824a738">
 						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					</reportElement>
@@ -296,31 +320,31 @@
 					</graphicElement>
 				</rectangle>
 				<rectangle>
-					<reportElement x="39" y="134" width="13" height="13" forecolor="#C00000" backcolor="#C00000" uuid="00d1bcac-a5a2-4360-a740-925f734f1153"/>
+					<reportElement x="39" y="110" width="13" height="13" forecolor="#C00000" backcolor="#C00000" uuid="00d1bcac-a5a2-4360-a740-925f734f1153"/>
 					<graphicElement>
 						<pen lineWidth="0.0"/>
 					</graphicElement>
 				</rectangle>
 				<rectangle>
-					<reportElement x="204" y="134" width="13" height="13" forecolor="#FFD966" backcolor="#FFD966" uuid="22738148-c4bf-4403-b194-315be60a7f4a"/>
+					<reportElement x="204" y="110" width="13" height="13" forecolor="#FFD966" backcolor="#FFD966" uuid="22738148-c4bf-4403-b194-315be60a7f4a"/>
 					<graphicElement>
 						<pen lineWidth="0.0"/>
 					</graphicElement>
 				</rectangle>
 				<rectangle>
-					<reportElement x="461" y="134" width="13" height="13" forecolor="#00B050" backcolor="#00B050" uuid="605920d1-48fe-438d-a650-c61ba616efa7"/>
+					<reportElement x="461" y="110" width="13" height="13" forecolor="#00B050" backcolor="#00B050" uuid="605920d1-48fe-438d-a650-c61ba616efa7"/>
 					<graphicElement>
 						<pen lineWidth="0.0"/>
 					</graphicElement>
 				</rectangle>
 				<rectangle>
-					<reportElement x="349" y="134" width="13" height="13" forecolor="#92D050" backcolor="#92D050" uuid="cd871c71-edf2-4ce6-a6e4-7515ea4508c8"/>
+					<reportElement x="349" y="110" width="13" height="13" forecolor="#92D050" backcolor="#92D050" uuid="cd871c71-edf2-4ce6-a6e4-7515ea4508c8"/>
 					<graphicElement>
 						<pen lineWidth="0.0"/>
 					</graphicElement>
 				</rectangle>
 				<staticText>
-					<reportElement x="54" y="132" width="147" height="16" uuid="58aa204b-4d45-4b02-97ad-a829ee8fc967">
+					<reportElement x="54" y="108" width="147" height="16" uuid="58aa204b-4d45-4b02-97ad-a829ee8fc967">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
 					<textElement verticalAlignment="Middle">
@@ -329,7 +353,7 @@
 					<text><![CDATA[Well below minimum competent]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="218" y="132" width="131" height="16" uuid="44e60f36-dedc-4bc8-8ee2-7df9eb6f9186">
+					<reportElement x="218" y="108" width="131" height="16" uuid="44e60f36-dedc-4bc8-8ee2-7df9eb6f9186">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
 					<textElement verticalAlignment="Middle">
@@ -338,7 +362,7 @@
 					<text><![CDATA[Below minimum competent]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="363" y="132" width="94" height="16" uuid="6379fd4c-5a4e-411e-a218-42781e8c1148">
+					<reportElement x="363" y="108" width="94" height="16" uuid="6379fd4c-5a4e-411e-a218-42781e8c1148">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
 					<textElement verticalAlignment="Middle">
@@ -347,7 +371,7 @@
 					<text><![CDATA[Minimum competent]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="476" y="132" width="64" height="16" uuid="561ecbc8-dbf0-48ac-91e9-2ef01cf09e02">
+					<reportElement x="476" y="108" width="64" height="16" uuid="561ecbc8-dbf0-48ac-91e9-2ef01cf09e02">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
 					<textElement verticalAlignment="Middle">
@@ -432,7 +456,7 @@
 				<textFieldExpression><![CDATA[$F{Tot4}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="364" height="20" uuid="6b357b28-299c-4809-86bd-b62510ceef16">
+				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="300" height="20" uuid="6b357b28-299c-4809-86bd-b62510ceef16">
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
 				</reportElement>
@@ -440,6 +464,20 @@
 					<bottomPen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Open Sans" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{examName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="300" y="0" width="64" height="20" uuid="1b2c3d4e-5f60-4718-92a3-b4c5d6e7f809">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+				</reportElement>
+				<box>
+					<bottomPen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Open Sans" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{Candidates}]]></textFieldExpression>

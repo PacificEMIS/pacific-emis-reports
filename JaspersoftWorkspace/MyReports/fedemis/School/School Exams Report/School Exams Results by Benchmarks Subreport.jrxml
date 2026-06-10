@@ -203,7 +203,7 @@
 	<group name="Exam Standard">
 		<groupExpression><![CDATA[$F{ExamStandard}]]></groupExpression>
 		<groupHeader>
-			<band height="227">
+			<band height="147">
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<frame>
 					<reportElement style="Detail Header Lighter" x="0" y="0" width="572" height="24" uuid="fd6dbcb4-487f-46e0-87e6-d4a20f4d80fc">
@@ -227,7 +227,7 @@
 					</textField>
 				</frame>
 				<staticText>
-					<reportElement key="" style="Group header fields" x="468" y="213" width="52" height="14" uuid="47cc3082-6217-430f-86c2-c48d1e407405">
+					<reportElement key="" style="Group header fields" x="468" y="133" width="52" height="14" uuid="47cc3082-6217-430f-86c2-c48d1e407405">
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
@@ -235,7 +235,7 @@
 					<text><![CDATA[Proficient]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="" style="Group header fields" x="416" y="213" width="52" height="14" uuid="4779978e-669d-43d3-bfef-e829629bd6a5">
+					<reportElement key="" style="Group header fields" x="416" y="133" width="52" height="14" uuid="4779978e-669d-43d3-bfef-e829629bd6a5">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					</reportElement>
@@ -243,13 +243,13 @@
 					<text><![CDATA[Developing]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="" style="Group header fields" x="0" y="213" width="312" height="14" uuid="1da6916a-c24a-4d85-99b4-bd13bbd780d2">
+					<reportElement key="" style="Group header fields" x="0" y="133" width="312" height="14" uuid="1da6916a-c24a-4d85-99b4-bd13bbd780d2">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
 					<text><![CDATA[Benchmark]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="" style="Group header fields" x="364" y="213" width="52" height="14" uuid="9df82d0c-180f-44a2-ac85-d6720389fb9a">
+					<reportElement key="" style="Group header fields" x="364" y="133" width="52" height="14" uuid="9df82d0c-180f-44a2-ac85-d6720389fb9a">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					</reportElement>
@@ -257,14 +257,14 @@
 					<text><![CDATA[Beginning]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="" style="Group header fields" x="312" y="213" width="52" height="14" uuid="8551fc86-8195-448f-ab4d-f9bea061d198">
+					<reportElement key="" style="Group header fields" x="312" y="133" width="52" height="14" uuid="8551fc86-8195-448f-ab4d-f9bea061d198">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
 					<textElement textAlignment="Right"/>
 					<text><![CDATA[Candidates]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="" style="Group header fields" x="520" y="213" width="52" height="14" uuid="74852144-6e32-49f7-9d91-05685f62aae9">
+					<reportElement key="" style="Group header fields" x="520" y="133" width="52" height="14" uuid="74852144-6e32-49f7-9d91-05685f62aae9">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					</reportElement>
@@ -274,7 +274,7 @@
 				</staticText>
 				<stackedBarChart>
 					<chart isShowLegend="false" evaluationTime="Group" evaluationGroup="Exam Standard">
-						<reportElement x="0" y="24" width="572" height="160" uuid="9fcad61e-8ac0-41f3-af80-6cf50910d843">
+						<reportElement x="0" y="24" width="572" height="80" uuid="9fcad61e-8ac0-41f3-af80-6cf50910d843">
 							<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
 							<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 							<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
@@ -356,7 +356,7 @@
 					</barPlot>
 				</stackedBarChart>
 				<rectangle>
-					<reportElement x="36" y="189" width="504" height="17" uuid="1e62f4ed-d9f6-44f2-a052-ab8816c3ec31">
+					<reportElement x="36" y="109" width="504" height="17" uuid="1e62f4ed-d9f6-44f2-a052-ab8816c3ec31">
 						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					</reportElement>
@@ -365,31 +365,31 @@
 					</graphicElement>
 				</rectangle>
 				<rectangle>
-					<reportElement x="38" y="191" width="13" height="13" forecolor="#C00000" backcolor="#C00000" uuid="b1623df9-a457-4387-91a7-432c99e5c473"/>
+					<reportElement x="38" y="111" width="13" height="13" forecolor="#C00000" backcolor="#C00000" uuid="b1623df9-a457-4387-91a7-432c99e5c473"/>
 					<graphicElement>
 						<pen lineWidth="0.0"/>
 					</graphicElement>
 				</rectangle>
 				<rectangle>
-					<reportElement x="203" y="191" width="13" height="13" forecolor="#FFD966" backcolor="#FFD966" uuid="a29f1b99-7695-4a8e-9d89-7f70bbee90a8"/>
+					<reportElement x="203" y="111" width="13" height="13" forecolor="#FFD966" backcolor="#FFD966" uuid="a29f1b99-7695-4a8e-9d89-7f70bbee90a8"/>
 					<graphicElement>
 						<pen lineWidth="0.0"/>
 					</graphicElement>
 				</rectangle>
 				<rectangle>
-					<reportElement x="460" y="191" width="13" height="13" forecolor="#00B050" backcolor="#00B050" uuid="84af6f6e-41f0-4bb8-b076-375004b46cda"/>
+					<reportElement x="460" y="111" width="13" height="13" forecolor="#00B050" backcolor="#00B050" uuid="84af6f6e-41f0-4bb8-b076-375004b46cda"/>
 					<graphicElement>
 						<pen lineWidth="0.0"/>
 					</graphicElement>
 				</rectangle>
 				<rectangle>
-					<reportElement x="348" y="191" width="13" height="13" forecolor="#92D050" backcolor="#92D050" uuid="346d142f-5c23-4839-a1a3-64af0fd155b0"/>
+					<reportElement x="348" y="111" width="13" height="13" forecolor="#92D050" backcolor="#92D050" uuid="346d142f-5c23-4839-a1a3-64af0fd155b0"/>
 					<graphicElement>
 						<pen lineWidth="0.0"/>
 					</graphicElement>
 				</rectangle>
 				<staticText>
-					<reportElement x="53" y="189" width="147" height="16" uuid="22d81d88-37eb-43d1-a27e-d33cbf9174ea">
+					<reportElement x="53" y="109" width="147" height="16" uuid="22d81d88-37eb-43d1-a27e-d33cbf9174ea">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
 					<textElement verticalAlignment="Middle">
@@ -398,7 +398,7 @@
 					<text><![CDATA[Well below minimum competent]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="217" y="189" width="131" height="16" uuid="968bfebe-8452-4a33-9c6a-3cc72477d384">
+					<reportElement x="217" y="109" width="131" height="16" uuid="968bfebe-8452-4a33-9c6a-3cc72477d384">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
 					<textElement verticalAlignment="Middle">
@@ -407,7 +407,7 @@
 					<text><![CDATA[Below minimum competent]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="362" y="189" width="94" height="16" uuid="37f0ce20-efea-4d72-a921-f3a9a6e7881d">
+					<reportElement x="362" y="109" width="94" height="16" uuid="37f0ce20-efea-4d72-a921-f3a9a6e7881d">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
 					<textElement verticalAlignment="Middle">
@@ -416,7 +416,7 @@
 					<text><![CDATA[Minimum competent]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="475" y="189" width="64" height="16" uuid="f4e9e25a-0d72-4f64-8d7a-5fb38e6b8e64">
+					<reportElement x="475" y="109" width="64" height="16" uuid="f4e9e25a-0d72-4f64-8d7a-5fb38e6b8e64">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
 					<textElement verticalAlignment="Middle">
