@@ -68,7 +68,7 @@
 		<defaultValueExpression><![CDATA[2021]]></defaultValueExpression>
 	</parameter>
 	<queryString language="SQL">
-		<![CDATA[SELECT [excID]
+		<![CDATA[SELECT ERBCX.[excID]
       ,[studentID]
       ,[excGiven] [GivenName]
       ,[excMiddleNames]
@@ -92,6 +92,7 @@
 	  ,ROUND(ISNULL(convert(float, SUM([4])) / SUM(ERBCX.[CandidateCount]), 0), 2) as [4]
 	  ,[AchievementLevel] AS [FinalLevel]
 	  ,[AchievementDesc] AS [FinalLevelDesc]
+	  ,SCORE.[FinalScore]
   FROM [warehouse].[ExamResultsBenchmarksCandidateX] ERBCX
   INNER JOIN 
   (
@@ -127,8 +128,18 @@
 	WHERE RecordType = 'Exam' AND CandidateCount = 1 AND schNo = $P{SchoolNo} AND ExamYear = $P{Year}
  ) T
   ON ERBCX.excID = T.CandidateID AND ERBCX.examID = T.ExamID
+  LEFT JOIN
+  (
+	SELECT ECI.excID AS scoreExcID
+	, CAST(ROUND(100.0 * SUM(ECI.exciResult) / NULLIF(COUNT(*), 0), 0) AS int) AS FinalScore
+	FROM dbo.ExamCandidateItems ECI
+	INNER JOIN dbo.ExamCandidates EC ON ECI.excID = EC.excID
+	INNER JOIN dbo.Exams X ON EC.exID = X.exID
+	WHERE EC.schNo = $P{SchoolNo} AND X.exYear = $P{Year}
+	GROUP BY ECI.excID
+  ) SCORE ON SCORE.scoreExcID = ERBCX.excID
   WHERE ERBCX.schNo = $P{SchoolNo} AND ERBCX.examYear = $P{Year}
-  GROUP BY [excID]
+  GROUP BY ERBCX.[excID]
       ,[studentID]
       ,[excGiven]
       ,[excMiddleNames]
@@ -142,6 +153,7 @@
 	  ,ERBCX.[Gender]
 	  ,[AchievementLevel]
 	  ,[AchievementDesc]
+		  ,SCORE.[FinalScore]
   ORDER BY
 	CASE 
 		WHEN [examCode] = 'A03' then 1
@@ -281,6 +293,10 @@
 		<property name="com.jaspersoft.studio.field.name" value="FinalLevelDesc"/>
 		<property name="com.jaspersoft.studio.field.label" value="FinalLevelDesc"/>
 	</field>
+	<field name="FinalScore" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="FinalScore"/>
+		<property name="com.jaspersoft.studio.field.label" value="FinalScore"/>
+	</field>
 	<group name="Exam Name">
 		<groupExpression><![CDATA[$F{examName}]]></groupExpression>
 		<groupHeader>
@@ -313,7 +329,7 @@
 			<band height="280">
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<staticText>
-					<reportElement key="" style="Group header fields" x="0" y="268" width="380" height="12" uuid="8b5395d2-a023-4f54-ac67-f6cb5b1c244f">
+					<reportElement key="" style="Group header fields" x="0" y="268" width="320" height="12" uuid="8b5395d2-a023-4f54-ac67-f6cb5b1c244f">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
@@ -321,7 +337,7 @@
 					<text><![CDATA[Candidate]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="" style="Group header fields" x="630" y="268" width="122" height="12" uuid="508ea8e5-77a8-4f59-82c4-1d65481f16d8">
+					<reportElement key="" style="Group header fields" x="570" y="268" width="118" height="12" uuid="508ea8e5-77a8-4f59-82c4-1d65481f16d8">
 						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -330,7 +346,16 @@
 					<text><![CDATA[Final Level]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="" style="Group header fields" x="480" y="268" width="50" height="12" uuid="d08665d5-9b99-46ab-9ae5-a92e9034ea73">
+					<reportElement key="" style="Group header fields" x="688" y="268" width="64" height="12" uuid="4a2b3c5d-8e7f-4b1d-9c32-1b2c3d4e5f60">
+						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right"/>
+					<text><![CDATA[Final Score]]></text>
+				</staticText>
+				<staticText>
+					<reportElement key="" style="Group header fields" x="420" y="268" width="50" height="12" uuid="d08665d5-9b99-46ab-9ae5-a92e9034ea73">
 						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -339,7 +364,7 @@
 					<text><![CDATA[Developing]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="" style="Group header fields" x="380" y="268" width="50" height="12" uuid="73fe01bb-9492-4d1f-8b4f-db4d88ecf5f1">
+					<reportElement key="" style="Group header fields" x="320" y="268" width="50" height="12" uuid="73fe01bb-9492-4d1f-8b4f-db4d88ecf5f1">
 						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -348,7 +373,7 @@
 					<text><![CDATA[Benchmarks]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="" style="Group header fields" x="580" y="268" width="50" height="12" uuid="8868a8e4-058e-4afa-926a-2313b87a2147">
+					<reportElement key="" style="Group header fields" x="520" y="268" width="50" height="12" uuid="8868a8e4-058e-4afa-926a-2313b87a2147">
 						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -357,7 +382,7 @@
 					<text><![CDATA[Advanced]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="" style="Group header fields" x="530" y="268" width="50" height="12" uuid="6edc49dc-6d3a-4ead-865e-4a601c5ad459">
+					<reportElement key="" style="Group header fields" x="470" y="268" width="50" height="12" uuid="6edc49dc-6d3a-4ead-865e-4a601c5ad459">
 						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -366,7 +391,7 @@
 					<text><![CDATA[Proficient]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="" style="Group header fields" x="430" y="268" width="50" height="12" uuid="ae1852f1-0378-4697-a82e-cbc784a1c867">
+					<reportElement key="" style="Group header fields" x="370" y="268" width="50" height="12" uuid="ae1852f1-0378-4697-a82e-cbc784a1c867">
 						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -653,7 +678,7 @@
 		<band height="20" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 			<textField>
-				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="580" y="0" width="50" height="20" uuid="dface132-4811-4f9d-bb4f-530310d7c523">
+				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="520" y="0" width="50" height="20" uuid="dface132-4811-4f9d-bb4f-530310d7c523">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
@@ -667,7 +692,7 @@
 				<textFieldExpression><![CDATA[$F{Tot4}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="530" y="0" width="50" height="20" uuid="ae40772a-fd8b-4fff-ac23-2613b41171ad">
+				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="470" y="0" width="50" height="20" uuid="ae40772a-fd8b-4fff-ac23-2613b41171ad">
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
@@ -681,7 +706,7 @@
 				<textFieldExpression><![CDATA[$F{Tot3}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="480" y="0" width="50" height="20" uuid="28cb5d71-6c36-4c76-a1ef-ae1fe0d8beea">
+				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="420" y="0" width="50" height="20" uuid="28cb5d71-6c36-4c76-a1ef-ae1fe0d8beea">
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
@@ -695,7 +720,7 @@
 				<textFieldExpression><![CDATA[$F{Tot2}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="430" y="0" width="50" height="20" uuid="e21ae40c-4ae1-45b7-8cb1-d9987de00d3e">
+				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="370" y="0" width="50" height="20" uuid="e21ae40c-4ae1-45b7-8cb1-d9987de00d3e">
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
@@ -709,7 +734,7 @@
 				<textFieldExpression><![CDATA[$F{Tot1}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="380" y="0" width="50" height="20" uuid="2a3a0506-52b4-4d1b-a917-cc94b9761d28">
+				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="320" y="0" width="50" height="20" uuid="2a3a0506-52b4-4d1b-a917-cc94b9761d28">
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -723,7 +748,7 @@
 				<textFieldExpression><![CDATA[$F{Benchmarks}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="380" height="20" uuid="f93cd998-e20e-43c1-8689-118407b3998e">
+				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="320" height="20" uuid="f93cd998-e20e-43c1-8689-118407b3998e">
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -737,7 +762,21 @@
 				<textFieldExpression><![CDATA[(($F{GivenName} == null) ? "" : $F{GivenName} + " ") + (($F{FamilyName} == null) ? "" : $F{FamilyName})]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="AchievementLevels" stretchType="RelativeToTallestObject" mode="Opaque" x="734" y="0" width="18" height="20" uuid="e980b6d8-2fed-4930-9f69-c255925bd372">
+				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="688" y="0" width="64" height="20" uuid="3f1c2a4b-7d6e-4a9c-bf21-0a1b2c3d4e5f">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box rightPadding="5">
+					<bottomPen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Open Sans" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{FinalScore} == null) ? "" : ($F{FinalScore} + "%")]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="AchievementLevels" stretchType="RelativeToTallestObject" mode="Opaque" x="670" y="0" width="18" height="20" uuid="e980b6d8-2fed-4930-9f69-c255925bd372">
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -751,7 +790,7 @@
 				<textFieldExpression><![CDATA[$F{FinalLevelDesc}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="630" y="0" width="104" height="20" uuid="889be731-d0c2-430c-a1d6-8d8f722701b0">
+				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="570" y="0" width="100" height="20" uuid="889be731-d0c2-430c-a1d6-8d8f722701b0">
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -788,7 +827,7 @@
 				</textField>
 				<textField pattern="EEEEE dd MMMMM yyyy">
 					<reportElement style="Page footer" x="22" y="1" width="288" height="20" uuid="fbce24bb-3cb1-44a3-8eec-8c067ddbe5b5"/>
-					<textFieldExpression><![CDATA["Generated by MIEMIS on " + new java.util.Date()]]></textFieldExpression>
+					<textFieldExpression><![CDATA["Generated by MIEMIS on " + new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").format(new java.util.Date())]]></textFieldExpression>
 				</textField>
 			</frame>
 		</band>
