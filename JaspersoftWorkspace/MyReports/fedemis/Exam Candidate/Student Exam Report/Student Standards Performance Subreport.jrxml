@@ -237,11 +237,11 @@
 		<band splitType="Stretch"/>
 	</pageHeader>
 	<columnHeader>
-		<band height="300" splitType="Stretch">
+		<band height="100" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 			<stackedBarChart>
 				<chart evaluationTime="Group" evaluationGroup="Exam Name" theme="default">
-					<reportElement x="0" y="0" width="572" height="300" uuid="f666c9bc-46b6-4436-b470-1c6d38bf86ac">
+					<reportElement x="0" y="0" width="572" height="100" uuid="f666c9bc-46b6-4436-b470-1c6d38bf86ac">
 						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -259,7 +259,9 @@
 					</box>
 					<chartTitle/>
 					<chartSubtitle/>
-					<chartLegend/>
+					<chartLegend>
+						<font size="6"/>
+					</chartLegend>
 				</chart>
 				<categoryDataset>
 					<dataset resetType="Group" resetGroup="Exam Name"/>
