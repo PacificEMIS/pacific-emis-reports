@@ -65,7 +65,7 @@
 		END FinalLevelDesc
 	, E.NextGradeProfAboveRule
 	, E.PercentageCorrect
-	, E.NextGrade60PercRule
+	, E.NextGradePassRule
 	, S.schNextSchool [NextSchoolCode]
 	, S2.schName [NextSchoolName]
 FROM (
@@ -95,14 +95,22 @@ SELECT E.exID exID
 		WHEN CONVERT(FLOAT, SUM(ECI.exciResult)) BETWEEN ((CONVERT(FLOAT, COUNT(ECI.exciResult))/4)*3)+1 AND CONVERT(FLOAT, COUNT(ECI.exciResult)) THEN 'Nine Grade'
 		END NextGradeProfAboveRule
 	, CONVERT(FLOAT, SUM(ECI.exciResult)) / CONVERT(FLOAT, COUNT(ECI.exciResult)) PercentageCorrect
-	, CASE 
-		WHEN CONVERT(FLOAT, SUM(ECI.exciResult)) / CONVERT(FLOAT, COUNT(ECI.exciResult)) >= 0.516 THEN 'Nine Grade'
-		WHEN CONVERT(FLOAT, SUM(ECI.exciResult)) / CONVERT(FLOAT, COUNT(ECI.exciResult)) < 0.516 THEN 'Pre-Nine Grade'
-		END NextGrade60PercRule
-FROM 
+	-- Pass decision per the effective configured rule (Exams override -> exam type default).
+	-- For H08 (seeded 'level') this is level >= 3, which equals correct > (total/4)*2 and
+	-- reproduces the legacy 0.516 split for the 60-item exam.
+	, CASE COALESCE(E.exPassRule, LKPX.exPassRule)
+		WHEN 'percent' THEN
+			CASE WHEN CONVERT(FLOAT, SUM(ECI.exciResult)) / CONVERT(FLOAT, COUNT(ECI.exciResult)) >= COALESCE(E.exPassPerc, LKPX.exPassPerc) THEN 'Nine Grade'
+				ELSE 'Pre-Nine Grade' END
+		WHEN 'level' THEN
+			CASE WHEN CONVERT(FLOAT, SUM(ECI.exciResult)) > (CONVERT(FLOAT, COUNT(ECI.exciResult)) / 4) * 2 THEN 'Nine Grade'
+				ELSE 'Pre-Nine Grade' END
+		END NextGradePassRule
+FROM
 Exams E
 INNER JOIN ExamCandidates EC ON E.exID = EC.exID
 INNER JOIN ExamCandidateItems ECI ON EC.excID = ECI.excID
+INNER JOIN lkpExamTypes LKPX ON E.exCode = LKPX.exCode
 GROUP BY E.exID
 	, E.exCode
 	, E.exYear
@@ -112,6 +120,10 @@ GROUP BY E.exID
 	, EC.excFamilyName
 	, EC.excGender
 	, EC.schNo
+	, E.exPassRule
+	, LKPX.exPassRule
+	, E.exPassPerc
+	, LKPX.exPassPerc
 	--, DSS.[School Name]
 	--, DSS.District
 	--, S.schNextSchool
@@ -121,7 +133,7 @@ INNER JOIN DimensionSchoolSurvey DSS ON E.schNo = DSS.[School No] AND E.exYear =
 INNER JOIN Schools S ON E.schNo = S.schNo
 LEFT OUTER JOIN Schools S2 ON S.schNextSchool = S2.schNo
 WHERE E.exCode = 'H08' AND E.exYear = $P{Year}
-ORDER BY S2.schName ASC, E.NextGradeProfAboveRule, E.NextGrade60PercRule, E.schNo, E.CorrectItems DESC]]>
+ORDER BY S2.schName ASC, E.NextGradeProfAboveRule, E.NextGradePassRule, E.schNo, E.CorrectItems DESC]]>
 	</queryString>
 	<field name="exID" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="exID"/>
@@ -191,9 +203,9 @@ ORDER BY S2.schName ASC, E.NextGradeProfAboveRule, E.NextGrade60PercRule, E.schN
 		<property name="com.jaspersoft.studio.field.name" value="PercentageCorrect"/>
 		<property name="com.jaspersoft.studio.field.label" value="PercentageCorrect"/>
 	</field>
-	<field name="NextGrade60PercRule" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="NextGrade60PercRule"/>
-		<property name="com.jaspersoft.studio.field.label" value="NextGrade60PercRule"/>
+	<field name="NextGradePassRule" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NextGradePassRule"/>
+		<property name="com.jaspersoft.studio.field.label" value="NextGradePassRule"/>
 	</field>
 	<field name="NextSchoolCode" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="NextSchoolCode"/>
@@ -230,7 +242,7 @@ ORDER BY S2.schName ASC, E.NextGradeProfAboveRule, E.NextGrade60PercRule, E.schN
 		</groupFooter>
 	</group>
 	<group name="Next Grade">
-		<groupExpression><![CDATA[$F{NextGrade60PercRule}]]></groupExpression>
+		<groupExpression><![CDATA[$F{NextGradePassRule}]]></groupExpression>
 		<groupHeader>
 			<band height="36">
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -244,7 +256,7 @@ ORDER BY S2.schName ASC, E.NextGradeProfAboveRule, E.NextGrade60PercRule, E.schN
 					</rectangle>
 					<textField>
 						<reportElement style="Group header" x="80" y="0" width="512" height="24" uuid="ffc3ddef-375b-4b6c-b8ad-30d9d71ed297"/>
-						<textFieldExpression><![CDATA[$F{NextGrade60PercRule}]]></textFieldExpression>
+						<textFieldExpression><![CDATA[$F{NextGradePassRule}]]></textFieldExpression>
 					</textField>
 				</frame>
 				<staticText>
