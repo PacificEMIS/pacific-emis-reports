@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Schools With Handwash Facilities by State Subreport" pageWidth="612" pageHeight="792" columnWidth="61" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="b0cf0aa5-c430-44f6-9e6a-5ab2ee89851b">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Schools With Handwash Facilities by Atoll Subreport" pageWidth="612" pageHeight="792" columnWidth="61" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="b0cf0aa5-c430-44f6-9e6a-5ab2ee89851b">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MIEMIS-OLD"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
@@ -12,7 +12,7 @@
 	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
-	<template><![CDATA["fedemis/Templates/FedEMIS_Style.jrtx"]]></template>
+	<template><![CDATA["repo:/Templates/MIEMIS_Style.jrtx"]]></template>
 	<style name="Row" mode="Transparent">
 		<conditionalStyle>
 			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
@@ -128,56 +128,13 @@
 			<defaultValueExpression><![CDATA["14"]]></defaultValueExpression>
 		</parameter>
 		<queryString>
-			<![CDATA[DECLARE @mainTable int;
-set @mainTable=(select count(*) as secondaryTable from warehouse.TempWashCoreSurveyData
- where InspectionYear=$P{Year});
-
- IF @mainTable>0
-
-BEGIN
-   --------------------------------------Query 1----------------------------------------------------
-select answer as 'ResourceAvailable',count(t2.Answer) as 'TotalSchool' from(
-		select 
-			distinct twc.schNo, cte.dname,
-			twc.Answer,
-			twc.inspStart from warehouse.TempWashCoreSurveyData as twc	
-			join (
-					Select d.dname, tcs.schNo, MAX(inspStart) inspStart from warehouse.TempWashCoreSurveyData tcs
-					join Schools sch on tcs.schNo=sch.schNo
-					join Islands i on sch.iCode=i.iCode
-					join Districts d on i.iGroup=d.dID where  d.dID=$P{District} 
-					and InspectionYear = $P{Year}  
-					Group by tcs.schNo,d.dname, InspectionYear
-				) cte on twc.schNo=cte.schNo
-					  and twc.inspStart=cte.inspStart 
-					  where twc.SubGroupName='Hygiene' and twc.answer in ('YES','NO') group by twc.schNo, cte.dName, Answer,twc.inspStart
-)t2 group by t2.Answer order by answer desc
-   ------------------------------------End of Query 1-----------------------------------------------
-END
-ELSE
-BEGIN
-       --------------------------------------Query 2----------------------------------------------------
-
-select  resourceAvailable as 'ResourceAvailable',COUNT(resourceAvailable) as 'TotalSchool' from 
-(
-		select schNo, dname,resourceType,
-						case when resourceAvailable=-1 then 'YES' else 'NO' end as resourceAvailable  from 
-			(	select
-						distinct ss.schNo,
-						d.dName,
-						ths.ssid
-						, resSplit as resourceType
-						,isnull(resAvail,0) as resourceAvailable from warehouse.TempHygieneSurvey ths
-						join SchoolSurvey ss on ths.ssID=ss.ssID 
-						join Schools sch on ss.schNo=sch.schNo
-						join Islands i on sch.iCode=i.iCode
-						join Districts d on i.iGroup=d.dID and d.dID=$P{District}
-						where ss.svyYear=$P{Year} 
-		)t1
-)t2 group by resourceAvailable order by resourceAvailable desc
-
-   ------------------------------------End of Query 2-----------------------------------------------
-END]]>
+			<![CDATA[-- Repointed to warehouse.WashHandwashCombinedSchoolDimension (layered handwash refactor):
+-- instrument precedence + SoapWaterStatus crosswalk + JMP derivation live in the view; the
+-- IF(inspection)/ELSE(census) is gone. Replaces TempWashCoreSurveyData + TempHygieneSurvey.
+select upper(FacilityAvailable) as ResourceAvailable, COUNT(distinct schNo) as TotalSchool
+from warehouse.WashHandwashCombinedSchoolDimension
+where SurveyYear=$P{Year} and DistrictCode=$P{District} and FacilityAvailable is not null
+group by FacilityAvailable]]>
 		</queryString>
 		<field name="ResourceAvailable" class="java.lang.String"/>
 		<field name="TotalSchool" class="java.lang.Integer"/>
@@ -192,56 +149,13 @@ END]]>
 		<defaultValueExpression><![CDATA["14"]]></defaultValueExpression>
 	</parameter>
 	<queryString language="SQL">
-		<![CDATA[DECLARE @mainTable int;
-set @mainTable=(select count(*) as secondaryTable from warehouse.TempWashCoreSurveyData
- where InspectionYear=$P{Year});
-
- IF @mainTable>0
-
-BEGIN
-   --------------------------------------Query 1----------------------------------------------------
-select answer as 'ResourceAvailable',count(t2.Answer) as 'TotalSchool' from(
-		select 
-			distinct twc.schNo, cte.dname,
-			twc.Answer,
-			twc.inspStart from warehouse.TempWashCoreSurveyData as twc	
-			join (
-					Select d.dname, tcs.schNo, MAX(inspStart) inspStart from warehouse.TempWashCoreSurveyData tcs
-					join Schools sch on tcs.schNo=sch.schNo
-					join Islands i on sch.iCode=i.iCode
-					join Districts d on i.iGroup=d.dID where  d.dID=$P{District} 
-					and InspectionYear = $P{Year}  
-					Group by tcs.schNo,d.dname, InspectionYear
-				) cte on twc.schNo=cte.schNo
-					  and twc.inspStart=cte.inspStart 
-					  where twc.SubGroupName='Hygiene' and twc.answer in ('YES','NO') group by twc.schNo, cte.dName, Answer,twc.inspStart
-)t2 group by t2.Answer order by answer desc
-   ------------------------------------End of Query 1-----------------------------------------------
-END
-ELSE
-BEGIN
-       --------------------------------------Query 2----------------------------------------------------
-
-select  resourceAvailable as 'ResourceAvailable',COUNT(resourceAvailable) as 'TotalSchool' from 
-(
-		select schNo, dname,resourceType,
-						case when resourceAvailable=-1 then 'YES' else 'NO' end as resourceAvailable  from 
-			(	select
-						distinct ss.schNo,
-						d.dName,
-						ths.ssid
-						, resSplit as resourceType
-						,isnull(resAvail,0) as resourceAvailable from warehouse.TempHygieneSurvey ths
-						join SchoolSurvey ss on ths.ssID=ss.ssID 
-						join Schools sch on ss.schNo=sch.schNo
-						join Islands i on sch.iCode=i.iCode
-						join Districts d on i.iGroup=d.dID and d.dID=$P{District}
-						where ss.svyYear=$P{Year} 
-		)t1
-)t2 group by resourceAvailable order by resourceAvailable desc
-
-   ------------------------------------End of Query 2-----------------------------------------------
-END]]>
+		<![CDATA[-- Repointed to warehouse.WashHandwashCombinedSchoolDimension (layered handwash refactor):
+-- instrument precedence + SoapWaterStatus crosswalk + JMP derivation live in the view; the
+-- IF(inspection)/ELSE(census) is gone. Replaces TempWashCoreSurveyData + TempHygieneSurvey.
+select upper(FacilityAvailable) as ResourceAvailable, COUNT(distinct schNo) as TotalSchool
+from warehouse.WashHandwashCombinedSchoolDimension
+where SurveyYear=$P{Year} and DistrictCode=$P{District} and FacilityAvailable is not null
+group by FacilityAvailable]]>
 	</queryString>
 	<field name="ResourceAvailable" class="java.lang.String"/>
 	<field name="TotalSchool" class="java.lang.Integer"/>

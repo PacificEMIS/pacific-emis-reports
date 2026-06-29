@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5-74d586df47b25dbd05bd0957999819196e59934a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Schools Water Source Survey" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="25963718-45f6-4722-99ff-412169e811fd">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MIEMIS-NEW"/>
-	<property name="ireport.jasperserver.url" value="http://reports.doe.fm:8080/jasperserver/"/>
-	<property name="ireport.jasperserver.user" value="jasperadmin|"/>
-	<property name="ireport.jasperserver.report.resource" value="/reports/fedemis/Wash/Schools_Water_Source_Survey_files/main_jrxml"/>
-	<property name="ireport.jasperserver.reportUnit" value="/reports/fedemis/Wash/Schools_Water_Source_Survey"/>
-	<template><![CDATA["repo:/Templates/FedEMIS_Style.jrtx"]]></template>
+	<property name="ireport.jasperserver.url" value="http://miemis.pss.edu.mh:8080/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/miemis/Wash/Schools_Water_Source_Survey_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/miemis/Wash/Schools_Water_Source_Survey"/>
+	<template><![CDATA["repo:/Templates/MIEMIS_Style.jrtx"]]></template>
 	<style name="Row" mode="Transparent">
 		<conditionalStyle>
 			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
@@ -141,7 +141,7 @@ select t2.schLandOwner,'Schools without Water Supply',COUNT(t1.WaterSupplyType) 
 		<field name="WaterSupplyType" class="java.lang.String"/>
 		<field name="Schools" class="java.lang.Integer"/>
 	</subDataset>
-	<subDataset name="StateWiseRsrcAvai" uuid="d1aca619-a3ba-442b-873a-485bc81361d9">
+	<subDataset name="AtollWiseRsrcAvai" uuid="d1aca619-a3ba-442b-873a-485bc81361d9">
 		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="FEDEMIS"/>
 		<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="0"/>
@@ -387,7 +387,7 @@ where WaterSupplyType='No Water Source' and [Year OF Data]=$P{Year}) as 'Schools
 				<reportElement x="0" y="0" width="126" height="126" uuid="c7ed6ab8-fd41-41d3-992a-f902c838e352">
 					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 				</reportElement>
-				<imageExpression><![CDATA["miemis/Images/rmi-seal.png"]]></imageExpression>
+				<imageExpression><![CDATA["repo:/images/rmi_seal.png"]]></imageExpression>
 			</image>
 			<staticText>
 				<reportElement style="Title" x="126" y="0" width="499" height="62" uuid="3ed5e7c5-0983-4617-9788-83e7832f92a4"/>
@@ -481,7 +481,7 @@ where WaterSupplyType='No Water Source' and [Year OF Data]=$P{Year}) as 'Schools
 					<subreportParameterExpression><![CDATA[$P{Year}]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA["Schools with Water Source State-wise.jrxml"]]></subreportExpression>
+				<subreportExpression><![CDATA["Schools with Water Source by Atoll.jrxml"]]></subreportExpression>
 			</subreport>
 		</band>
 		<band height="33">

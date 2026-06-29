@@ -16,7 +16,7 @@
 	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
-	<template><![CDATA["miemis/Templates/MIEMIS_Style.jrtx"]]></template>
+	<template><![CDATA["repo:/Templates/MIEMIS_Style.jrtx"]]></template>
 	<parameter name="Year" class="java.lang.Integer">
 		<defaultValueExpression><![CDATA[2018]]></defaultValueExpression>
 	</parameter>
@@ -97,7 +97,7 @@
 					<subreportParameterExpression><![CDATA[$P{Year}]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA["Schools with Water Source State-wise By Nation Subreport.jrxml"]]></subreportExpression>
+				<subreportExpression><![CDATA["Schools with Water Source Atoll-wise By Nation Subreport.jrxml"]]></subreportExpression>
 			</subreport>
 		</band>
 		<band height="30">
@@ -198,7 +198,7 @@
 					<subreportParameterExpression><![CDATA[$P{Year}]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA["School Toilets Gender wise Averages State Wise By Nation Subreport.jrxml"]]></subreportExpression>
+				<subreportExpression><![CDATA["School Toilets Gender wise Averages Atoll Wise By Nation Subreport.jrxml"]]></subreportExpression>
 			</subreport>
 		</band>
 		<band height="40">
@@ -273,7 +273,7 @@
 					<subreportParameterExpression><![CDATA[$P{Year}]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA["Schools with Handwash Source State-wise By Nation Subreport.jrxml"]]></subreportExpression>
+				<subreportExpression><![CDATA["Schools with Handwash Source Atoll-wise By Nation Subreport.jrxml"]]></subreportExpression>
 			</subreport>
 			<textField bookmarkLevel="2">
 				<reportElement style="Detail Header 1" x="-20" y="0" width="391" height="20" uuid="5406c4a6-96e3-402f-ae62-89d8f311ee05">

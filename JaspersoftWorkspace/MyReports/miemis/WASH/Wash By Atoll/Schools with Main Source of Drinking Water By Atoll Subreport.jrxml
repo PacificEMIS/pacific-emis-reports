@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Schools with Main Source of Drinking Water By State Subreport" pageWidth="612" pageHeight="792" columnWidth="612" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="25963718-45f6-4722-99ff-412169e811fd">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Schools with Main Source of Drinking Water By Atoll Subreport" pageWidth="612" pageHeight="792" columnWidth="612" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="25963718-45f6-4722-99ff-412169e811fd">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MIEMIS-OLD"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
-	<template><![CDATA["fedemis/Templates/FedEMIS_Style.jrtx"]]></template>
+	<template><![CDATA["repo:/Templates/MIEMIS_Style.jrtx"]]></template>
 	<style name="Row" mode="Transparent">
 		<conditionalStyle>
 			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
@@ -136,49 +136,17 @@
 			<defaultValueExpression><![CDATA["14"]]></defaultValueExpression>
 		</parameter>
 		<queryString>
-			<![CDATA[DECLARE @mainTable int;
-set @mainTable=(select count(*) as secondaryTable from warehouse.TempWashCoreSurveyData
-where InspectionYear=$P{Year});
-
-IF @mainTable>0
-
-BEGIN
---------------------------------------Query 1----------------------------------------------------
-	Select 
-	SubQuestion as WaterSupplyType
-	, CurrentlyAvailable
-	, Count(Distinct tmp.schNo) 'Total Schools'
-	from warehouse.TempWashCoreSurveyData tmp
- join (
-				Select schNo, 
-				MAX(inspStart) inspStart 
-				from  warehouse.TempWashCoreSurveyData
-			where InspectionYear = $P{Year} Group by schNo
-) t1 
-	on tmp.schNo = t1.schNo and tmp.inspStart = t1.inspStart
-			join Schools sch on t1.schNo=sch.schNo
-			join Islands i on sch.iCode=i.iCode
-			join Districts d on i.iGroup=d.dID
-	where InspectionYear=$P{Year} and d.dID=$P{District} and SubGroupName = 'Water' and SubQuestion is not null 
-	Group by SubQuestion, CurrentlyAvailable
-	
-------------------------------------End of Query 1-----------------------------------------------
-END
-ELSE
-BEGIN
---------------------------------------Query 2----------------------------------------------------
-select WaterSupplyType,CurrentlyAvailable,count( distinct schNo) as 'Total Schools' from (
-
-Select tws.schNo, WaterSupplyType, 
-Case when resAvail = -1 then 'Yes' else 'No' end CurrentlyAvailable 
-from warehouse.TempWaterSupply tws
-	join Schools sch on tws.schNo=sch.schNo
-	join Islands i on sch.iCode=i.iCode
-	join Districts d on i.iGroup=d.dID 
-	where [Year OF Data] =$P{Year} and d.dID=$P{District}
-	)t1 group by t1.WaterSupplyType,t1.CurrentlyAvailable
-------------------------------------End of Query 2-----------------------------------------------
-END]]>
+			<![CDATA[-- Precedence (current-year WASH inspection > quarterly > census > carried-forward
+-- inspection) and JMP/SDG source normalisation now live in warehouse.WashWaterCombined,
+-- so the former IF (inspection) / ELSE (census) branching is gone - it lives in the view.
+-- By-atoll variant: filter the school-dimension view by district.
+-- Replaces TempWashCoreSurveyData + TempWaterSupply.
+Select WaterSourceName as WaterSupplyType
+, CurrentlyAvailable
+, Count(Distinct schNo) 'Total Schools'
+from warehouse.WashWaterCombinedSchoolDimension
+where SurveyYear = $P{Year} and DistrictCode = $P{District}
+Group by WaterSourceName, CurrentlyAvailable]]>
 		</queryString>
 		<field name="WaterSupplyType" class="java.lang.String"/>
 		<field name="CurrentlyAvailable" class="java.lang.String"/>
@@ -192,49 +160,17 @@ END]]>
 		<defaultValueExpression><![CDATA["14"]]></defaultValueExpression>
 	</parameter>
 	<queryString language="SQL">
-		<![CDATA[DECLARE @mainTable int;
-set @mainTable=(select count(*) as secondaryTable from warehouse.TempWashCoreSurveyData
-where InspectionYear=$P{Year});
-
-IF @mainTable>0
-
-BEGIN
---------------------------------------Query 1----------------------------------------------------
-	Select 
-	SubQuestion as WaterSupplyType
-	, CurrentlyAvailable
-	, Count(Distinct tmp.schNo) 'Total Schools'
-	from warehouse.TempWashCoreSurveyData tmp
- join (
-				Select schNo, 
-				MAX(inspStart) inspStart 
-				from  warehouse.TempWashCoreSurveyData
-			where InspectionYear = $P{Year} Group by schNo
-) t1 
-	on tmp.schNo = t1.schNo and tmp.inspStart = t1.inspStart
-			join Schools sch on t1.schNo=sch.schNo
-			join Islands i on sch.iCode=i.iCode
-			join Districts d on i.iGroup=d.dID
-	where InspectionYear=$P{Year} and d.dID=$P{District} and SubGroupName = 'Water' and SubQuestion is not null 
-	Group by SubQuestion, CurrentlyAvailable
-	
-------------------------------------End of Query 1-----------------------------------------------
-END
-ELSE
-BEGIN
---------------------------------------Query 2----------------------------------------------------
-select WaterSupplyType,CurrentlyAvailable,count( distinct schNo) as 'Total Schools' from (
-
-Select tws.schNo, WaterSupplyType, 
-Case when resAvail = -1 then 'Yes' else 'No' end CurrentlyAvailable 
-from warehouse.TempWaterSupply tws
-	join Schools sch on tws.schNo=sch.schNo
-	join Islands i on sch.iCode=i.iCode
-	join Districts d on i.iGroup=d.dID 
-	where [Year OF Data] =$P{Year} and d.dID=$P{District}
-	)t1 group by t1.WaterSupplyType,t1.CurrentlyAvailable
-------------------------------------End of Query 2-----------------------------------------------
-END]]>
+		<![CDATA[-- Precedence (current-year WASH inspection > quarterly > census > carried-forward
+-- inspection) and JMP/SDG source normalisation now live in warehouse.WashWaterCombined,
+-- so the former IF (inspection) / ELSE (census) branching is gone - it lives in the view.
+-- By-atoll variant: filter the school-dimension view by district.
+-- Replaces TempWashCoreSurveyData + TempWaterSupply.
+Select WaterSourceName as WaterSupplyType
+, CurrentlyAvailable
+, Count(Distinct schNo) 'Total Schools'
+from warehouse.WashWaterCombinedSchoolDimension
+where SurveyYear = $P{Year} and DistrictCode = $P{District}
+Group by WaterSourceName, CurrentlyAvailable]]>
 	</queryString>
 	<field name="WaterSupplyType" class="java.lang.String"/>
 	<field name="CurrentlyAvailable" class="java.lang.String"/>

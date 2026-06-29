@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Wash Summary Report By State" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="8b63a1f3-92f9-4ee9-b169-047cd8a3836d">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Wash Summary Report By Atoll" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="8b63a1f3-92f9-4ee9-b169-047cd8a3836d">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MIEMIS-OLD"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
@@ -16,7 +16,7 @@
 	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
-	<template><![CDATA["miemis/Templates/MIEMIS_Style.jrtx"]]></template>
+	<template><![CDATA["repo:/Templates/MIEMIS_Style.jrtx"]]></template>
 	<parameter name="Year" class="java.lang.Integer">
 		<defaultValueExpression><![CDATA[2018]]></defaultValueExpression>
 	</parameter>
@@ -75,7 +75,7 @@
 					<subreportParameterExpression><![CDATA[$P{District}]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA["Schools with Water Source Private and Public By State Subreport.jrxml"]]></subreportExpression>
+				<subreportExpression><![CDATA["Schools with Water Source Private and Public By Atoll Subreport.jrxml"]]></subreportExpression>
 			</subreport>
 		</band>
 		<band height="30">
@@ -106,7 +106,7 @@
 					<subreportParameterExpression><![CDATA[$P{District}]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA["Schools with Main Source of Drinking Water By State Subreport.jrxml"]]></subreportExpression>
+				<subreportExpression><![CDATA["Schools with Main Source of Drinking Water By Atoll Subreport.jrxml"]]></subreportExpression>
 			</subreport>
 		</band>
 		<band height="60" splitType="Immediate">
@@ -154,7 +154,7 @@
 					<subreportParameterExpression><![CDATA[$P{District}]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA["School Toilets Gender wise Averages By State Subreport.jrxml"]]></subreportExpression>
+				<subreportExpression><![CDATA["School Toilets Gender wise Averages By Atoll Subreport.jrxml"]]></subreportExpression>
 			</subreport>
 		</band>
 		<band height="32">
@@ -169,7 +169,7 @@
 					<subreportParameterExpression><![CDATA[$P{District}]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA["Schools with type of Toilet Facilites By State Subreport.jrxml"]]></subreportExpression>
+				<subreportExpression><![CDATA["Schools with type of Toilet Facilites By Atoll Subreport.jrxml"]]></subreportExpression>
 			</subreport>
 			<textField bookmarkLevel="2">
 				<reportElement style="Detail Header 1" x="-20" y="0" width="391" height="20" uuid="e9645d75-7469-4103-905d-e37de452e89c">
@@ -215,7 +215,7 @@
 					<subreportParameterExpression><![CDATA[$P{District}]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA["Schools with Handwash Private and Public By State Subreport.jrxml"]]></subreportExpression>
+				<subreportExpression><![CDATA["Schools with Handwash Private and Public By Atoll Subreport.jrxml"]]></subreportExpression>
 			</subreport>
 			<break>
 				<reportElement x="0" y="2" width="100" height="1" uuid="21a5d58a-9dfd-494f-96c2-c9c122a0aa19"/>
@@ -244,7 +244,7 @@
 					<subreportParameterExpression><![CDATA[$P{District}]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA["Schools with Type of Handwash By State Subreport.jrxml"]]></subreportExpression>
+				<subreportExpression><![CDATA["Schools with Type of Handwash By Atoll Subreport.jrxml"]]></subreportExpression>
 			</subreport>
 		</band>
 	</detail>

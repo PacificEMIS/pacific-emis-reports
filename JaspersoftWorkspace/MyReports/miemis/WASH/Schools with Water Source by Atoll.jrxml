@@ -93,74 +93,15 @@
 		<defaultValueExpression><![CDATA[2019]]></defaultValueExpression>
 	</parameter>
 	<queryString language="SQL">
-		<![CDATA[-- Query for wash 03/12/2019
-
-
-DECLARE @mainTable int;
-set @mainTable=(select count(*) as secondaryTable from warehouse.TempWashCoreSurveyData
- where InspectionYear=$P{Year});
-
- IF @mainTable>0
-BEGIN
-       --------------------------------------Query 1----------------------------------------------------
-	select d.dName,'Schools with Water supply' as WithAndWithoutWaterSupply, COUNT(distinct vw.schNo) as 'noOfSchools'  from 
-(select dID,dName from Districts)d
-left join 
-(select 
-		InspectionYear as[Survey Year], twc.schNo,d.dID,
-		Answer as 'WaterSupplyType'  
-		from warehouse.TempWashCoreSurveyData twc
-		 join [dbo].[schools] c on twc.SchNo=c.SchNo
-		inner join [dbo].[islands] i on c.iCode = i.iCode
-		inner join [dbo].[districts] d on i.iGroup = d.dID
-		where twc.SubGroupName='Water' and 
-		twc.Answer!='No water source' and twc.InspectionYear=$P{Year}) vw
-on d.dID=vw.dID group by dName
-
-union all 
-select d1.dName,'Schools without Water supply' as WithAndWithoutWaterSupply, COUNT(vw1.WaterSupplyType)  from 
-(select dID,dName from Districts)d1
-left join 
-(select 
-		InspectionYear as[Survey Year], twc.schNo,d.dID,
-		Answer as 'WaterSupplyType'  
-		from warehouse.TempWashCoreSurveyData twc
-		 join [dbo].[schools] c on twc.SchNo=c.SchNo
-		inner join [dbo].[islands] i on c.iCode = i.iCode
-		inner join [dbo].[districts] d on i.iGroup = d.dID
-		where twc.SubGroupName='Water' and 
-		twc.Answer='No water source' and twc.InspectionYear=$P{Year}
-) vw1
-on d1.dID=vw1.dID group by d1.dName
-   ------------------------------------End of Query 1-----------------------------------------------
-END
-ELSE
-BEGIN
-   --------------------------------------Query 2----------------------------------------------------
-select d.dName,'Schools with Water supply' as WithAndWithoutWaterSupply, COUNT(vw.WaterSupplyType) as 'noOfSchools'  from 
-(select dID,dName from Districts)d
-left join 
-(select [Survey Year], 
-		left(schNo,3) as dShort ,
-		WaterSupplyType 
-		from vtblWaterSupplyEst 
-			where WaterSupplyType!='No Water Source' and 
-				  [Survey Year]=$P{Year}) vw
-on d.dID=vw.dShort group by dName
-
-union all 
-select d1.dName,'Schools without Water supply' as WithAndWithoutWaterSupply, COUNT(vw1.WaterSupplyType)  from 
-(select dID,dName from Districts)d1
-left join 
-(select [Survey Year], 
-		left(schNo,3) as dShort ,
-		WaterSupplyType 
-		from vtblWaterSupplyEst 
-			where WaterSupplyType='No Water Source' and 
-				  [Survey Year]=$P{Year}) vw1
-on d1.dID=vw1.dShort group by d1.dName
-   ------------------------------------End of Query 2-----------------------------------------------
-END]]>
+		<![CDATA[-- Precedence + JMP normalisation now live in warehouse.WashWaterCombined; a school is
+-- "without water" when its resolved source is NO_WATER (one NO_WATER row per school).
+-- Replaces TempWashCoreSurveyData + vtblWaterSupplyEst.
+Select District as dName
+, case when CurrentlyAvailable = 'Yes' then 'Schools without Water supply' else 'Schools with Water supply' end as WithAndWithoutWaterSupply
+, count(distinct schNo) as 'noOfSchools'
+from warehouse.WashWaterCombinedSchoolDimension
+where SurveyYear = $P{Year} and WaterSource = 'NO_WATER'
+group by District, case when CurrentlyAvailable = 'Yes' then 'Schools without Water supply' else 'Schools with Water supply' end]]>
 	</queryString>
 	<field name="dName" class="java.lang.String"/>
 	<field name="WithAndWithoutWaterSupply" class="java.lang.String"/>

@@ -12,7 +12,7 @@
 	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
-	<template><![CDATA["fedemis/Templates/FedEMIS_Style.jrtx"]]></template>
+	<template><![CDATA["repo:/Templates/MIEMIS_Style.jrtx"]]></template>
 	<style name="Row" mode="Transparent">
 		<conditionalStyle>
 			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
@@ -68,150 +68,20 @@
 			<defaultValueExpression><![CDATA[2019]]></defaultValueExpression>
 		</parameter>
 		<queryString language="SQL">
-			<![CDATA[DECLARE @mainTable int;
-set @mainTable=(select count(*) as secondaryTable from warehouse.TempWashCoreSurveyData
- where InspectionYear=$P{Year});
-
- IF @mainTable>0
-
-BEGIN
-   --------------------------------------Query 1----------------------------------------------------
-Select 
-t1.Gender as genderCode,
-case when t1.Gender ='C' then 'Common'
-when t1.Gender ='M' then 'Boys'
-else 'Girls' end as toiUse,
-SUM(t1.TotalToilets) TotalToilets,
-SUM(t1.UsableToilets) UsableToilets,
-SUM(t1.TotalToilets)-SUM(t1.UsableToilets) UnusableToilets,
-case when isnull(SUM(t2.Students),0)=0 then 0 else isnull(SUM(t2.Students),0)/SUM(t1.UsableToilets) end as Average,
-isnull(SUM(t2.Students),0) Students
-FROM
-(
-	SELECT cte.schNo,'M' as Gender,
-	sum(cast(Case When SubQuestion = 'Total Number' then isnull(BoysToilets,0)
-		else 0 end as int)) as TotalToilets,
-	sum(cast(Case When SubQuestion = 'Number that are usable (accessible, functional, private)' then isnull(BoysToilets,0)
-		else 0 end as int)) as UsableToilets
-	from warehouse.TempWashCoreSurveyData tmp 
-	join (
-	Select schNo, MAX(inspStart) inspStart from warehouse.TempWashCoreSurveyData
-	where InspectionYear = $P{Year} Group by schNo,InspectionYear
-	) cte on 
-	tmp.schNo = cte.schNo and tmp.inspStart = cte.inspStart
-	join Schools sch on tmp.schNo=sch.schNo
-	join Islands i on sch.iCode=i.iCode
-	join Districts d on i.iGroup=d.dID 
-	where SubGroupName='Sanitation' and InspectionYear =$P{Year} group by cte.schNo
-
-	UNION ALL
-
-	SELECT cte.schNo,'F' as Gender,
-	sum(cast(Case When SubQuestion = 'Total Number' then isnull(GirlsToilets,0)
-		else 0 end as int)) as TotalToilets,
-	sum(cast(Case When SubQuestion = 'Number that are usable (accessible, functional, private)' then isnull(GirlsToilets,0)
-		else 0 end as int)) as UsableToilets
-	from warehouse.TempWashCoreSurveyData tmp 
-	join (
-	Select schNo, MAX(inspStart) inspStart from warehouse.TempWashCoreSurveyData
-	where InspectionYear = $P{Year} Group by schNo,InspectionYear
-	) cte on 
-	tmp.schNo = cte.schNo and tmp.inspStart = cte.inspStart
-	join Schools sch on tmp.schNo=sch.schNo
-	join Islands i on sch.iCode=i.iCode
-	join Districts d on i.iGroup=d.dID 
-	where SubGroupName='Sanitation' and InspectionYear =$P{Year} group by cte.schNo
-
-	UNION ALL
-
-	SELECT cte.schNo,'C' as Gender,
-	sum(cast(Case When SubQuestion = 'Total Number' then isnull(CommonUseToilets,0)
-		else 0 end as int)) as TotalToilets,
-	sum(cast(Case When SubQuestion = 'Number that are usable (accessible, functional, private)' then isnull(CommonUseToilets,0)
-		else 0 end as int)) as UsableToilets
-	from warehouse.TempWashCoreSurveyData tmp 
-	join (
-	Select schNo, MAX(inspStart) inspStart from warehouse.TempWashCoreSurveyData
-	where InspectionYear = $P{Year} Group by schNo,InspectionYear
-	) cte on 
-	tmp.schNo = cte.schNo and tmp.inspStart = cte.inspStart
-	join Schools sch on tmp.schNo=sch.schNo
-	join Islands i on sch.iCode=i.iCode
-	join Districts d on i.iGroup=d.dID 
-	where SubGroupName='Sanitation' and InspectionYear =$P{Year} group by cte.schNo
-)t1
-left join 
-(
-	Select 
-	en.schNo, GenderCode, sum(isnull(Enrol,0)) as Students from 
-	warehouse.enrol en
-	join Schools sch on en.schNo=sch.schNo
-	join Islands i on sch.iCode=i.iCode
-	join Districts d on i.iGroup=d.dID 
-	where surveyYear=$P{Year} group by en.schNo,GenderCode
-		UNION ALL
-	Select 
-	en.schno, 'C', sum(isnull(Enrol,0)) as Students from 
-	warehouse.enrol en
-	join Schools sch on en.schNo=sch.schNo
-	join Islands i on sch.iCode=i.iCode
-	join Districts d on i.iGroup=d.dID 
-	where surveyYear=$P{Year} and GenderCode='C' or  GenderCode is null group by en.schno
-) t2 on t1.schNo=t2.schNo and t1.Gender=t2.GenderCode group by t1.Gender
-
-
-   ------------------------------------End of Query 1-----------------------------------------------
-END
-ELSE
-BEGIN
-       --------------------------------------Query 2----------------------------------------------------
-	Select 
-t1.Gender as genderCode,
-t1.toiUse,
-SUM(t1.TotalToilets) TotalToilets,
-SUM(t1.UsableToilets) UsableToilets,
-SUM(t1.TotalToilets)-SUM(t1.UsableToilets) UnusableToilets,
-case when isnull(SUM(t2.Students),0)=0 then 0 else isnull(SUM(t2.Students),0)/SUM(t1.UsableToilets) end as Average,
-isnull(SUM(t2.Students),0) Students
-FROM
-(
-	Select a.Gender,a.toiUse,a.schNo,
-	sum(a.toiNum) as 'TotalToilets',
-	sum(a.toiNumUsable) as 'UsableToilets'
-	from (	
-	select ts.ssID,ts.schNo,
-	case when toiUse='Boys' then 'M'
-	when toiUse='Girls' then 'F'
-	else 'C' end as Gender,	 
-	toiUse, toiNum, toiNumUsable
-	from warehouse.TempToiletsSurvey ts 
-	join SchoolSurvey ss on ss.ssID=ts.ssID 
-	join Schools sch on ss.schNo=sch.schNo
-	join Islands i on sch.iCode=i.iCode
-	join Districts d on i.iGroup=d.dID 
-	where ts.SurveyYear=$P{Year}
-	)a group by a.Gender,a.toiUse,a.schNo
-)t1
-left join 
-(
-	Select 
-	en.schNo, GenderCode, sum(isnull(Enrol,0)) as Students from 
-	warehouse.enrol en
-	join Schools sch on en.schNo=sch.schNo
-	join Islands i on sch.iCode=i.iCode
-	join Districts d on i.iGroup=d.dID 
-	where surveyYear=$P{Year} group by en.schNo,GenderCode
-		UNION ALL
-	Select 
-	en.schno, 'C', sum(isnull(Enrol,0)) as Students from 
-	warehouse.enrol en
-	join Schools sch on en.schNo=sch.schNo
-	join Islands i on sch.iCode=i.iCode
-	join Districts d on i.iGroup=d.dID 
-	where surveyYear=$P{Year} and GenderCode='C' or  GenderCode is null group by en.schno
-) t2 on t1.schNo=t2.schNo and t1.Gender=t2.GenderCode group by t1.Gender,t1.toiUse 
-   ------------------------------------End of Query 2-----------------------------------------------
-END]]>
+			<![CDATA[-- Repointed to warehouse.WashToiletsCombinedSchoolDimension (layered toilet refactor): instrument
+-- precedence + ToiletType crosswalk live in the view, so the IF(inspection)/ELSE(census) is gone.
+-- Ratios match the WASH dashboard (gender toilets use gender enrol; common toilets use total enrol).
+-- Replaces TempWashCoreSurveyData + TempToiletsSurvey.
+select genderCode, toiUse,
+  SUM(TotalToilets) TotalToilets, SUM(UsableToilets) UsableToilets,
+  SUM(TotalToilets)-SUM(UsableToilets) UnusableToilets,
+  case when isnull(SUM(UsableToilets),0)=0 then 0 else isnull(SUM(Students),0)/SUM(UsableToilets) end Average,
+  isnull(SUM(Students),0) Students
+from (
+  select 'M' genderCode,'Boys' toiUse, TotalM TotalToilets, UsableM UsableToilets, EnrolM Students from warehouse.WashToiletsCombinedSchoolDimension where SurveyYear=$P{Year}
+  union all select 'F','Girls', TotalF, UsableF, EnrolF from warehouse.WashToiletsCombinedSchoolDimension where SurveyYear=$P{Year}
+  union all select 'C','Common', TotalC, UsableC, Enrol from warehouse.WashToiletsCombinedSchoolDimension where SurveyYear=$P{Year}
+) x group by genderCode, toiUse]]>
 		</queryString>
 		<field name="genderCode" class="java.lang.String"/>
 		<field name="toiUse" class="java.lang.String"/>
@@ -240,150 +110,20 @@ END]]>
 		<defaultValueExpression><![CDATA[2019]]></defaultValueExpression>
 	</parameter>
 	<queryString language="SQL">
-		<![CDATA[DECLARE @mainTable int;
-set @mainTable=(select count(*) as secondaryTable from warehouse.TempWashCoreSurveyData
- where InspectionYear=$P{Year});
-
- IF @mainTable>0
-
-BEGIN
-   --------------------------------------Query 1----------------------------------------------------
-Select 
-t1.Gender as genderCode,
-case when t1.Gender ='C' then 'Common'
-when t1.Gender ='M' then 'Boys'
-else 'Girls' end as toiUse,
-SUM(t1.TotalToilets) TotalToilets,
-SUM(t1.UsableToilets) UsableToilets,
-SUM(t1.TotalToilets)-SUM(t1.UsableToilets) UnusableToilets,
-case when isnull(SUM(t1.UsableToilets),0)=0 then 0 else isnull(SUM(t2.Students),0)/SUM(t1.UsableToilets) end as Average,
-isnull(SUM(t2.Students),0) Students
-FROM
-(
-	SELECT cte.schNo,'M' as Gender,
-	sum(cast(Case When SubQuestion = 'Total Number' then isnull(BoysToilets,0)
-		else 0 end as int)) as TotalToilets,
-	sum(cast(Case When SubQuestion = 'Number that are usable (accessible, functional, private)' then isnull(BoysToilets,0)
-		else 0 end as int)) as UsableToilets
-	from warehouse.TempWashCoreSurveyData tmp 
-	join (
-	Select schNo, MAX(inspStart) inspStart from warehouse.TempWashCoreSurveyData
-	where InspectionYear = $P{Year} Group by schNo,InspectionYear
-	) cte on 
-	tmp.schNo = cte.schNo and tmp.inspStart = cte.inspStart
-	join Schools sch on tmp.schNo=sch.schNo
-	join Islands i on sch.iCode=i.iCode
-	join Districts d on i.iGroup=d.dID 
-	where SubGroupName='Sanitation' and InspectionYear =$P{Year} group by cte.schNo
-
-	UNION ALL
-
-	SELECT cte.schNo,'F' as Gender,
-	sum(cast(Case When SubQuestion = 'Total Number' then isnull(GirlsToilets,0)
-		else 0 end as int)) as TotalToilets,
-	sum(cast(Case When SubQuestion = 'Number that are usable (accessible, functional, private)' then isnull(GirlsToilets,0)
-		else 0 end as int)) as UsableToilets
-	from warehouse.TempWashCoreSurveyData tmp 
-	join (
-	Select schNo, MAX(inspStart) inspStart from warehouse.TempWashCoreSurveyData
-	where InspectionYear = $P{Year} Group by schNo,InspectionYear
-	) cte on 
-	tmp.schNo = cte.schNo and tmp.inspStart = cte.inspStart
-	join Schools sch on tmp.schNo=sch.schNo
-	join Islands i on sch.iCode=i.iCode
-	join Districts d on i.iGroup=d.dID 
-	where SubGroupName='Sanitation' and InspectionYear =$P{Year} group by cte.schNo
-
-	UNION ALL
-
-	SELECT cte.schNo,'C' as Gender,
-	sum(cast(Case When SubQuestion = 'Total Number' then isnull(CommonUseToilets,0)
-		else 0 end as int)) as TotalToilets,
-	sum(cast(Case When SubQuestion = 'Number that are usable (accessible, functional, private)' then isnull(CommonUseToilets,0)
-		else 0 end as int)) as UsableToilets
-	from warehouse.TempWashCoreSurveyData tmp 
-	join (
-	Select schNo, MAX(inspStart) inspStart from warehouse.TempWashCoreSurveyData
-	where InspectionYear = $P{Year} Group by schNo,InspectionYear
-	) cte on 
-	tmp.schNo = cte.schNo and tmp.inspStart = cte.inspStart
-	join Schools sch on tmp.schNo=sch.schNo
-	join Islands i on sch.iCode=i.iCode
-	join Districts d on i.iGroup=d.dID 
-	where SubGroupName='Sanitation' and InspectionYear =$P{Year} group by cte.schNo
-)t1
-left join 
-(
-	Select 
-	en.schNo, GenderCode, sum(isnull(Enrol,0)) as Students from 
-	warehouse.enrol en
-	join Schools sch on en.schNo=sch.schNo
-	join Islands i on sch.iCode=i.iCode
-	join Districts d on i.iGroup=d.dID 
-	where surveyYear=$P{Year} group by en.schNo,GenderCode
-		UNION ALL
-	Select 
-	en.schno, 'C', sum(isnull(Enrol,0)) as Students from 
-	warehouse.enrol en
-	join Schools sch on en.schNo=sch.schNo
-	join Islands i on sch.iCode=i.iCode
-	join Districts d on i.iGroup=d.dID 
-	where surveyYear=$P{Year} and GenderCode='C' or  GenderCode is null group by en.schno
-) t2 on t1.schNo=t2.schNo and t1.Gender=t2.GenderCode group by t1.Gender
-
-
-   ------------------------------------End of Query 1-----------------------------------------------
-END
-ELSE
-BEGIN
-       --------------------------------------Query 2----------------------------------------------------
-	Select 
-t1.Gender as genderCode,
-t1.toiUse,
-SUM(t1.TotalToilets) TotalToilets,
-SUM(t1.UsableToilets) UsableToilets,
-SUM(t1.TotalToilets)-SUM(t1.UsableToilets) UnusableToilets,
-case when isnull(SUM(t1.UsableToilets),0)=0 then 0 else isnull(SUM(t2.Students),0)/SUM(t1.UsableToilets) end as Average,
-isnull(SUM(t2.Students),0) Students
-FROM
-(
-	Select a.Gender,a.toiUse,a.schNo,
-	sum(a.toiNum) as 'TotalToilets',
-	sum(a.toiNumUsable) as 'UsableToilets'
-	from (	
-	select ts.ssID,ts.schNo,
-	case when toiUse='Boys' then 'M'
-	when toiUse='Girls' then 'F'
-	else 'C' end as Gender,	 
-	toiUse, toiNum, toiNumUsable
-	from warehouse.TempToiletsSurvey ts 
-	join SchoolSurvey ss on ss.ssID=ts.ssID 
-	join Schools sch on ss.schNo=sch.schNo
-	join Islands i on sch.iCode=i.iCode
-	join Districts d on i.iGroup=d.dID 
-	where ts.SurveyYear=$P{Year}
-	)a group by a.Gender,a.toiUse,a.schNo
-)t1
-left join 
-(
-	Select 
-	en.schNo, GenderCode, sum(isnull(Enrol,0)) as Students from 
-	warehouse.enrol en
-	join Schools sch on en.schNo=sch.schNo
-	join Islands i on sch.iCode=i.iCode
-	join Districts d on i.iGroup=d.dID 
-	where surveyYear=$P{Year} group by en.schNo,GenderCode
-		UNION ALL
-	Select 
-	en.schno, 'C', sum(isnull(Enrol,0)) as Students from 
-	warehouse.enrol en
-	join Schools sch on en.schNo=sch.schNo
-	join Islands i on sch.iCode=i.iCode
-	join Districts d on i.iGroup=d.dID 
-	where surveyYear=$P{Year} and GenderCode='C' or  GenderCode is null group by en.schno
-) t2 on t1.schNo=t2.schNo and t1.Gender=t2.GenderCode group by t1.Gender,t1.toiUse 
-   ------------------------------------End of Query 2-----------------------------------------------
-END]]>
+		<![CDATA[-- Repointed to warehouse.WashToiletsCombinedSchoolDimension (layered toilet refactor): instrument
+-- precedence + ToiletType crosswalk live in the view, so the IF(inspection)/ELSE(census) is gone.
+-- Ratios match the WASH dashboard (gender toilets use gender enrol; common toilets use total enrol).
+-- Replaces TempWashCoreSurveyData + TempToiletsSurvey.
+select genderCode, toiUse,
+  SUM(TotalToilets) TotalToilets, SUM(UsableToilets) UsableToilets,
+  SUM(TotalToilets)-SUM(UsableToilets) UnusableToilets,
+  case when isnull(SUM(UsableToilets),0)=0 then 0 else isnull(SUM(Students),0)/SUM(UsableToilets) end Average,
+  isnull(SUM(Students),0) Students
+from (
+  select 'M' genderCode,'Boys' toiUse, TotalM TotalToilets, UsableM UsableToilets, EnrolM Students from warehouse.WashToiletsCombinedSchoolDimension where SurveyYear=$P{Year}
+  union all select 'F','Girls', TotalF, UsableF, EnrolF from warehouse.WashToiletsCombinedSchoolDimension where SurveyYear=$P{Year}
+  union all select 'C','Common', TotalC, UsableC, Enrol from warehouse.WashToiletsCombinedSchoolDimension where SurveyYear=$P{Year}
+) x group by genderCode, toiUse]]>
 	</queryString>
 	<field name="genderCode" class="java.lang.String"/>
 	<field name="toiUse" class="java.lang.String"/>

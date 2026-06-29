@@ -9,7 +9,7 @@
 	<property name="ireport.jasperserver.reportUnit" value="/reports/fedemis/Wash/Schools_Water_Source_Survey"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="298"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="695"/>
-	<template><![CDATA["repo:/Templates/FedEMIS_Style.jrtx"]]></template>
+	<template><![CDATA["repo:/Templates/MIEMIS_Style.jrtx"]]></template>
 	<style name="Row" mode="Transparent">
 		<conditionalStyle>
 			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
@@ -266,7 +266,7 @@
 				<reportElement x="0" y="0" width="126" height="126" uuid="c7ed6ab8-fd41-41d3-992a-f902c838e352">
 					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 				</reportElement>
-				<imageExpression><![CDATA["miemis/Images/rmi-seal.png"]]></imageExpression>
+				<imageExpression><![CDATA["repo:/images/rmi_seal.png"]]></imageExpression>
 			</image>
 			<staticText>
 				<reportElement style="Title" x="126" y="0" width="499" height="62" uuid="3ed5e7c5-0983-4617-9788-83e7832f92a4"/>
@@ -286,7 +286,7 @@
 				<reportElement x="625" y="0" width="127" height="126" uuid="8f15376b-b80d-43a1-9a86-b35cf77a2902">
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 				</reportElement>
-				<imageExpression><![CDATA["miemis/Images/rmi-pss.png"]]></imageExpression>
+				<imageExpression><![CDATA["repo:/images/rmi_pss.png"]]></imageExpression>
 			</image>
 			<rectangle>
 				<reportElement mode="Opaque" x="-21" y="-20" width="793" height="10" forecolor="#08298C" backcolor="#08298C" uuid="c8524551-29bf-427d-9878-c9124175093c"/>
