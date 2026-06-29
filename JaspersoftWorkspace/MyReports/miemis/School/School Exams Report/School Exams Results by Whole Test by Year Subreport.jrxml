@@ -40,7 +40,12 @@ exLevel IN (
 	FROM [dbo].[metaSchoolTypeLevelMap] 
 	WHERE stCode = (SELECT schType FROM Schools WHERE schNo = $P{SchoolNo})
 )
-ORDER BY   
+-- Special case: two middle schools do not sit the full Primary exam set implied by their school type.
+-- MAJ120 (Majuro Middle School) sits only Grade 8 (HSET) and High School; skips Grade 3 & 6.
+-- KWA107 (Ebeye Public Middle School) sits Grade 6, Grade 8 (HSET) and High School; skips Grade 3.
+AND NOT ($P{SchoolNo} = 'MAJ120' AND exLevel IN ('G3','G6'))
+AND NOT ($P{SchoolNo} = 'KWA107' AND exLevel IN ('G3'))
+ORDER BY
 	CASE 
 		WHEN [examCode] = 'A03' then 1
         WHEN [examCode] = 'B03' then 2
