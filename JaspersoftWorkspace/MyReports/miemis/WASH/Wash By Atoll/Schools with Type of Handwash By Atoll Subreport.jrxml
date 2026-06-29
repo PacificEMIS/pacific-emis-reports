@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Schools with Type of Handwash By State Subreport" pageWidth="612" pageHeight="792" columnWidth="612" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="25963718-45f6-4722-99ff-412169e811fd">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Schools with Type of Handwash By Atoll Subreport" pageWidth="612" pageHeight="792" columnWidth="612" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="25963718-45f6-4722-99ff-412169e811fd">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MIEMIS-OLD"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
@@ -12,7 +12,7 @@
 	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
-	<template><![CDATA["fedemis/Templates/FedEMIS_Style.jrtx"]]></template>
+	<template><![CDATA["repo:/Templates/MIEMIS_Style.jrtx"]]></template>
 	<style name="Row" mode="Transparent">
 		<conditionalStyle>
 			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
@@ -135,60 +135,13 @@
 			<defaultValueExpression><![CDATA["14"]]></defaultValueExpression>
 		</parameter>
 		<queryString language="SQL">
-			<![CDATA[DECLARE @mainTable int;
-set @mainTable=(select count(*) as secondaryTable from warehouse.TempWashCoreSurveyData
- where InspectionYear=$P{Year});
-
- IF @mainTable>0
-
-BEGIN
-   --------------------------------------Query 1----------------------------------------------------
-
-select concat('Handwash with ',t1.Answer) as 'HandWashType',
-			case when t1.Answer='Neither water or soap' then 4
-			when t1.Answer='Soap only' then 3
-			when t1.Answer='Water only' then 2
-			when t1.Answer='Yes, water and soap' then 1
-			else 5 end as titleOrder
-			, COUNT(t1.schNo)  as 'Total Schools'  from (
-
-					SELECT cte.schNo,Answer,cte.InspectionYear
-					from warehouse.TempWashCoreSurveyData tmp 
-					join (
-							Select schNo,InspectionYear, MAX(inspStart) inspStart from warehouse.TempWashCoreSurveyData
-							where InspectionYear = $P{Year} Group by schNo,InspectionYear
-						) cte on 
-						tmp.schNo = cte.schNo and tmp.inspStart = cte.inspStart 
-						join Schools sch on cte.schNo=sch.schNo
-						join Islands i on sch.iCode=i.iCode
-						join Districts d on i.iGroup=d.dID 
-						where SubGroupName='Hygiene' and 
-							cte.InspectionYear =$P{Year} and  d.dID=$P{District} and
-							tmp.Answer not in('YES','NO') and tmp.Answer is not null group by tmp.Answer, cte.schNo,cte.InspectionYear
-		)t1  group by t1.Answer
-
-   ------------------------------------End of Query 1-----------------------------------------------
-END
-ELSE
-BEGIN
-   --------------------------------------Query 2----------------------------------------------------
-
-select concat('Handwash with ',r.resSplit) as 'HandWashType',
-case when resSplit='Neither water nor soap' then 3
-	 when resSplit='Water only' then 2
-	 when resSplit='Water and Soap' then 1
-else 4 end as titleOrder,
-count( distinct ss.schNo) as 'Total Schools' from warehouse.TempHygieneSurvey  r 
-inner join 
-	SchoolSurvey ss on  r.ssID = ss.ssID 
-	join Schools  s on s.schNo = ss.schNo
-	join Islands i on s.iCode=i.iCode
-	join Districts d on d.dID=i.iGroup 
-where ss.svyYear= $P{Year}  and d.dID=$P{District} and r.resName='Handwashing'
-group by r.resSplit order by 2
-
-   ------------------------------------End of Query 2-----------------------------------------------
-END]]>
+			<![CDATA[-- Repointed to warehouse.WashHandwashCombinedSchoolDimension (layered handwash refactor):
+-- instrument precedence + SoapWaterStatus crosswalk + JMP derivation live in the view; the
+-- IF(inspection)/ELSE(census) is gone. Replaces TempWashCoreSurveyData + TempHygieneSurvey.
+select case SoapWaterStatus when 'Water and soap' then 1 when 'Water only' then 2 when 'Soap only' then 3 when 'Neither' then 4 else 5 end as titleOrder, 'Handwash with ' + SoapWaterStatus as HandWashType, COUNT(distinct schNo) as 'Total Schools'
+from warehouse.WashHandwashCombinedSchoolDimension
+where SurveyYear=$P{Year} and DistrictCode=$P{District} and SoapWaterStatus is not null
+group by SoapWaterStatus]]>
 		</queryString>
 		<field name="HandWashType" class="java.lang.String"/>
 		<field name="titleOrder" class="java.lang.Integer"/>
@@ -205,60 +158,13 @@ END]]>
 		<defaultValueExpression><![CDATA["14"]]></defaultValueExpression>
 	</parameter>
 	<queryString language="SQL">
-		<![CDATA[DECLARE @mainTable int;
-set @mainTable=(select count(*) as secondaryTable from warehouse.TempWashCoreSurveyData
- where InspectionYear=$P{Year});
-
- IF @mainTable>0
-
-BEGIN
-   --------------------------------------Query 1----------------------------------------------------
-
-select concat('Handwash with ',t1.Answer) as 'HandWashType',
-			case when t1.Answer='Neither water or soap' then 4
-			when t1.Answer='Soap only' then 3
-			when t1.Answer='Water only' then 2
-			when t1.Answer='Yes, water and soap' then 1
-			else 5 end as titleOrder
-			, COUNT(t1.schNo)  as 'Total Schools'  from (
-
-					SELECT cte.schNo,Answer,cte.InspectionYear
-					from warehouse.TempWashCoreSurveyData tmp 
-					join (
-							Select schNo,InspectionYear, MAX(inspStart) inspStart from warehouse.TempWashCoreSurveyData
-							where InspectionYear = $P{Year} Group by schNo,InspectionYear
-						) cte on 
-						tmp.schNo = cte.schNo and tmp.inspStart = cte.inspStart 
-						join Schools sch on cte.schNo=sch.schNo
-						join Islands i on sch.iCode=i.iCode
-						join Districts d on i.iGroup=d.dID 
-						where SubGroupName='Hygiene' and 
-							cte.InspectionYear =$P{Year} and  d.dID=$P{District} and
-							tmp.Answer not in('YES','NO') and tmp.Answer is not null group by tmp.Answer, cte.schNo,cte.InspectionYear
-		)t1  group by t1.Answer
-
-   ------------------------------------End of Query 1-----------------------------------------------
-END
-ELSE
-BEGIN
-   --------------------------------------Query 2----------------------------------------------------
-
-select concat('Handwash with ',r.resSplit) as 'HandWashType',
-case when resSplit='Neither water nor soap' then 3
-	 when resSplit='Water only' then 2
-	 when resSplit='Water and Soap' then 1
-else 4 end as titleOrder,
-count( distinct ss.schNo) as 'Total Schools' from warehouse.TempHygieneSurvey  r 
-inner join 
-	SchoolSurvey ss on  r.ssID = ss.ssID 
-	join Schools  s on s.schNo = ss.schNo
-	join Islands i on s.iCode=i.iCode
-	join Districts d on d.dID=i.iGroup 
-where ss.svyYear= $P{Year}  and d.dID=$P{District} and r.resName='Handwashing'
-group by r.resSplit order by 2
-
-   ------------------------------------End of Query 2-----------------------------------------------
-END]]>
+		<![CDATA[-- Repointed to warehouse.WashHandwashCombinedSchoolDimension (layered handwash refactor):
+-- instrument precedence + SoapWaterStatus crosswalk + JMP derivation live in the view; the
+-- IF(inspection)/ELSE(census) is gone. Replaces TempWashCoreSurveyData + TempHygieneSurvey.
+select case SoapWaterStatus when 'Water and soap' then 1 when 'Water only' then 2 when 'Soap only' then 3 when 'Neither' then 4 else 5 end as titleOrder, 'Handwash with ' + SoapWaterStatus as HandWashType, COUNT(distinct schNo) as 'Total Schools'
+from warehouse.WashHandwashCombinedSchoolDimension
+where SurveyYear=$P{Year} and DistrictCode=$P{District} and SoapWaterStatus is not null
+group by SoapWaterStatus]]>
 	</queryString>
 	<field name="HandWashType" class="java.lang.String"/>
 	<field name="titleOrder" class="java.lang.Integer"/>

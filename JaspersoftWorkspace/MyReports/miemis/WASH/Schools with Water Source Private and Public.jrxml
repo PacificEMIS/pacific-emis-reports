@@ -3,7 +3,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Schools with and without WATER SOURCE Availablity" pageWidth="752" pageHeight="572" orientation="Landscape" columnWidth="752" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="25963718-45f6-4722-99ff-412169e811fd">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MIEMIS-NEW"/>
-	<template><![CDATA["fedemis/Templates/FedEMIS_Style.jrtx"]]></template>
+	<template><![CDATA["repo:/Templates/MIEMIS_Style.jrtx"]]></template>
 	<style name="Row" mode="Transparent">
 		<conditionalStyle>
 			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
@@ -92,84 +92,15 @@
 		<defaultValueExpression><![CDATA[2019]]></defaultValueExpression>
 	</parameter>
 	<queryString language="SQL">
-		<![CDATA[
-DECLARE @mainTable int;
-set @mainTable=(select count(*) as secondaryTable from warehouse.TempWashCoreSurveyData
- where InspectionYear=$P{Year});
-
- IF @mainTable>0
-
-BEGIN
-   --------------------------------------Query 1----------------------------------------------------
-   Select tmp.Authority as schLandOwner, tmp.waterSourceStatus withAndWithoutWater, count(fnl.schNo) 'Total Schools'
-from (
-	select 'Private' as Authority, 'Schools with Water Supply' waterSourceStatus
-	union all
-	select 'Public',  'Schools with Water Supply'
-	union all
-	select 'Private', 'Schools without Water Supply'
-	union all
-	select 'Public', 'Schools without Water Supply'
-) tmp
-left join (
-	Select distinct t1.schNo, waterSourceStatus, t2.Authority from (
-		select 
-			'Schools with Water Supply' as waterSourceStatus, schNo from 
-			warehouse.TempWashCoreSurveyData
-			where SubGroupName='Water' and Answer!='No water source' and InspectionYear=$P{Year} 
-		union all
-		select 
-			'Schools without Water Supply', schNo from 
-			warehouse.TempWashCoreSurveyData
-			where SubGroupName='Water' and Answer='No water source' and InspectionYear=$P{Year} 
-	) t1 join (
-		Select distinct c.schNo,
-		replace(replace(coalesce(c.schLandOwner, dss.AuthorityGroup),'Non-government','Private'),'Government','Public') Authority
-		from
-		[dbo].[schools] c inner join warehouse.dimensionSchoolSurvey dss 
-		on c.schNo=dss.[School No] and dss.[Survey Data Year] = $P{Year} 
-	) t2 on t1.schNo = t2.schNo
-) fnl on tmp.Authority = fnl.Authority and tmp.waterSourceStatus = fnl.waterSourceStatus
-group by tmp.Authority, tmp.waterSourceStatus
-   ------------------------------------End of Query 1-----------------------------------------------
-END
-ELSE
-BEGIN
-       --------------------------------------Query 2----------------------------------------------------
-	select t2.schLandOwner,'Schools with Water Supply' as 'withAndWithoutWater',COUNT(t1.WaterSupplyType) 'Total Schools' from 
-(select 
-	[Year OF Data],
-	schNo,
-	WaterSupplyType 
-	from vtblWaterSupplyEst)t1
-	left join 
-	(select 
-		schNo,
-		schLandOwner 
-		from Schools)t2 on t1.schNo=t2.schNo where t1.WaterSupplyType!='No Water Source' and t1.[Year OF Data]=$P{Year} GROUP BY t2.schLandOwner 
-
-union all
-
-select t2.schLandOwner,'Schools without Water Supply',COUNT(t1.WaterSupplyType) 'Total Schools' from 
-(select 
-	[Year OF Data],
-	schNo,
-	WaterSupplyType 
-	from vtblWaterSupplyEst)t1
-	left join 
-	(select 
-		schNo,
-		schLandOwner 
-		from Schools)t2 on t1.schNo=t2.schNo where t1.WaterSupplyType='No Water Source' and t1.[Year OF Data]=$P{Year}  GROUP BY t2.schLandOwner 
-		
-		order by 2,1 desc
-
-   ------------------------------------End of Query 2-----------------------------------------------
-END
-
-
-
-]]>
+		<![CDATA[-- Precedence + JMP normalisation now live in warehouse.WashWaterCombined; a school is
+-- "without water" when its resolved source is NO_WATER (one NO_WATER row per school).
+-- AuthorityGovt is already Public/Private. Replaces TempWashCoreSurveyData + vtblWaterSupplyEst.
+Select AuthorityGovt as schLandOwner
+, case when CurrentlyAvailable = 'Yes' then 'Schools without Water Supply' else 'Schools with Water Supply' end as withAndWithoutWater
+, count(distinct schNo) 'Total Schools'
+from warehouse.WashWaterCombinedSchoolDimension
+where SurveyYear = $P{Year} and WaterSource = 'NO_WATER'
+group by AuthorityGovt, case when CurrentlyAvailable = 'Yes' then 'Schools without Water Supply' else 'Schools with Water Supply' end]]>
 	</queryString>
 	<field name="schLandOwner" class="java.lang.String"/>
 	<field name="withAndWithoutWater" class="java.lang.String"/>

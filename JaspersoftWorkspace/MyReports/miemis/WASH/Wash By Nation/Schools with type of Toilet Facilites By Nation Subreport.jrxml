@@ -52,39 +52,14 @@
 			<defaultValueExpression><![CDATA[2019]]></defaultValueExpression>
 		</parameter>
 		<queryString language="SQL">
-			<![CDATA[DECLARE @mainTable int;
-set @mainTable=(select count(*) as secondaryTable from warehouse.TempWashCoreSurveyData
- where InspectionYear=$P{Year});
-
- IF @mainTable>0
-
-BEGIN
-   --------------------------------------Query 1----------------------------------------------------
-select t1.Answer as toiType,COUNT(t1.schNo) as totalSch from (
-
-			SELECT cte.schNo,Answer
-			from warehouse.TempWashCoreSurveyData tmp 
-			join (
-					Select schNo, MAX(inspStart) inspStart from warehouse.TempWashCoreSurveyData
-					where InspectionYear = $P{Year} Group by schNo,InspectionYear
-				) cte on 
-				tmp.schNo = cte.schNo and tmp.inspStart = cte.inspStart 
-				where SubGroupName='Sanitation' and InspectionYear =$P{Year} and tmp.Answer is not null group by tmp.Answer, cte.schNo 
-)t1 group by t1.Answer
-
-	   ------------------------------------End of Query 1-----------------------------------------------
-END
-ELSE
-BEGIN
-   --------------------------------------Query 2----------------------------------------------------
-   select 
-	toiType,
-	Count(distinct SchNo) totalSch from measureToilets mt
-	join Toilets t on mt.SurveyDimensionID=t.ssID and SurveyYear =  $P{Year}
-	group by toiType
-
-   ------------------------------------End of Query 2-----------------------------------------------
-END]]>
+			<![CDATA[-- Repointed to warehouse.WashToiletsCombinedSchoolDimension (layered toilet refactor): instrument
+-- precedence + ToiletType crosswalk live in the view, so the IF(inspection)/ELSE(census) is gone.
+-- Ratios match the WASH dashboard (gender toilets use gender enrol; common toilets use total enrol).
+-- Replaces TempWashCoreSurveyData + TempToiletsSurvey.
+select ToiletType toiType, COUNT(distinct schNo) totalSch
+from warehouse.WashToiletsCombinedSchoolDimension
+where SurveyYear=$P{Year} and ToiletType is not null
+group by ToiletType]]>
 		</queryString>
 		<field name="toiType" class="java.lang.String"/>
 		<field name="totalSch" class="java.lang.Integer"/>
@@ -96,39 +71,14 @@ END]]>
 		<defaultValueExpression><![CDATA[2019]]></defaultValueExpression>
 	</parameter>
 	<queryString language="SQL">
-		<![CDATA[DECLARE @mainTable int;
-set @mainTable=(select count(*) as secondaryTable from warehouse.TempWashCoreSurveyData
- where InspectionYear=$P{Year});
-
- IF @mainTable>0
-
-BEGIN
-   --------------------------------------Query 1----------------------------------------------------
-select t1.Answer as toiType,COUNT(t1.schNo) as totalSch from (
-
-			SELECT cte.schNo,Answer
-			from warehouse.TempWashCoreSurveyData tmp 
-			join (
-					Select schNo, MAX(inspStart) inspStart from warehouse.TempWashCoreSurveyData
-					where InspectionYear = $P{Year} Group by schNo,InspectionYear
-				) cte on 
-				tmp.schNo = cte.schNo and tmp.inspStart = cte.inspStart 
-				where SubGroupName='Sanitation' and InspectionYear =$P{Year} and tmp.Answer is not null group by tmp.Answer, cte.schNo 
-)t1 group by t1.Answer
-
-	   ------------------------------------End of Query 1-----------------------------------------------
-END
-ELSE
-BEGIN
-   --------------------------------------Query 2----------------------------------------------------
-   select 
-	toiType,
-	Count(distinct SchNo) totalSch from measureToilets mt
-	join Toilets t on mt.SurveyDimensionID=t.ssID and SurveyYear =  $P{Year}
-	group by toiType
-
-   ------------------------------------End of Query 2-----------------------------------------------
-END]]>
+		<![CDATA[-- Repointed to warehouse.WashToiletsCombinedSchoolDimension (layered toilet refactor): instrument
+-- precedence + ToiletType crosswalk live in the view, so the IF(inspection)/ELSE(census) is gone.
+-- Ratios match the WASH dashboard (gender toilets use gender enrol; common toilets use total enrol).
+-- Replaces TempWashCoreSurveyData + TempToiletsSurvey.
+select ToiletType toiType, COUNT(distinct schNo) totalSch
+from warehouse.WashToiletsCombinedSchoolDimension
+where SurveyYear=$P{Year} and ToiletType is not null
+group by ToiletType]]>
 	</queryString>
 	<field name="toiType" class="java.lang.String"/>
 	<field name="totalSch" class="java.lang.Integer"/>

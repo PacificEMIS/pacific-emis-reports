@@ -29,7 +29,7 @@
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 				</reportElement>
-				<imageExpression><![CDATA["miemis/images/MIEMIS Coverpage.png"]]></imageExpression>
+				<imageExpression><![CDATA["repo:/images/MIEMIS_Coverpage.png"]]></imageExpression>
 			</image>
 			<textField>
 				<reportElement mode="Opaque" x="10" y="646" width="30" height="129" forecolor="#628AAF" backcolor="#0C355D" uuid="83af1e8f-440a-48b1-b699-c7a0e5a99298"/>

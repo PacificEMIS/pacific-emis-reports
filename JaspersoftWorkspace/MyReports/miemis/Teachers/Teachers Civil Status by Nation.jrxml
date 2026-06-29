@@ -18,7 +18,7 @@
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
 	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="706"/>
 	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="280"/>
-	<template><![CDATA["miemis/Templates/MIEMIS_Style.jrtx"]]></template>
+	<template><![CDATA["repo:/Templates/MIEMIS_Style.jrtx"]]></template>
 	<style name="CrossTab_Row" fontName="Open Sans" fontSize="10">
 		<conditionalStyle>
 			<conditionExpression><![CDATA[new Boolean($V{ROW_COUNT}.intValue()%2==0)]]></conditionExpression>
@@ -175,7 +175,7 @@
 		<queryString language="SQL">
 			<![CDATA[select replace(replace(coalesce(c.schLandOwner, dss.AuthorityGroup),'Non-government','Private'),'Government','Public') Authority, 
  isnull(tcs.codeDescription,'Unknown') as 'CivilStatusType', 
- count(DISTINCT TID) as 'TotalTeachers'  from  warehouse.TempTeachersCivilStatus  vts
+ count(DISTINCT TID) as 'TotalTeachers'  from  (select tl.TID, ts.tchCivilStatus, ts.tchGender, tl.SurveySchNo schNo, ts.ssID, tl.SurveyDataYear [Year OF Data] from warehouse.TeacherLocation tl left join pTeacherRead.TeacherSurveyV ts on ts.tID=tl.TID and ts.svyYear=tl.SurveyDataYear and ts.schNo=tl.SurveySchNo) vts
 inner join
  [dbo].[schools] c on vts.SchNo=c.SchNo
  inner join [dbo].[islands] i on c.iCode = i.iCode
@@ -202,7 +202,7 @@ inner join
 			<defaultValueExpression><![CDATA[2019]]></defaultValueExpression>
 		</parameter>
 		<queryString language="SQL">
-			<![CDATA[select isnull(tcs.codeDescription,'Unknown') as 'CivilStatusType',coalesce(vts.tchGender,'Others') as tchGender, count(DISTINCT TID) as 'TotalTeachers'  from  warehouse.TempTeachersCivilStatus  vts
+			<![CDATA[select isnull(tcs.codeDescription,'Unknown') as 'CivilStatusType',coalesce(vts.tchGender,'Others') as tchGender, count(DISTINCT TID) as 'TotalTeachers'  from  (select tl.TID, ts.tchCivilStatus, ts.tchGender, tl.SurveySchNo schNo, ts.ssID, tl.SurveyDataYear [Year OF Data] from warehouse.TeacherLocation tl left join pTeacherRead.TeacherSurveyV ts on ts.tID=tl.TID and ts.svyYear=tl.SurveyDataYear and ts.schNo=tl.SurveySchNo) vts
 inner join
  [dbo].[schools] c on vts.SchNo=c.SchNo
  inner join [dbo].[islands] i on c.iCode = i.iCode
@@ -225,7 +225,7 @@ inner join
 			<defaultValueExpression><![CDATA[2019]]></defaultValueExpression>
 		</parameter>
 		<queryString language="SQL">
-			<![CDATA[select d.dName, c.schNo, c.schname,isnull(tcs.codeDescription,'Unknown') as 'CivilStatusType',coalesce(vts.tchGender,'Others') as tchGender, count(DISTINCT TID) as 'TotalTeachers'  from  warehouse.TempTeachersCivilStatus  vts
+			<![CDATA[select d.dName, c.schNo, c.schname,isnull(tcs.codeDescription,'Unknown') as 'CivilStatusType',coalesce(vts.tchGender,'Others') as tchGender, count(DISTINCT TID) as 'TotalTeachers'  from  (select tl.TID, ts.tchCivilStatus, ts.tchGender, tl.SurveySchNo schNo, ts.ssID, tl.SurveyDataYear [Year OF Data] from warehouse.TeacherLocation tl left join pTeacherRead.TeacherSurveyV ts on ts.tID=tl.TID and ts.svyYear=tl.SurveyDataYear and ts.schNo=tl.SurveySchNo) vts
 inner join
  [dbo].[schools] c on vts.SchNo=c.SchNo
  inner join [dbo].[islands] i on c.iCode = i.iCode
@@ -252,7 +252,7 @@ inner join
 		<queryString language="SQL">
 			<![CDATA[Select * from (
 
-select isnull(tcs.codeDescription,'Unknown') as 'CivilStatusType', count(DISTINCT TID) as 'TotalTeachers'  from  warehouse.TempTeachersCivilStatus  vts
+select isnull(tcs.codeDescription,'Unknown') as 'CivilStatusType', count(DISTINCT TID) as 'TotalTeachers'  from  (select tl.TID, ts.tchCivilStatus, ts.tchGender, tl.SurveySchNo schNo, ts.ssID, tl.SurveyDataYear [Year OF Data] from warehouse.TeacherLocation tl left join pTeacherRead.TeacherSurveyV ts on ts.tID=tl.TID and ts.svyYear=tl.SurveyDataYear and ts.schNo=tl.SurveySchNo) vts
 inner join
  [dbo].[schools] c on vts.SchNo=c.SchNo
  left join TRCivilStatus tcs on vts.tchCivilStatus=tcs.codeCode
@@ -273,7 +273,7 @@ join Islands i on  s.iCode=i.iCode
 join Districts d on i.iGroup=d.dID  where s.schClosed=0
 ) as totalSchools,(
 
-select count(distinct vts.schNo) from  warehouse.TempTeachersCivilStatus  vts 
+select count(distinct vts.schNo) from  (select tl.TID, ts.tchCivilStatus, ts.tchGender, tl.SurveySchNo schNo, ts.ssID, tl.SurveyDataYear [Year OF Data] from warehouse.TeacherLocation tl left join pTeacherRead.TeacherSurveyV ts on ts.tID=tl.TID and ts.svyYear=tl.SurveyDataYear and ts.schNo=tl.SurveySchNo) vts 
 join Schools s on vts.schNo=s.schNo
 join Islands i on s.iCode=i.iCode
 join Districts di on i.iGroup=di.dID where  vts.[Year OF Data]=$P{Year} and s.schClosed=0) as surveyedSchools,
@@ -282,12 +282,12 @@ join Districts di on i.iGroup=di.dID where  vts.[Year OF Data]=$P{Year} and s.sc
 join Islands i on  s.iCode=i.iCode 
 join Districts d on i.iGroup=d.dID and s.schClosed=0)-(
 
-select count(distinct vts.schNo) from  warehouse.TempTeachersCivilStatus  vts 
+select count(distinct vts.schNo) from  (select tl.TID, ts.tchCivilStatus, ts.tchGender, tl.SurveySchNo schNo, ts.ssID, tl.SurveyDataYear [Year OF Data] from warehouse.TeacherLocation tl left join pTeacherRead.TeacherSurveyV ts on ts.tID=tl.TID and ts.svyYear=tl.SurveyDataYear and ts.schNo=tl.SurveySchNo) vts 
 join Schools s on vts.schNo=s.schNo
 join Islands i on s.iCode=i.iCode
 join Districts di on i.iGroup=di.dID where  vts.[Year OF Data]=$P{Year} and s.schClosed=0) as NotSurveyed,
 
-(select count(distinct tID) from  warehouse.TempTeachersCivilStatus  vts 
+(select count(distinct tID) from  (select tl.TID, ts.tchCivilStatus, ts.tchGender, tl.SurveySchNo schNo, ts.ssID, tl.SurveyDataYear [Year OF Data] from warehouse.TeacherLocation tl left join pTeacherRead.TeacherSurveyV ts on ts.tID=tl.TID and ts.svyYear=tl.SurveyDataYear and ts.schNo=tl.SurveySchNo) vts 
 join Schools s on vts.schNo=s.schNo
 join Islands i on s.iCode=i.iCode
 join Districts di on i.iGroup=di.dID where  vts.[Year OF Data]=$P{Year} and s.schClosed=0) as 'TotalTeachers']]>
@@ -1635,7 +1635,7 @@ join Districts di on i.iGroup=di.dID where  vts.[Year OF Data]=$P{Year} and s.sc
 					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 				</reportElement>
-				<imageExpression><![CDATA["miemis/Images/rmi-pss.png"]]></imageExpression>
+				<imageExpression><![CDATA["repo:/images/rmi_pss.png"]]></imageExpression>
 			</image>
 			<rectangle>
 				<reportElement mode="Opaque" x="-21" y="-20" width="793" height="10" forecolor="#08298C" backcolor="#08298C" uuid="65520dc6-3509-46f8-aa4e-f4cf8430cf2c"/>
@@ -1675,7 +1675,7 @@ join Districts di on i.iGroup=di.dID where  vts.[Year OF Data]=$P{Year} and s.sc
 					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 				</reportElement>
-				<imageExpression><![CDATA["miemis/Images/rmi-seal.png"]]></imageExpression>
+				<imageExpression><![CDATA["repo:/images/rmi_seal.png"]]></imageExpression>
 			</image>
 		</band>
 	</title>

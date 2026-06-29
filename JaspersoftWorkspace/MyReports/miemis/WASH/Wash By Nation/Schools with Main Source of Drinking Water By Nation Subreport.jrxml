@@ -4,7 +4,7 @@
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MIEMIS-OLD"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
-	<template><![CDATA["fedemis/Templates/FedEMIS_Style.jrtx"]]></template>
+	<template><![CDATA["repo:/Templates/MIEMIS_Style.jrtx"]]></template>
 	<style name="Row" mode="Transparent">
 		<conditionalStyle>
 			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
@@ -132,40 +132,16 @@
 			<defaultValueExpression><![CDATA[2019]]></defaultValueExpression>
 		</parameter>
 		<queryString>
-			<![CDATA[DECLARE @mainTable int;
-set @mainTable=(select count(*) as secondaryTable from warehouse.TempWashCoreSurveyData
-where InspectionYear=$P{Year});
-
-IF @mainTable>0
-
-BEGIN
---------------------------------------Query 1----------------------------------------------------
-Select 
-	SubQuestion as WaterSupplyType
-	, CurrentlyAvailable
-	, Count(Distinct tmp.schNo) 'Total Schools'
-	from warehouse.TempWashCoreSurveyData tmp
- join (
-				Select schNo, 
-				MAX(inspStart) inspStart 
-				from  warehouse.TempWashCoreSurveyData
-			where InspectionYear = $P{Year} Group by schNo
-) t1 
-	on tmp.schNo = t1.schNo and tmp.inspStart = t1.inspStart
-	where InspectionYear=$P{Year} and SubGroupName = 'Water' and SubQuestion is not null
-	Group by SubQuestion, CurrentlyAvailable
-------------------------------------End of Query 1-----------------------------------------------
-END
-ELSE
-BEGIN
---------------------------------------Query 2----------------------------------------------------
-Select WaterSupplyType, 
-Case when resAvail = -1 then 'Yes' else 'No' end CurrentlyAvailable,
-Count(Distinct schNo) 'Total Schools'
-from vtblWaterSupplyEst where [Year OF Data] = $P{Year} 
-Group by WaterSupplyType, (Case when resAvail = -1 then 'Yes' else 'No' end)
-------------------------------------End of Query 2-----------------------------------------------
-END]]>
+			<![CDATA[-- Precedence (current-year WASH inspection > quarterly > census > carried-forward
+-- inspection) and JMP/SDG source normalisation now live in warehouse.WashWaterCombined,
+-- so the former IF (inspection) / ELSE (census) branching is gone - it lives in the view.
+-- Replaces TempWashCoreSurveyData + TempWaterSupply.
+Select WaterSourceName as WaterSupplyType
+, CurrentlyAvailable
+, Count(Distinct schNo) 'Total Schools'
+from warehouse.WashWaterCombined
+where SurveyYear = $P{Year}
+Group by WaterSourceName, CurrentlyAvailable]]>
 		</queryString>
 		<field name="WaterSupplyType" class="java.lang.String"/>
 		<field name="CurrentlyAvailable" class="java.lang.String"/>
@@ -175,41 +151,16 @@ END]]>
 		<defaultValueExpression><![CDATA[2019]]></defaultValueExpression>
 	</parameter>
 	<queryString language="SQL">
-		<![CDATA[DECLARE @mainTable int;
-set @mainTable=(select count(*) as secondaryTable from warehouse.TempWashCoreSurveyData
-where InspectionYear=$P{Year});
-
-IF @mainTable>0
-
-BEGIN
---------------------------------------Query 1----------------------------------------------------
-	Select 
-	SubQuestion as WaterSupplyType
-	, CurrentlyAvailable
-	, Count(Distinct tmp.schNo) 'Total Schools'
-	from warehouse.TempWashCoreSurveyData tmp
- join (
-				Select schNo, 
-				MAX(inspStart) inspStart 
-				from  warehouse.TempWashCoreSurveyData
-			where InspectionYear = $P{Year} Group by schNo
-) t1 
-	on tmp.schNo = t1.schNo and tmp.inspStart = t1.inspStart
-	where InspectionYear=$P{Year} and SubGroupName = 'Water' and SubQuestion is not null
-	Group by SubQuestion, CurrentlyAvailable
-	
-------------------------------------End of Query 1-----------------------------------------------
-END
-ELSE
-BEGIN
---------------------------------------Query 2----------------------------------------------------
-Select WaterSupplyType, 
-Case when resAvail = -1 then 'Yes' else 'No' end CurrentlyAvailable,
-Count(Distinct schNo) 'Total Schools'
-from warehouse.TempWaterSupply where [Year OF Data] = $P{Year} 
-Group by WaterSupplyType, (Case when resAvail = -1 then 'Yes' else 'No' end)
-------------------------------------End of Query 2-----------------------------------------------
-END]]>
+		<![CDATA[-- Precedence (current-year WASH inspection > quarterly > census > carried-forward
+-- inspection) and JMP/SDG source normalisation now live in warehouse.WashWaterCombined,
+-- so the former IF (inspection) / ELSE (census) branching is gone - it lives in the view.
+-- Replaces TempWashCoreSurveyData + TempWaterSupply.
+Select WaterSourceName as WaterSupplyType
+, CurrentlyAvailable
+, Count(Distinct schNo) 'Total Schools'
+from warehouse.WashWaterCombined
+where SurveyYear = $P{Year}
+Group by WaterSourceName, CurrentlyAvailable]]>
 	</queryString>
 	<field name="WaterSupplyType" class="java.lang.String"/>
 	<field name="CurrentlyAvailable" class="java.lang.String"/>
