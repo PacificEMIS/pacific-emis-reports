@@ -52,10 +52,13 @@
 	-- the ISNULL is a bit of a hack due to "misplaced student name data during loading
 	, E.Student
 	, E.excGender
-	, E.schNo + ': ' + DSS.[School Name] School
-	, DSS.District
+	, E.schNo + ': ' + ISNULL(DSS.[School Name], S.schName) School
+	, ISNULL(DSS.District, D.dName) District
 	, CorrectItems
 	, TotalItems
+	, E.TestsTaken
+	-- exams making up the HSET in the selected year: 1 (H08) up to 2025, 3 (A08/B08/M08) from 2026
+	, (SELECT COUNT(*) FROM Exams X WHERE X.exYear = $P{Year} AND X.exCode IN ('H08', 'A08', 'B08', 'M08')) TestsGiven
 	, E.FinalLevel
 	, CASE
 		WHEN FinalLevel = 1 THEN 'Beginning'
@@ -69,38 +72,42 @@
 	, S.schNextSchool [NextSchoolCode]
 	, S2.schName [NextSchoolName]
 FROM (
-SELECT E.exID exID
-	, E.exCode exCode
-	, exYear exYear
-	, EC.excID excID
-	, excGiven excGiven
-	, excMiddleNames excMiddleNames
-	, excFamilyName excFamilyName
+-- Up to 2025 the HSET is a single mixed-subject exam (H08); from 2026 it is three subject
+-- exams (A08 Marshallese, B08 English, M08 Math) sat by the same students. Results are
+-- combined per student by pooling correct/total items across the exams the student sat,
+-- reproducing the historical H08 semantics (one pool of items, one percentage).
+-- Candidates are linked across the subject exams by normalised name + school (studentID is
+-- never loaded and stuID resolution is too patchy to rely on). H08 rows keep per-candidate
+-- identity via the excID grouping term, so pre-2026 output is unchanged.
+SELECT MAX(E.exID) exID
+	, MAX(E.exCode) exCode
+	, E.exYear exYear
+	, MAX(CONVERT(NVARCHAR(36), EC.excID)) excID
+	, MAX(EC.excGiven) excGiven
+	, MAX(EC.excMiddleNames) excMiddleNames
+	, MAX(EC.excFamilyName) excFamilyName
 	-- the ISNULL is a bit of a hack due to "misplaced student name data during loading
-	, ISNULL(excGiven + ' ','') + ISNULL(excMiddleNames + ' ','') + excFamilyName Student
-	, excGender	
+	, ISNULL(MAX(EC.excGiven) + ' ','') + ISNULL(MAX(EC.excMiddleNames) + ' ','') + MAX(EC.excFamilyName) Student
+	, MAX(EC.excGender) excGender
 	, EC.schNo schNo
+	, COUNT(DISTINCT E.exID) TestsTaken
 	, SUM(ECI.exciResult) CorrectItems
 	, COUNT(ECI.exciResult) TotalItems
-	, CASE 
-		WHEN CONVERT(FLOAT, SUM(ECI.exciResult)) BETWEEN 0 AND CONVERT(FLOAT, COUNT(ECI.exciResult))/4 THEN 1
-		WHEN CONVERT(FLOAT, SUM(ECI.exciResult)) BETWEEN (CONVERT(FLOAT, COUNT(ECI.exciResult))/4)+1 AND (CONVERT(FLOAT, COUNT(ECI.exciResult))/4)*2 THEN 2
-		WHEN CONVERT(FLOAT, SUM(ECI.exciResult)) BETWEEN ((CONVERT(FLOAT, COUNT(ECI.exciResult))/4)*2)+1 AND (CONVERT(FLOAT, COUNT(ECI.exciResult))/4)*3 THEN 3
-		WHEN CONVERT(FLOAT, SUM(ECI.exciResult)) BETWEEN ((CONVERT(FLOAT, COUNT(ECI.exciResult))/4)*3)+1 AND CONVERT(FLOAT, COUNT(ECI.exciResult)) THEN 4
-		END FinalLevel
-	, CASE 
-		WHEN CONVERT(FLOAT, SUM(ECI.exciResult)) BETWEEN 0 AND CONVERT(FLOAT, COUNT(ECI.exciResult))/4 THEN 'Pre-Nine Grade'
-		WHEN CONVERT(FLOAT, SUM(ECI.exciResult)) BETWEEN (CONVERT(FLOAT, COUNT(ECI.exciResult))/4)+1 AND (CONVERT(FLOAT, COUNT(ECI.exciResult))/4)*2 THEN 'Pre-Nine Grade'
-		WHEN CONVERT(FLOAT, SUM(ECI.exciResult)) BETWEEN ((CONVERT(FLOAT, COUNT(ECI.exciResult))/4)*2)+1 AND (CONVERT(FLOAT, COUNT(ECI.exciResult))/4)*3 THEN 'Nine Grade'
-		WHEN CONVERT(FLOAT, SUM(ECI.exciResult)) BETWEEN ((CONVERT(FLOAT, COUNT(ECI.exciResult))/4)*3)+1 AND CONVERT(FLOAT, COUNT(ECI.exciResult)) THEN 'Nine Grade'
-		END NextGradeProfAboveRule
+	-- gap-free quartile banding: the legacy BETWEEN bands leave holes when the item total
+	-- is not a multiple of 4 (e.g. 30 of 118 matched no band); CEILING(4c/t) tiles every
+	-- total and reproduces the legacy bands exactly for the 60-item H08
+	, CONVERT(INT, CASE WHEN SUM(ECI.exciResult) <= 0 THEN 1
+		ELSE CEILING(CONVERT(FLOAT, SUM(ECI.exciResult)) * 4 / CONVERT(FLOAT, COUNT(ECI.exciResult))) END) FinalLevel
+	, CASE WHEN CONVERT(FLOAT, SUM(ECI.exciResult)) > CONVERT(FLOAT, COUNT(ECI.exciResult)) / 2 THEN 'Nine Grade'
+		ELSE 'Pre-Nine Grade' END NextGradeProfAboveRule
 	, CONVERT(FLOAT, SUM(ECI.exciResult)) / CONVERT(FLOAT, COUNT(ECI.exciResult)) PercentageCorrect
-	-- Pass decision per the effective configured rule (Exams override -> exam type default).
-	-- For H08 (seeded 'level') this is level >= 3, which equals correct > (total/4)*2 and
-	-- reproduces the legacy 0.516 split for the 60-item exam.
-	, CASE COALESCE(E.exPassRule, LKPX.exPassRule)
+	-- Pass decision per the effective configured rule (Exams override -> exam type default),
+	-- applied to the pooled result. The subject exams are expected to share one configured
+	-- rule; MAX picks the effective one across the exams the student sat. For 'level'
+	-- (seeded for all HSET codes) pass is level >= 3, i.e. more than half the items correct.
+	, CASE MAX(COALESCE(E.exPassRule, LKPX.exPassRule))
 		WHEN 'percent' THEN
-			CASE WHEN CONVERT(FLOAT, SUM(ECI.exciResult)) / CONVERT(FLOAT, COUNT(ECI.exciResult)) >= COALESCE(E.exPassPerc, LKPX.exPassPerc) THEN 'Nine Grade'
+			CASE WHEN CONVERT(FLOAT, SUM(ECI.exciResult)) / CONVERT(FLOAT, COUNT(ECI.exciResult)) >= MAX(COALESCE(E.exPassPerc, LKPX.exPassPerc)) THEN 'Nine Grade'
 				ELSE 'Pre-Nine Grade' END
 		WHEN 'level' THEN
 			CASE WHEN CONVERT(FLOAT, SUM(ECI.exciResult)) > (CONVERT(FLOAT, COUNT(ECI.exciResult)) / 4) * 2 THEN 'Nine Grade'
@@ -111,28 +118,20 @@ Exams E
 INNER JOIN ExamCandidates EC ON E.exID = EC.exID
 INNER JOIN ExamCandidateItems ECI ON EC.excID = ECI.excID
 INNER JOIN lkpExamTypes LKPX ON E.exCode = LKPX.exCode
-GROUP BY E.exID
-	, E.exCode
-	, E.exYear
-	, EC.excID
-	, EC.excGiven
-	, EC.excMiddleNames
-	, EC.excFamilyName
-	, EC.excGender
+WHERE E.exCode IN ('H08', 'A08', 'B08', 'M08') AND E.exYear = $P{Year}
+GROUP BY E.exYear
 	, EC.schNo
-	, E.exPassRule
-	, LKPX.exPassRule
-	, E.exPassPerc
-	, LKPX.exPassPerc
-	--, DSS.[School Name]
-	--, DSS.District
-	--, S.schNextSchool
-	--, S2.schName
+	, UPPER(LTRIM(RTRIM(ISNULL(EC.excGiven, ''))))
+	, UPPER(LTRIM(RTRIM(ISNULL(EC.excFamilyName, ''))))
+	, CASE WHEN E.exCode = 'H08' THEN CONVERT(NVARCHAR(36), EC.excID) ELSE '' END
 ) E
-INNER JOIN DimensionSchoolSurvey DSS ON E.schNo = DSS.[School No] AND E.exYear = DSS.[Survey Year]
+-- survey-dimension join is LEFT with Schools/Districts fallback so a school missing its
+-- survey row does not silently drop its students from the passing list
+LEFT OUTER JOIN DimensionSchoolSurvey DSS ON E.schNo = DSS.[School No] AND E.exYear = DSS.[Survey Year]
 INNER JOIN Schools S ON E.schNo = S.schNo
+LEFT OUTER JOIN Islands I ON S.iCode = I.iCode
+LEFT OUTER JOIN Districts D ON I.iGroup = D.dID
 LEFT OUTER JOIN Schools S2 ON S.schNextSchool = S2.schNo
-WHERE E.exCode = 'H08' AND E.exYear = $P{Year}
 ORDER BY S2.schName ASC, E.NextGradeProfAboveRule, E.NextGradePassRule, E.schNo, E.CorrectItems DESC]]>
 	</queryString>
 	<field name="exID" class="java.lang.Integer">
@@ -214,6 +213,14 @@ ORDER BY S2.schName ASC, E.NextGradeProfAboveRule, E.NextGradePassRule, E.schNo,
 	<field name="NextSchoolName" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="NextSchoolName"/>
 		<property name="com.jaspersoft.studio.field.label" value="NextSchoolName"/>
+	</field>
+	<field name="TestsTaken" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="TestsTaken"/>
+		<property name="com.jaspersoft.studio.field.label" value="TestsTaken"/>
+	</field>
+	<field name="TestsGiven" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="TestsGiven"/>
+		<property name="com.jaspersoft.studio.field.label" value="TestsGiven"/>
 	</field>
 	<group name="High School">
 		<groupExpression><![CDATA[$F{NextSchoolCode} + ": " + $F{NextSchoolName}]]></groupExpression>
@@ -538,7 +545,7 @@ ORDER BY S2.schName ASC, E.NextGradeProfAboveRule, E.NextGradePassRule, E.schNo,
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Open Sans Semibold" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{Student}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{Student} + ($F{TestsTaken}.intValue() < $F{TestsGiven}.intValue() ? " (" + $F{TestsTaken} + " of " + $F{TestsGiven} + " tests)" : "")]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight">
 				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="99" y="1" width="201" height="14" uuid="08ddf433-d338-4002-81a9-ff171ab8e4ba">
