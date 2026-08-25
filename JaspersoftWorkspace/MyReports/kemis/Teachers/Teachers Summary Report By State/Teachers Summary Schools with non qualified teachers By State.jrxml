@@ -181,44 +181,13 @@ order by schElectN,c.SchName,a.TID]]>
 							<property name="com.jaspersoft.studio.unit.height" value="px"/>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="44" uuid="554800c0-d882-42e0-b605-c504c05cdb63">
-						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
-						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
-						<jr:tableHeader style="Table_TH" height="15" rowSpan="1">
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-							<staticText>
-								<reportElement x="0" y="0" width="44" height="15" uuid="42b7b61a-48f8-4f69-9a35-2fe247308366"/>
-								<box rightPadding="10"/>
-								<textElement textAlignment="Right" verticalAlignment="Middle">
-									<font fontName="Open Sans" size="10" isBold="true"/>
-								</textElement>
-								<text><![CDATA[TID]]></text>
-							</staticText>
-						</jr:tableHeader>
-						<jr:groupHeader groupName="Group1">
-							<jr:cell style="Table_CH" height="15" rowSpan="1"/>
-						</jr:groupHeader>
-						<jr:groupHeader groupName="Group2">
-							<jr:cell style="Table_CH" height="15" rowSpan="1"/>
-						</jr:groupHeader>
-						<jr:detailCell style="Table_TD" height="15">
-							<textField>
-								<reportElement x="0" y="0" width="44" height="15" uuid="0097fbee-8288-4085-b933-d89b07365220"/>
-								<box rightPadding="10"/>
-								<textElement textAlignment="Right" verticalAlignment="Middle">
-									<font fontName="Open Sans" size="10"/>
-								</textElement>
-								<textFieldExpression><![CDATA[$F{TID}==null?"N/A":$F{TID}]]></textFieldExpression>
-							</textField>
-						</jr:detailCell>
-					</jr:column>
-					<jr:column width="105" uuid="fcb919f0-a698-406c-a011-f666c07dfb51">
+					<jr:column width="160" uuid="fcb919f0-a698-406c-a011-f666c07dfb51">
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 						<jr:tableHeader style="Table_TH" height="15" rowSpan="1">
 							<property name="com.jaspersoft.studio.unit.width" value="px"/>
 							<staticText>
-								<reportElement x="0" y="0" width="105" height="15" uuid="bbb4d474-077b-4210-9ca0-f88ba23ea59c"/>
+								<reportElement x="0" y="0" width="160" height="15" uuid="bbb4d474-077b-4210-9ca0-f88ba23ea59c"/>
 								<textElement verticalAlignment="Middle">
 									<font fontName="Open Sans" size="10" isBold="true"/>
 								</textElement>
@@ -233,7 +202,7 @@ order by schElectN,c.SchName,a.TID]]>
 						</jr:groupHeader>
 						<jr:detailCell style="Table_TD" height="15">
 							<textField>
-								<reportElement x="0" y="0" width="105" height="15" uuid="6c136f39-1d1f-46b1-bdea-e18d59c956af"/>
+								<reportElement x="0" y="0" width="160" height="15" uuid="6c136f39-1d1f-46b1-bdea-e18d59c956af"/>
 								<textElement textAlignment="Left" verticalAlignment="Middle">
 									<font fontName="Open Sans" size="10"/>
 								</textElement>
@@ -241,12 +210,12 @@ order by schElectN,c.SchName,a.TID]]>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="105" uuid="f20286d1-8700-44a0-8ed3-c82155cc9f36">
+					<jr:column width="160" uuid="f20286d1-8700-44a0-8ed3-c82155cc9f36">
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column4"/>
 						<jr:tableHeader style="Table_TH" height="15" rowSpan="1">
 							<property name="com.jaspersoft.studio.unit.width" value="px"/>
 							<staticText>
-								<reportElement x="0" y="0" width="105" height="15" uuid="36978002-7403-416d-85e3-7a6aa9819c7f"/>
+								<reportElement x="0" y="0" width="160" height="15" uuid="36978002-7403-416d-85e3-7a6aa9819c7f"/>
 								<textElement verticalAlignment="Middle">
 									<font fontName="Open Sans" size="10" isBold="true"/>
 								</textElement>
@@ -261,7 +230,7 @@ order by schElectN,c.SchName,a.TID]]>
 						</jr:groupHeader>
 						<jr:detailCell style="Table_TD" height="15">
 							<textField>
-								<reportElement x="0" y="0" width="105" height="15" uuid="774fcd21-544b-4071-9196-f12b646cece7"/>
+								<reportElement x="0" y="0" width="160" height="15" uuid="774fcd21-544b-4071-9196-f12b646cece7"/>
 								<textElement textAlignment="Left" verticalAlignment="Middle">
 									<font fontName="Open Sans" size="10"/>
 								</textElement>
@@ -298,36 +267,7 @@ order by schElectN,c.SchName,a.TID]]>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="66" uuid="4da3e997-8f0e-4c5c-8dee-b6296bf10ac7">
-						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column6"/>
-						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
-						<jr:tableHeader style="Table_TH" height="15" rowSpan="1">
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-							<staticText>
-								<reportElement x="0" y="0" width="66" height="15" uuid="89485139-a956-44e9-911b-437bb3309102"/>
-								<textElement verticalAlignment="Middle">
-									<font fontName="Open Sans" size="10" isBold="true"/>
-								</textElement>
-								<text><![CDATA[DOB]]></text>
-							</staticText>
-						</jr:tableHeader>
-						<jr:groupHeader groupName="Group1">
-							<jr:cell style="Table_CH" height="15" rowSpan="1"/>
-						</jr:groupHeader>
-						<jr:groupHeader groupName="Group2">
-							<jr:cell style="Table_CH" height="15" rowSpan="1"/>
-						</jr:groupHeader>
-						<jr:detailCell style="Table_TD" height="15">
-							<textField pattern="dd/M/yyyy">
-								<reportElement x="0" y="0" width="66" height="15" uuid="3bb64c59-c73f-4f50-b5ee-3868915fc12f"/>
-								<textElement textAlignment="Left" verticalAlignment="Middle">
-									<font fontName="Open Sans" size="10"/>
-								</textElement>
-								<textFieldExpression><![CDATA[$F{tchDOB}==null?"N/A":$F{tchDOB}]]></textFieldExpression>
-							</textField>
-						</jr:detailCell>
-					</jr:column>
-				</jr:table>
+					</jr:table>
 			</componentElement>
 		</band>
 	</summary>

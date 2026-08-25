@@ -1,0 +1,468 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.2.final using JasperReports Library version 6.21.2-8434a0bd7c3bbc37cbf916f2968d35e4b165821a  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Teachers Qualifications by State and Year" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f07c542c-381c-4b9a-944d-27c8ed6811bf">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.url" value="http://fedemis.doe.fm:8080/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/fedemis/Teachers/Teachers_Qualifications_by_State_and_Year"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/fedemis/Teachers/Teachers_Qualifications_by_State_and_Year_files/main_jrxml"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="Teachers with their recorded qualifications and certifications from teacher training records for the chosen year, for the chosen state; teachers with none recorded are highlighted"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="FEDEMIS-TEST"/>
+	<template><![CDATA["repo:/Templates/FedEMIS_Style.jrtx"]]></template>
+	<style name="Row" mode="Transparent">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
+			<style backcolor="#ECECEC"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="Year" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[2024]]></defaultValueExpression>
+	</parameter>
+	<parameter name="District" class="java.lang.String">
+		<defaultValueExpression><![CDATA["CHK"]]></defaultValueExpression>
+	</parameter>
+	<queryString language="SQL">
+		<![CDATA[-- Teachers the warehouse places in a school in the chosen year (warehouse.TeacherLocation, including teachers
+-- carried forward as estimates), one location per teacher, with every qualification recorded in TeacherTraining.
+SELECT LL.dName AS District
+      ,LL.SchNo AS SchoolNo
+      ,LL.schName AS SchoolName
+      ,[TI].tID
+      ,[tSurname] + ', ' + [tGiven] AS [Teacher]
+      ,ROW_NUMBER() OVER (PARTITION BY [TI].tID ORDER BY [trQual]) AS TeacherRow
+      ,[trYear]
+      ,[trComplete]
+      ,[trQual]
+      ,[codeDescription]
+      ,[codeGroup]
+      ,[trInstitution]
+      ,COALESCE(SM.subjName, TT.trMajor) AS trMajor -- trMajor holds a lkpSubjects code
+      ,[trEffectiveDate]
+      ,[trExpirationDate]
+  FROM [dbo].[TeacherIdentity] AS [TI]
+  INNER JOIN
+  ( -- Location of each teacher in the chosen year
+  SELECT TID, SchNo, schName, dName, dID
+  FROM (
+    SELECT TL.TID, TL.SchNo, S.schName, D.dName, D.dID
+          ,ROW_NUMBER() OVER (PARTITION BY TL.TID ORDER BY TL.SchNo) AS rn
+    FROM [warehouse].[TeacherLocation] TL
+    INNER JOIN Schools S ON TL.SchNo = S.schNo
+    INNER JOIN Islands I ON S.iCode = I.iCode
+    INNER JOIN Districts D ON I.iGroup = D.dID
+    WHERE TL.SurveyYear = $P{Year}
+  ) loc
+  WHERE rn = 1
+  ) AS LL ON [TI].[tID] = LL.TID
+  LEFT OUTER JOIN [dbo].[TeacherTraining] AS [TT] ON [TI].[tID] = [TT].[tID]
+  LEFT OUTER JOIN [dbo].[lkpTeacherQual] AS [TQ] ON [TT].[trQual] = [TQ].[codeCode]
+  LEFT OUTER JOIN [dbo].[lkpSubjects] AS [SM] ON [TT].[trMajor] = [SM].[subjCode]
+  WHERE LL.dID = $P{District}
+  ORDER BY LL.dName, LL.schName, [tSurname], [tGiven], [TI].[tID], [trQual]]]>
+	</queryString>
+	<field name="District" class="java.lang.String"/>
+	<field name="SchoolNo" class="java.lang.String"/>
+	<field name="SchoolName" class="java.lang.String"/>
+	<field name="tID" class="java.lang.Integer"/>
+	<field name="Teacher" class="java.lang.String"/>
+	<field name="TeacherRow" class="java.lang.Long"/>
+	<field name="trYear" class="java.lang.Integer"/>
+	<field name="trComplete" class="java.lang.Boolean"/>
+	<field name="trQual" class="java.lang.String"/>
+	<field name="codeDescription" class="java.lang.String"/>
+	<field name="codeGroup" class="java.lang.String"/>
+	<field name="trInstitution" class="java.lang.String"/>
+	<field name="trMajor" class="java.lang.String"/>
+	<field name="trEffectiveDate" class="java.sql.Timestamp"/>
+	<field name="trExpirationDate" class="java.sql.Timestamp"/>
+	<variable name="DistrictTeachers" class="java.lang.Integer" resetType="Group" resetGroup="District" calculation="Sum">
+		<variableExpression><![CDATA[$F{TeacherRow} == 1 ? 1 : 0]]></variableExpression>
+	</variable>
+	<variable name="DistrictStat2" class="java.lang.Integer" resetType="Group" resetGroup="District" calculation="Sum">
+		<variableExpression><![CDATA[$F{trQual} == null ? 1 : 0]]></variableExpression>
+	</variable>
+	<variable name="SchoolTeachers" class="java.lang.Integer" resetType="Group" resetGroup="School" calculation="Sum">
+		<variableExpression><![CDATA[$F{TeacherRow} == 1 ? 1 : 0]]></variableExpression>
+	</variable>
+	<variable name="SchoolStat2" class="java.lang.Integer" resetType="Group" resetGroup="School" calculation="Sum">
+		<variableExpression><![CDATA[$F{trQual} == null ? 1 : 0]]></variableExpression>
+	</variable>
+	<group name="District">
+		<groupExpression><![CDATA[$F{District}]]></groupExpression>
+		<groupHeader>
+			<band height="24">
+				<frame>
+					<reportElement style="Detail Header Dark" x="-21" y="0" width="793" height="24" uuid="75a2e474-93ff-40e4-8abe-459baf27986d"/>
+					<rectangle>
+						<reportElement style="Detail Header Darker" x="21" y="0" width="36" height="24" uuid="0db39440-7ff6-4e57-9c6d-be62241680b2"/>
+					</rectangle>
+					<textField>
+						<reportElement style="Group header" x="68" y="0" width="312" height="24" uuid="3e9513ec-97f8-468b-aa21-b42803b2f806"/>
+						<textFieldExpression><![CDATA[$F{District} != null ? $F{District} : "School with no State"]]></textFieldExpression>
+					</textField>
+					<textField evaluationTime="Group" evaluationGroup="District">
+						<reportElement style="Group header" x="380" y="0" width="120" height="24" uuid="899d781b-8962-4c23-8fde-1f24c6ffb5c6"/>
+						<textElement>
+							<font size="8"/>
+						</textElement>
+						<textFieldExpression><![CDATA["Teachers: " + $V{DistrictTeachers}]]></textFieldExpression>
+					</textField>
+					<textField evaluationTime="Group" evaluationGroup="District">
+						<reportElement style="Group header" x="500" y="0" width="205" height="24" uuid="21dce616-2756-4a4f-8623-0d773892864c"/>
+						<textElement>
+							<font size="8"/>
+						</textElement>
+						<textFieldExpression><![CDATA["Without qualification: " + $V{DistrictStat2}]]></textFieldExpression>
+					</textField>
+				</frame>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="School">
+		<groupExpression><![CDATA[$F{SchoolName}]]></groupExpression>
+		<groupHeader>
+			<band height="24">
+				<frame>
+					<reportElement style="Detail Header Lighter" x="-21" y="0" width="793" height="24" uuid="587b6e89-89ec-4f16-a89a-e6deb94f8d4e"/>
+					<rectangle>
+						<reportElement style="Detail Header Light" x="21" y="0" width="47" height="24" uuid="62391078-9330-49fa-a3c8-c0decbf2fd60"/>
+					</rectangle>
+					<textField>
+						<reportElement style="Group header" x="80" y="0" width="300" height="24" uuid="e4c4ba6a-9e3e-43ae-87bc-c2530f68c25c"/>
+						<textFieldExpression><![CDATA[$F{SchoolNo} != null ? $F{SchoolNo} + ": " + $F{SchoolName} : "Teacher not in any school"]]></textFieldExpression>
+					</textField>
+					<textField evaluationTime="Group" evaluationGroup="School">
+						<reportElement style="Group header" x="380" y="0" width="120" height="24" uuid="db6ef9b5-7156-49c6-8eb4-fd0b2056fa24"/>
+						<textElement>
+							<font size="8"/>
+						</textElement>
+						<textFieldExpression><![CDATA["Teachers: " + $V{SchoolTeachers}]]></textFieldExpression>
+					</textField>
+					<textField evaluationTime="Group" evaluationGroup="School">
+						<reportElement style="Group header" x="500" y="0" width="205" height="24" uuid="2b8882be-549d-42f1-bcaa-52f438ac194a"/>
+						<textElement>
+							<font size="8"/>
+						</textElement>
+						<textFieldExpression><![CDATA["Without qualification: " + $V{SchoolStat2}]]></textFieldExpression>
+					</textField>
+				</frame>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<group name="Teacher">
+		<groupExpression><![CDATA[$F{tID}]]></groupExpression>
+		<groupHeader>
+			<band height="30">
+				<textField>
+					<reportElement x="0" y="2" width="752" height="14" uuid="e3046185-46c0-40f7-b710-9bd01bf1800e">
+						<printWhenExpression><![CDATA[$F{trQual} != null]]></printWhenExpression>
+					</reportElement>
+					<box>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#C8C8C8"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Open Sans Semibold" size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{Teacher}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="2" width="752" height="14" forecolor="#C00000" uuid="3351bcec-aaf2-4548-af06-55e821306d06">
+						<printWhenExpression><![CDATA[$F{trQual} == null]]></printWhenExpression>
+					</reportElement>
+					<box>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#C8C8C8"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Open Sans Semibold" size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{Teacher} + " (no qualification recorded)"]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement style="Column header" x="0" y="18" width="220" height="12" isRemoveLineWhenBlank="true" uuid="7e63191d-1985-4fd1-86ad-92609bc652df">
+						<printWhenExpression><![CDATA[$F{trQual} != null]]></printWhenExpression>
+					</reportElement>
+					<box>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#C8C8C8"/>
+					</box>
+					<textElement textAlignment="Left">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Qualification]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="Column header" x="220" y="18" width="30" height="12" isRemoveLineWhenBlank="true" uuid="94d6f8de-235a-4afd-9f46-7f800084c592">
+						<printWhenExpression><![CDATA[$F{trQual} != null]]></printWhenExpression>
+					</reportElement>
+					<box>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#C8C8C8"/>
+					</box>
+					<textElement textAlignment="Left">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Year]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="Column header" x="250" y="18" width="140" height="12" isRemoveLineWhenBlank="true" uuid="2672bb2d-7a97-4f57-a609-e4a462d359ed">
+						<printWhenExpression><![CDATA[$F{trQual} != null]]></printWhenExpression>
+					</reportElement>
+					<box>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#C8C8C8"/>
+					</box>
+					<textElement textAlignment="Left">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Institution]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="Column header" x="390" y="18" width="150" height="12" isRemoveLineWhenBlank="true" uuid="c60a28cd-08b9-422a-b0d1-c9023c55a3c3">
+						<printWhenExpression><![CDATA[$F{trQual} != null]]></printWhenExpression>
+					</reportElement>
+					<box>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#C8C8C8"/>
+					</box>
+					<textElement textAlignment="Left">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Major]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="Column header" x="540" y="18" width="92" height="12" isRemoveLineWhenBlank="true" uuid="631d3a90-4a8e-418d-bdb4-dab55d8e4763">
+						<printWhenExpression><![CDATA[$F{trQual} != null]]></printWhenExpression>
+					</reportElement>
+					<box>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#C8C8C8"/>
+					</box>
+					<textElement textAlignment="Left">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Group]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="Column header" x="632" y="18" width="60" height="12" isRemoveLineWhenBlank="true" uuid="4ce9763a-e69d-4f50-a86e-6237e0a5d997">
+						<printWhenExpression><![CDATA[$F{trQual} != null]]></printWhenExpression>
+					</reportElement>
+					<box>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#C8C8C8"/>
+					</box>
+					<textElement textAlignment="Left">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Effective]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="Column header" x="692" y="18" width="60" height="12" isRemoveLineWhenBlank="true" uuid="9965013e-ca42-40fd-987d-fa7bedfd0a2b">
+						<printWhenExpression><![CDATA[$F{trQual} != null]]></printWhenExpression>
+					</reportElement>
+					<box>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#C8C8C8"/>
+					</box>
+					<textElement textAlignment="Left">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Expired]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="131" splitType="Stretch">
+			<image>
+				<reportElement x="0" y="0" width="126" height="126" uuid="e36fa4e6-63c5-425f-9632-5db7447df3a6">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<imageExpression><![CDATA["repo:/images/fsm_seal.png"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement style="Title" x="126" y="0" width="499" height="62" uuid="511949ed-2332-409c-beec-b45987018577">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="45"/>
+				</textElement>
+				<text><![CDATA[Teacher Qualifications]]></text>
+			</staticText>
+			<textField>
+				<reportElement style="SubTitle" x="140" y="62" width="470" height="48" uuid="c20e9c3b-ca2b-48cd-b614-50dba2df14ae">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Teachers located in a school in " + $P{Year} + " in " + $P{District} + " with every qualification recorded in their teacher training records. Teachers with none recorded are highlighted in red. Note: duplicate teacher identities are not resolved; a teacher shown without a qualification may have it recorded under a duplicate identity."]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="625" y="0" width="126" height="126" uuid="e94b5d53-25b2-44b1-879d-9da07cc9d07a">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA["repo:/images/fsm_ndoe.png"]]></imageExpression>
+			</image>
+			<rectangle>
+				<reportElement style="Detail Header Dark" x="-21" y="-20" width="793" height="10" uuid="e77b30ce-2e17-45e5-bc08-eb0a846bb03a">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+			</rectangle>
+			<rectangle>
+				<reportElement style="Detail Header Dark" x="-21" y="-10" width="20" height="10" uuid="c25f4a5e-fa84-455b-9c25-d69526a38602">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+			</rectangle>
+			<rectangle>
+				<reportElement style="Detail Header Dark" x="752" y="-10" width="20" height="10" uuid="8825c1a8-df9b-4fcf-8ddd-92decac3570c">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+			</rectangle>
+			<ellipse>
+				<reportElement x="-21" y="-9" width="38" height="38" forecolor="#FFFFFF" uuid="5b2083f0-232c-4056-8627-67c4c30c3912">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+			</ellipse>
+			<ellipse>
+				<reportElement x="735" y="-9" width="38" height="38" forecolor="#FFFFFF" uuid="3d78174e-2135-458e-ba14-b6014213657c">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+			</ellipse>
+			<textField>
+				<reportElement style="Title text" x="126" y="111" width="499" height="20" uuid="3efb711b-0761-4ba5-aa60-8d9e724722e5">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA["State " + $P{District} + ", year " + $P{Year}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<printWhenExpression><![CDATA[$F{trQual} != null]]></printWhenExpression>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="1" width="220" height="14" uuid="018e1594-10a1-4445-b917-4b71f12c6cb4"/>
+				<box>
+					<bottomPen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Open Sans Semibold" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{codeDescription}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="220" y="1" width="30" height="14" uuid="c7be7c9c-ecae-4853-9951-0964e2c35816"/>
+				<box>
+					<bottomPen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Open Sans Semibold" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{trYear}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="250" y="1" width="140" height="14" uuid="bdc45140-a370-4e8a-943d-a5ecd5019290"/>
+				<box>
+					<bottomPen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Open Sans Semibold" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{trInstitution}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="390" y="1" width="150" height="14" uuid="25c36ad6-eb2e-45db-a9b8-7a6f8aa7c8ad"/>
+				<box>
+					<bottomPen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Open Sans Semibold" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{trMajor}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="540" y="1" width="92" height="14" uuid="059f3fe2-7ec9-484c-98fc-7bbe12c5cea3"/>
+				<box>
+					<bottomPen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Open Sans Semibold" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{codeGroup}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" pattern="d MMM yyyy" isBlankWhenNull="true">
+				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="632" y="1" width="60" height="14" uuid="8341e2f4-49a7-43cf-8df6-724f8daba70b"/>
+				<box>
+					<bottomPen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Open Sans Semibold" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{trEffectiveDate}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" pattern="d MMM yyyy" isBlankWhenNull="true">
+				<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="692" y="1" width="60" height="14" uuid="d6792fb4-8ded-41c5-a962-7f365845b4cf"/>
+				<box>
+					<bottomPen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Open Sans Semibold" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{trExpirationDate}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="25" splitType="Stretch">
+			<frame>
+				<reportElement style="Page footer" x="-21" y="1" width="793" height="24" uuid="f4eef57c-b2f1-47b7-9794-2e46b861e1d7"/>
+				<textField evaluationTime="Report">
+					<reportElement style="Page footer" x="726" y="1" width="40" height="20" uuid="98613ca3-c95e-4678-adcc-1a1c5548a2af">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement style="Page footer" x="646" y="1" width="80" height="20" uuid="e6470122-fe35-440e-b113-2933916cc62a">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+				</textField>
+				<textField pattern="EEEEE dd MMMMM yyyy">
+					<reportElement style="Page footer" x="22" y="1" width="288" height="20" uuid="ce35a5f5-69eb-4cb6-b9f9-303b792dbc07"/>
+					<textFieldExpression><![CDATA["Generated by FedEMIS on " + new java.util.Date()]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

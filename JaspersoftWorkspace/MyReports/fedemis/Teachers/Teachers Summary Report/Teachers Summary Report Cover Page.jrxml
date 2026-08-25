@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<!-- Created with Jaspersoft Studio version 6.21.2.final using JasperReports Library version 6.21.2-8434a0bd7c3bbc37cbf916f2968d35e4b165821a  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CoverPage" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="612" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isSummaryNewPage="true" uuid="c50b24eb-eb33-413f-8e75-e7e20a5341fd">
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="ireport.callouts" value="callouts.2.fg=0,0,0\ncallouts.1.text=You can dynamically specify a title\nby setting the default value of the\nBookTitle parameter, or transform\nthis text field in a static text.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ncallouts.1.fg=0,0,0\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ncallouts.2.text=You can dynamically specify a subtitle\nby setting the default value of the\nBookTitle parameter, or transform\nthis text field in a static text.\ncallouts.2.bg=255,255,0\ncallouts.2.bounds=650,210,219,70\ncallouts.1.pins=587,113\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ncallouts.1.bounds=650,70,220,80\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ncallouts.1.bg=255,255,0\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ncallouts.2.pins=375,177\n"/>
@@ -25,7 +25,7 @@
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
-				<imageExpression><![CDATA["fedemis/images/National_FedEMIS_Coverpage.png"]]></imageExpression>
+				<imageExpression><![CDATA["repo:/images/National_FedEMIS_Coverpage.png"]]></imageExpression>
 			</image>
 			<textField>
 				<reportElement mode="Opaque" x="197" y="710" width="393" height="49" forecolor="#9CC2E5" backcolor="#0658A5" uuid="83af1e8f-440a-48b1-b699-c7a0e5a99298"/>
@@ -34,13 +34,27 @@
 				</textElement>
 				<textFieldExpression><![CDATA[($P{Year}-1)+"-"+$P{Year}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
+			<textField textAdjust="StretchHeight">
 				<reportElement mode="Opaque" x="130" y="620" width="460" height="50" forecolor="#FFFFFF" backcolor="#0658A5" uuid="6ea7507a-1635-4684-9b75-f1e049a63704"/>
 				<textElement textAlignment="Right" verticalAlignment="Top">
 					<font fontName="Open Sans" size="30" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["TEACHERS SUMMARY REPORT"]]></textFieldExpression>
 			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="20" width="612" height="60" forecolor="#FFFFFF" backcolor="#C00000" uuid="bf4dcb43-1e5a-4416-bb6e-0fed731ac369"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Open Sans" size="34" isBold="true"/>
+				</textElement>
+				<text><![CDATA[OBSOLETE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="80" width="612" height="44" forecolor="#FFFFFF" backcolor="#C00000" uuid="420d5095-c0a6-4abe-b330-4af03d511960"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Open Sans" size="11"/>
+				</textElement>
+				<text><![CDATA[This report has been retired and is no longer maintained. Use the Teachers Assignments, Teachers Certification and Teachers Qualifications reports, or the online dashboards, instead.]]></text>
+			</staticText>
 		</band>
 	</title>
 </jasperReport>

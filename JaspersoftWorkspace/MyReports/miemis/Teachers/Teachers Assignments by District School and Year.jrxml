@@ -6,7 +6,7 @@
 	<property name="ireport.jasperserver.user" value="jasperadmin"/>
 	<property name="ireport.jasperserver.reportUnit" value="/reports/miemis/Teachers/Teachers_Assignments_by_Atoll_School_and_Year"/>
 	<property name="ireport.jasperserver.report.resource" value="/reports/miemis/Teachers/Teachers_Assignments_by_Atoll_School_and_Year_files/main_jrxml"/>
-	<property name="com.jaspersoft.studio.report.unit.description" value="Proportion of students at each level of achievement for chosen school and year (all exams)"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="List of teachers and their grade assignments as reported in the school census for the chosen year, grouped by atoll and school"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
@@ -142,7 +142,7 @@
     -- Your teacher query here
     SELECT 
         TL.[TID],
-        TI.tFullName AS Teacher,
+        TI.tSurname + ', ' + TI.tGiven AS Teacher, -- Surname, Given as in the web UI
         TL.[SurveyYear],
         common.SchoolYearStr(CAST(CONCAT(TL.[SurveyYear], '-01-01') AS DATETIME), null) AS SchoolYear,
         [GenderCode] AS G,
@@ -306,8 +306,7 @@ ORDER BY
     District, 
     SchoolName, 
     CASE WHEN Teacher IS NULL THEN 1 ELSE 0 END,
-    Teacher;
-]]>
+    Teacher;]]>
 	</queryString>
 	<field name="TID" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="TID"/>
@@ -513,7 +512,7 @@ ORDER BY
 					</rectangle>
 					<textField>
 						<reportElement style="Group header" x="68" y="0" width="312" height="24" uuid="ab0c7c87-df10-4fc6-9ad4-169f98f35f94"/>
-						<textFieldExpression><![CDATA[$F{District} != null ? $F{District} : "School with no State"]]></textFieldExpression>
+						<textFieldExpression><![CDATA[$F{District} != null ? $F{District} : "School with no Atoll"]]></textFieldExpression>
 					</textField>
 					<textField evaluationTime="Group" evaluationGroup="District">
 						<reportElement style="Group header" x="380" y="0" width="86" height="24" uuid="ce14fc78-5c2c-4719-b06c-c2bdadb32c98">
@@ -766,18 +765,18 @@ ORDER BY
 				<imageExpression><![CDATA["repo:/images/rmi_pss.png"]]></imageExpression>
 			</image>
 			<rectangle>
-				<reportElement mode="Opaque" x="-21" y="-20" width="793" height="10" forecolor="#08298C" backcolor="#08298C" uuid="a879b5ed-22f8-4e7b-9093-811aaea43211">
+				<reportElement style="Detail Header Dark" x="-21" y="-20" width="793" height="10" uuid="a879b5ed-22f8-4e7b-9093-811aaea43211">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 			</rectangle>
 			<rectangle>
-				<reportElement x="-21" y="-10" width="20" height="10" forecolor="#08298C" backcolor="#08298C" uuid="0a58d963-ec76-492f-9d28-8419cff95766">
+				<reportElement style="Detail Header Dark" x="-21" y="-10" width="20" height="10" uuid="0a58d963-ec76-492f-9d28-8419cff95766">
 					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 				</reportElement>
 			</rectangle>
 			<rectangle>
-				<reportElement x="752" y="-10" width="20" height="10" forecolor="#08298C" backcolor="#08298C" uuid="f0a00416-98e9-4650-b25b-a7e2a9f68561">
+				<reportElement style="Detail Header Dark" x="752" y="-10" width="20" height="10" uuid="f0a00416-98e9-4650-b25b-a7e2a9f68561">
 					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
