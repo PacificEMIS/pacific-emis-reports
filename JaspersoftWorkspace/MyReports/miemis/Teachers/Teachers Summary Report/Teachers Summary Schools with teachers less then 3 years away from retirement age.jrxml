@@ -54,7 +54,7 @@
 d.dName as DistrictName,
 c.SchName,a.TID,b.tGiven as tchFirstName,b.tSurname as tchFamilyName,
 Case when b.tsex = 'M' then 'Male'
-when  b.tsex='F' then 'Female' end as Gender ,b.tDOB as tchDOB
+when  b.tsex='F' then 'Female' end as Gender ,b.tDOB as tchDOB, a.SurveyDataYear - a.BirthYear as Age
 from warehouse.TeacherLocation
   a inner join dbo.TeacherIdentity b on a.TID=b.tID
 inner join
@@ -76,6 +76,7 @@ order by DistrictName,c.SchName,a.TID]]>
 		<field name="tchFamilyName" class="java.lang.String"/>
 		<field name="Gender" class="java.lang.String"/>
 		<field name="tchDOB" class="java.sql.Timestamp"/>
+		<field name="Age" class="java.lang.Integer"/>
 		<group name="Group1">
 			<groupExpression><![CDATA[$F{DistrictName}]]></groupExpression>
 		</group>
@@ -162,47 +163,7 @@ order by DistrictName,c.SchName,a.TID]]>
 						</jr:groupHeader>
 						<jr:detailCell style="Table_TD" height="15"/>
 					</jr:column>
-					<jr:column width="65" uuid="c3f059a4-db61-49f4-a58d-cbc1735f857f">
-						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
-						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
-						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
-						<jr:tableHeader style="Table_TH" height="15" rowSpan="1">
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-							<box>
-								<bottomPen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
-							</box>
-							<staticText>
-								<reportElement x="0" y="0" width="65" height="15" uuid="46804a33-c4d5-45f1-9fe8-9f2cb4412913"/>
-								<box rightPadding="10"/>
-								<textElement textAlignment="Right" verticalAlignment="Middle">
-									<font fontName="Open Sans" size="10" isBold="true"/>
-								</textElement>
-								<text><![CDATA[TID]]></text>
-							</staticText>
-						</jr:tableHeader>
-						<jr:groupHeader groupName="Group1">
-							<jr:cell style="Table_CH" height="15" rowSpan="1"/>
-						</jr:groupHeader>
-						<jr:groupHeader groupName="Group2">
-							<jr:cell style="Table_CH" height="15" rowSpan="1"/>
-						</jr:groupHeader>
-						<jr:detailCell style="Table_TD" height="15">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-							<box>
-								<bottomPen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
-							</box>
-							<textField isStretchWithOverflow="true">
-								<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="65" height="15" uuid="d28a3287-653c-4f16-a7a1-9c9558a57d39"/>
-								<box rightPadding="10"/>
-								<textElement textAlignment="Right" verticalAlignment="Middle">
-									<font fontName="Open Sans" size="9"/>
-								</textElement>
-								<textFieldExpression><![CDATA[$F{TID}==null?"N/A":$F{TID}]]></textFieldExpression>
-							</textField>
-						</jr:detailCell>
-					</jr:column>
-					<jr:column width="105" uuid="48acc9e6-1a71-4d78-ac09-1c3138c42ae7">
+					<jr:column width="137" uuid="48acc9e6-1a71-4d78-ac09-1c3138c42ae7">
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 						<jr:tableHeader style="Table_TH" height="15" rowSpan="1">
@@ -211,7 +172,7 @@ order by DistrictName,c.SchName,a.TID]]>
 								<bottomPen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
 							</box>
 							<staticText>
-								<reportElement x="0" y="0" width="105" height="15" uuid="82bcdc14-c02d-45b1-b282-e1f05f90272a"/>
+								<reportElement x="0" y="0" width="137" height="15" uuid="82bcdc14-c02d-45b1-b282-e1f05f90272a"/>
 								<textElement textAlignment="Left" verticalAlignment="Middle">
 									<font fontName="Open Sans" size="10" isBold="true"/>
 								</textElement>
@@ -230,7 +191,7 @@ order by DistrictName,c.SchName,a.TID]]>
 								<bottomPen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
 							</box>
 							<textField isStretchWithOverflow="true">
-								<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="105" height="15" uuid="797a43ac-e446-49d9-a622-3fdb50d22d3e"/>
+								<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="137" height="15" uuid="797a43ac-e446-49d9-a622-3fdb50d22d3e"/>
 								<textElement textAlignment="Left" verticalAlignment="Middle">
 									<font fontName="Open Sans" size="9" isBold="false"/>
 								</textElement>
@@ -238,7 +199,7 @@ order by DistrictName,c.SchName,a.TID]]>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="105" uuid="d4f107ae-13e7-44d4-bf46-05c00a2a61a5">
+					<jr:column width="138" uuid="d4f107ae-13e7-44d4-bf46-05c00a2a61a5">
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column4"/>
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 						<jr:tableHeader style="Table_TH" height="15" rowSpan="1">
@@ -247,7 +208,7 @@ order by DistrictName,c.SchName,a.TID]]>
 								<bottomPen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
 							</box>
 							<staticText>
-								<reportElement x="0" y="0" width="105" height="15" uuid="eb49c4a7-094e-4bee-b4cb-8464005aa07f"/>
+								<reportElement x="0" y="0" width="138" height="15" uuid="eb49c4a7-094e-4bee-b4cb-8464005aa07f"/>
 								<textElement textAlignment="Left" verticalAlignment="Middle">
 									<font fontName="Open Sans" size="10" isBold="true"/>
 								</textElement>
@@ -265,7 +226,7 @@ order by DistrictName,c.SchName,a.TID]]>
 								<bottomPen lineWidth="1.0" lineStyle="Dotted" lineColor="#C8C8C8"/>
 							</box>
 							<textField isStretchWithOverflow="true">
-								<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="105" height="15" uuid="0a7b8274-77be-49f9-b02c-f677be2f95e4">
+								<reportElement style="Row" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="138" height="15" uuid="0a7b8274-77be-49f9-b02c-f677be2f95e4">
 									<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 								</reportElement>
 								<textElement textAlignment="Left" verticalAlignment="Middle">
@@ -323,7 +284,7 @@ order by DistrictName,c.SchName,a.TID]]>
 								<textElement textAlignment="Left" verticalAlignment="Middle">
 									<font fontName="Open Sans" size="10" isBold="true"/>
 								</textElement>
-								<text><![CDATA[DOB]]></text>
+								<text><![CDATA[Age]]></text>
 							</staticText>
 						</jr:tableHeader>
 						<jr:groupHeader groupName="Group1">
@@ -341,7 +302,7 @@ order by DistrictName,c.SchName,a.TID]]>
 								<textElement textAlignment="Left" verticalAlignment="Middle">
 									<font fontName="Open Sans" size="9"/>
 								</textElement>
-								<textFieldExpression><![CDATA[$F{tchDOB} ==null?"N/A":$F{tchDOB}]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$F{Age} == null ? "N/A" : String.valueOf($F{Age})]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>

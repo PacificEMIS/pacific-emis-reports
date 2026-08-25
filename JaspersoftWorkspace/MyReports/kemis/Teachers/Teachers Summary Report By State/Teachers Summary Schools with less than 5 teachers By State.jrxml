@@ -193,47 +193,13 @@ order by schElectN,c.schname,a.TID,b.tGiven]]>
 							<property name="com.jaspersoft.studio.unit.height" value="px"/>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="44" uuid="4a2aa712-5089-43c3-a765-c75d985a830d">
-						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
-						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
-						<jr:tableHeader style="Table_TH" height="15" rowSpan="1">
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-							<staticText>
-								<reportElement x="0" y="0" width="44" height="15" uuid="ae39fafe-c830-4c8e-82e2-4433133d2ad7"/>
-								<box rightPadding="10"/>
-								<textElement textAlignment="Right" verticalAlignment="Middle">
-									<font fontName="Open Sans" size="10" isBold="true"/>
-								</textElement>
-								<text><![CDATA[TID]]></text>
-							</staticText>
-						</jr:tableHeader>
-						<jr:tableFooter style="Table_TH" height="0" rowSpan="1"/>
-						<jr:groupHeader groupName="Group1">
-							<jr:cell style="Table_CH" height="15" rowSpan="1"/>
-						</jr:groupHeader>
-						<jr:groupHeader groupName="Group2">
-							<jr:cell style="Table_CH" height="15" rowSpan="1"/>
-						</jr:groupHeader>
-						<jr:columnHeader style="Table_CH" height="0" rowSpan="1"/>
-						<jr:columnFooter style="Table_CH" height="0" rowSpan="1"/>
-						<jr:detailCell style="Table_TD" height="15">
-							<textField>
-								<reportElement x="0" y="0" width="44" height="15" uuid="33d78416-29ed-4dc8-b4bb-50268f0cc665"/>
-								<box rightPadding="10"/>
-								<textElement textAlignment="Right" verticalAlignment="Middle">
-									<font fontName="Open Sans" size="10"/>
-								</textElement>
-								<textFieldExpression><![CDATA[$F{tid}==null?"N/A":$F{tid}]]></textFieldExpression>
-							</textField>
-						</jr:detailCell>
-					</jr:column>
-					<jr:column width="105" uuid="014b9550-100f-4633-8732-9869a78cc183">
+					<jr:column width="160" uuid="014b9550-100f-4633-8732-9869a78cc183">
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 						<jr:tableHeader style="Table_TH" height="15" rowSpan="1">
 							<property name="com.jaspersoft.studio.unit.width" value="px"/>
 							<staticText>
-								<reportElement x="0" y="0" width="105" height="15" uuid="6c23847d-faba-4705-93cf-132f4f1aac8e"/>
+								<reportElement x="0" y="0" width="160" height="15" uuid="6c23847d-faba-4705-93cf-132f4f1aac8e"/>
 								<textElement verticalAlignment="Middle">
 									<font fontName="Open Sans" size="10" isBold="true"/>
 								</textElement>
@@ -251,7 +217,7 @@ order by schElectN,c.schname,a.TID,b.tGiven]]>
 						<jr:columnFooter style="Table_CH" height="0" rowSpan="1"/>
 						<jr:detailCell style="Table_TD" height="15">
 							<textField>
-								<reportElement x="0" y="0" width="105" height="15" uuid="a17a2794-4e64-4f9a-9476-2991ef8876a6"/>
+								<reportElement x="0" y="0" width="160" height="15" uuid="a17a2794-4e64-4f9a-9476-2991ef8876a6"/>
 								<textElement verticalAlignment="Middle">
 									<font fontName="Open Sans" size="10"/>
 								</textElement>
@@ -259,13 +225,13 @@ order by schElectN,c.schname,a.TID,b.tGiven]]>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="105" uuid="6e203a14-d573-4f8f-9021-d40fed0b9a27">
+					<jr:column width="160" uuid="6e203a14-d573-4f8f-9021-d40fed0b9a27">
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column4"/>
 						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 						<jr:tableHeader style="Table_TH" height="15" rowSpan="1">
 							<property name="com.jaspersoft.studio.unit.width" value="px"/>
 							<staticText>
-								<reportElement x="0" y="0" width="105" height="15" uuid="10553345-9eb6-4255-b6d1-b78a4e4b8930"/>
+								<reportElement x="0" y="0" width="160" height="15" uuid="10553345-9eb6-4255-b6d1-b78a4e4b8930"/>
 								<textElement verticalAlignment="Middle">
 									<font fontName="Open Sans" size="10" isBold="true"/>
 								</textElement>
@@ -283,7 +249,7 @@ order by schElectN,c.schname,a.TID,b.tGiven]]>
 						<jr:columnFooter style="Table_CH" height="0" rowSpan="1"/>
 						<jr:detailCell style="Table_TD" height="15">
 							<textField>
-								<reportElement x="0" y="0" width="105" height="15" uuid="a299e3f5-3cb2-4009-af39-47d2976aafbe"/>
+								<reportElement x="0" y="0" width="160" height="15" uuid="a299e3f5-3cb2-4009-af39-47d2976aafbe"/>
 								<textElement verticalAlignment="Middle">
 									<font fontName="Open Sans" size="10"/>
 								</textElement>
@@ -323,39 +289,7 @@ order by schElectN,c.schname,a.TID,b.tGiven]]>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="66" uuid="75db14b0-f6b7-46b5-84b3-67f25c775c83">
-						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column6"/>
-						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
-						<jr:tableHeader style="Table_TH" height="15" rowSpan="1">
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-							<staticText>
-								<reportElement x="0" y="0" width="66" height="15" uuid="c730a5a5-463e-4c0a-9138-28907b863334"/>
-								<textElement verticalAlignment="Middle">
-									<font fontName="Open Sans" size="10" isBold="true"/>
-								</textElement>
-								<text><![CDATA[DOB]]></text>
-							</staticText>
-						</jr:tableHeader>
-						<jr:tableFooter style="Table_TH" height="0" rowSpan="1"/>
-						<jr:groupHeader groupName="Group1">
-							<jr:cell style="Table_CH" height="15" rowSpan="1"/>
-						</jr:groupHeader>
-						<jr:groupHeader groupName="Group2">
-							<jr:cell style="Table_CH" height="15" rowSpan="1"/>
-						</jr:groupHeader>
-						<jr:columnHeader style="Table_CH" height="0" rowSpan="1"/>
-						<jr:columnFooter style="Table_CH" height="0" rowSpan="1"/>
-						<jr:detailCell style="Table_TD" height="15">
-							<textField pattern="dd/M/yyyy">
-								<reportElement x="0" y="0" width="66" height="15" uuid="8f0bbbae-ad1d-4c0b-9bfe-6a38e19c48cf"/>
-								<textElement verticalAlignment="Middle">
-									<font fontName="Open Sans" size="10"/>
-								</textElement>
-								<textFieldExpression><![CDATA[$F{tchDOB}==null?"N/A":$F{tchDOB}]]></textFieldExpression>
-							</textField>
-						</jr:detailCell>
-					</jr:column>
-				</jr:table>
+					</jr:table>
 			</componentElement>
 		</band>
 	</summary>
