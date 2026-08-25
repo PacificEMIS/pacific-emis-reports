@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.21.2.final using JasperReports Library version 6.21.2-8434a0bd7c3bbc37cbf916f2968d35e4b165821a  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Teachers_Certification_By_District_School_And_Year" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c18c15c8-b90b-4ddf-8193-96fae4e78231">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Teachers_Certification_By_School_And_Year" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="df013db5-f76e-44d3-b0df-bcbc46d93160">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="ireport.jasperserver.url" value="http://fedemis.doe.fm:8080/jasperserver/"/>
 	<property name="ireport.jasperserver.user" value="jasperadmin"/>
-	<property name="ireport.jasperserver.reportUnit" value="/reports/fedemis/Teachers/Teachers_Certification_by_State_School_and_Year"/>
-	<property name="ireport.jasperserver.report.resource" value="/reports/fedemis/Teachers/Teachers_Certification_by_State_School_and_Year_files/main_jrxml"/>
-	<property name="com.jaspersoft.studio.report.unit.description" value="List of teachers with their certification status for the chosen year and the record (teacher training or census) it is based on, for the chosen state, grouped by school"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/fedemis/Teachers/Teachers_Certification_by_School_and_Year"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/fedemis/Teachers/Teachers_Certification_by_School_and_Year_files/main_jrxml"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="List of teachers with their certification status for the chosen year and the record (teacher training or census) it is based on, grouped by state and school"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
@@ -44,9 +44,6 @@
 	</style>
 	<parameter name="Year" class="java.lang.Integer">
 		<defaultValueExpression><![CDATA[2024]]></defaultValueExpression>
-	</parameter>
-	<parameter name="District" class="java.lang.String">
-		<defaultValueExpression><![CDATA["CHK"]]></defaultValueExpression>
 	</parameter>
 	<queryString language="SQL">
 		<![CDATA[WITH QualDefs AS (
@@ -150,7 +147,6 @@ LEFT OUTER JOIN [dbo].[lkpTeacherRole] TR ON TL.SurveyRole = TR.codeCode
 LEFT OUTER JOIN lkpTeacherQual LQ ON TS.tchEdQual = LQ.codeCode
 LEFT OUTER JOIN CertSource CS ON CS.tID = TL.TID
 WHERE TL.SurveyYear = $P{Year}
-  AND D.dID = $P{District}
   AND TAMX IN ('T','M')
 ORDER BY District, SchoolName, Teacher;]]>
 	</queryString>

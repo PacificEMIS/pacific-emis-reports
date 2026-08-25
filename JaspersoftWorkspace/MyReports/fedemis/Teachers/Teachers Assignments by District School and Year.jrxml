@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.21.2.final using JasperReports Library version 6.21.2-8434a0bd7c3bbc37cbf916f2968d35e4b165821a  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Teachers_Assignments_By_District_School_And_Year" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="df013db5-f76e-44d3-b0df-bcbc46d93160">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Teachers_Assignments_By_District_School_And_Year" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="1524cf4d-da4d-4837-986e-8af6eaedf9a2">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="ireport.jasperserver.url" value="http://fedemis.doe.fm:8080/jasperserver/"/>
 	<property name="ireport.jasperserver.user" value="jasperadmin"/>
 	<property name="ireport.jasperserver.reportUnit" value="/reports/fedemis/Teachers/Teachers_Assignments_by_State_School_and_Year"/>
 	<property name="ireport.jasperserver.report.resource" value="/reports/fedemis/Teachers/Teachers_Assignments_by_State_School_and_Year_files/main_jrxml"/>
-	<property name="com.jaspersoft.studio.report.unit.description" value="Proportion of students at each level of achievement for chosen school and year (all exams)"/>
+	<property name="com.jaspersoft.studio.report.unit.description" value="List of teachers and their grade assignments as reported in the school census for the chosen year, for the chosen state, grouped by school"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
@@ -137,12 +137,15 @@
 	<parameter name="Year" class="java.lang.Integer">
 		<defaultValueExpression><![CDATA[2024]]></defaultValueExpression>
 	</parameter>
+	<parameter name="District" class="java.lang.String">
+		<defaultValueExpression><![CDATA["CHK"]]></defaultValueExpression>
+	</parameter>
 	<queryString language="SQL">
 		<![CDATA[WITH TeacherData AS (
     -- Your teacher query here
     SELECT 
         TL.[TID],
-        TI.tFullName AS Teacher,
+        TI.tSurname + ', ' + TI.tGiven AS Teacher, -- Surname, Given as in the web UI
         TL.[SurveyYear],
         common.SchoolYearStr(CAST(CONCAT(TL.[SurveyYear], '-01-01') AS DATETIME), null) AS SchoolYear,
         [GenderCode] AS G,
@@ -227,6 +230,7 @@
         GROUP BY [SurveyYear], [schNo]
     ) E ON TL.SchNo = E.schNo AND E.SurveyYear = $P{Year}
     WHERE TL.SurveyYear = $P{Year}
+      AND D.dID = $P{District}
       AND TAMX IN ('T','M')
 ),
 SchoolList AS (
@@ -306,8 +310,7 @@ ORDER BY
     District, 
     SchoolName, 
     CASE WHEN Teacher IS NULL THEN 1 ELSE 0 END,
-    Teacher;
-]]>
+    Teacher;]]>
 	</queryString>
 	<field name="TID" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="TID"/>
@@ -766,18 +769,18 @@ ORDER BY
 				<imageExpression><![CDATA["repo:/images/fsm_ndoe.png"]]></imageExpression>
 			</image>
 			<rectangle>
-				<reportElement mode="Opaque" x="-21" y="-20" width="793" height="10" forecolor="#08298C" backcolor="#08298C" uuid="a879b5ed-22f8-4e7b-9093-811aaea43211">
+				<reportElement style="Detail Header Dark" x="-21" y="-20" width="793" height="10" uuid="a879b5ed-22f8-4e7b-9093-811aaea43211">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 			</rectangle>
 			<rectangle>
-				<reportElement x="-21" y="-10" width="20" height="10" forecolor="#08298C" backcolor="#08298C" uuid="0a58d963-ec76-492f-9d28-8419cff95766">
+				<reportElement style="Detail Header Dark" x="-21" y="-10" width="20" height="10" uuid="0a58d963-ec76-492f-9d28-8419cff95766">
 					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 				</reportElement>
 			</rectangle>
 			<rectangle>
-				<reportElement x="752" y="-10" width="20" height="10" forecolor="#08298C" backcolor="#08298C" uuid="f0a00416-98e9-4650-b25b-a7e2a9f68561">
+				<reportElement style="Detail Header Dark" x="752" y="-10" width="20" height="10" uuid="f0a00416-98e9-4650-b25b-a7e2a9f68561">
 					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
